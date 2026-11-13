@@ -22,18 +22,35 @@
  * SOFTWARE.
  */
 
-#ifndef MDKFILE_H
-#define MDKFILE_H
+#ifndef MOBILEDEVELOPMENTKIT_MDKFILE_H
+#define MOBILEDEVELOPMENTKIT_MDKFILE_H
 
 #import <Foundation/Foundation.h>
 #import <MobileDevelopmentKit/MDKCFType.h>
-#import <CoreCompiler/CCFile.h>
 
-@interface MDKFile : MDKCFType <NSCopying,NSMutableCopying>
+typedef NS_ENUM(UInt8, MDKFileType) {
+    MDKFileTypeC = 0,
+    MDKFileTypeCHeader,
+    MDKFileTypeCXX,
+    MDKFileTypeCXXHeader,
+    MDKFileTypeObjC,
+    MDKFileTypeObjCHeader,
+    MDKFileTypeObjCXX,
+    MDKFileTypeObjCXXHeader,
+    MDKFileTypeSwift,
+    MDKFileTypeObject,
+    MDKFileTypeUnknown,
+};
+
+@interface MDKFile : MDKCFType <NSSecureCoding,NSCopying,NSMutableCopying>
 
 @property (nonatomic, readonly) NSURL *fileURL;
 @property (nonatomic, readonly) NSData *unsavedData;
-@property (nonatomic, readonly) CCFileType type;
+@property (nonatomic, readonly) MDKFileType type;
+
+@property (nonatomic, readonly) BOOL isSwift;
+@property (nonatomic, readonly) BOOL isClang;
+@property (nonatomic, readonly) BOOL isObject;
 
 + (instancetype)fileWithURL:(NSURL*)fileURL;
 + (instancetype)fileWithPath:(NSString*)filePath;
@@ -41,7 +58,7 @@
 
 @end
 
-@interface MDKMutableFile : MDKFile
+@interface MDKMutableFile : MDKFile <NSSecureCoding>
 
 @property (nonatomic, readwrite) NSURL *fileURL;
 @property (nonatomic, readwrite) NSData *unsavedData;
@@ -51,4 +68,4 @@
 
 @end
 
-#endif /* MDKFILE_H */
+#endif /* MOBILEDEVELOPMENTKIT_MDKFILE_H */

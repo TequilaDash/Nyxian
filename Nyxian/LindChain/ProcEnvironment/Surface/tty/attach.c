@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #include <LindChain/ProcEnvironment/Surface/tty/attach.h>
@@ -42,33 +43,42 @@ bool tty_proc_event_handler(kvobject_event_type_t type,
     }
 }
 
-kern_return_t tty_attach_proc(ksurface_proc_t *proc,
-                              ksurface_tty_t *tty)
+kern_return_t tty_hold_proc(ksurface_proc_t *proc,
+                            ksurface_tty_t *tty)
 {
-    /* retain process */
     if(!kvo_retain(proc))
     {
         return KERN_FAILURE;
     }
     
-    /*
-     * attach to process lifecycle
-     * and consume callers reference.
-     */
-    kern_return_t ksr = kvo_event_register(proc, 0, tty_proc_event_handler, tty, NULL);
-    if(ksr != KERN_SUCCESS)
+    kern_return_t kr = kvo_event_register(proc, 0, tty_proc_event_handler, tty, NULL);
+    kvo_release(proc);
+    return kr;
+}
+
+kern_return_t tty_attach_proc(ksurface_proc_t *proc,
+                              ksurface_tty_t *tty)
+{
+    kern_return_t kr = tty_hold_proc(proc, tty);
+    if(kr != KERN_SUCCESS)
     {
-        kvo_release(proc);
-        return KERN_FAILURE;
+        return kr;
     }
     
-    kvo_wrlock(proc);
-    proc->bsd.kp_proc.p_flag |= P_CONTROLT;
+    pid_t sid;
+    pid_t pgid;
     
-    /* TODO: implement pgrp support */
-    tty->pgrp = proc_getsid(proc);
+    kvo_wrlock(proc);
+    sid = proc_getsid(proc);
+    pgid = proc_getpgid(proc);
+    proc->bsd.kp_proc.p_flag |= P_CONTROLT;
+    proc->bsd.kp_eproc.e_tpgid = pgid;
     kvo_unlock(proc);
     
-    kvo_release(proc);
+    kvo_wrlock(tty);
+    tty->sid = sid;
+    tty->pgrp = pgid;
+    kvo_unlock(tty);
+    
     return KERN_SUCCESS;
 }

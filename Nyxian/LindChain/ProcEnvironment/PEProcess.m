@@ -1,34 +1,86 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
+#import <LindChain/ProcEnvironment/Surface/libkern/klog.h>
 #import <LindChain/ProcEnvironment/PEProcess.h>
 #import <LindChain/WindowServer/NXWindowServer.h>
-#import <LindChain/ProcEnvironment/Utils/klog.h>
 #import <LindChain/ProcEnvironment/PEExtension.h>
 #import <LindChain/ProcEnvironment/PEUserspaceManager.h>
 #import <LindChain/ProcEnvironment/PEMachPort.h>
 #import <LindChain/ProcEnvironment/Server/Server.h>
 #import <LindChain/ProcEnvironment/Surface/proc/proctil.h>
-#import <MobileDevelopmentKit/MDKThreadPool.h>
 #import <LindChain/IDEFoundation/NXBootstrap.h>
+#import <LindChain/ProcEnvironment/PEFileTable.h>
+#import <LindChain/ProcEnvironment/PEFileHandle.h>
+#import <LindChain/ProcEnvironment/Shims/posix_spawn.h>
+#import <LindChain/ProcEnvironment/Surface/proc/list.h>
+#import <LindChain/ProcEnvironment/Surface/tty/tty.h>
+#import <LindChain/Private/mach/fileport.h>
+#include <mach/mach.h>
+#include <unistd.h>
+
+static void PEAttachControllingTTYForSpawn(NSDictionary *items,
+                                           ksurface_proc_t *child)
+{
+    PEFileTable *fileTable = items[@"PEFileTable"];
+    if(fileTable == nil)
+    {
+        return;
+    }
+    
+    /* TODO: go through the entire file table */
+    PEFileHandle *stdinHandle = fileTable.fd_map[@(STDIN_FILENO)];
+    if(stdinHandle == nil)
+    {
+        return;
+    }
+    
+    int fd = [stdinHandle extractFileDescriptor];
+    if(fd < 0)
+    {
+        return;
+    }
+    
+    fileport_t port = MACH_PORT_NULL;
+    if(fileport_makeport(fd, &port) != 0)
+    {
+        close(fd);
+        return;
+    }
+    close(fd);
+    
+    ksurface_tty_t *tty = NULL;
+    kern_return_t kr = tty_for_port(port, &tty);
+    mach_port_deallocate(mach_task_self(), port);
+    if(kr != KERN_SUCCESS || tty == NULL)
+    {
+        return;
+    }
+    
+    if(tty_attach_proc(child, tty) != KERN_SUCCESS)
+    {
+        kvo_release(tty);
+    }
+}
 
 @implementation PEProcess {
     NSHashTable<id<PEProcessObserver>> *_observers;
@@ -70,11 +122,40 @@
         return nil;
     }
     
+    short spawnFlags = [items[@"PEPOSIXSpawnFlags"] shortValue];
+    pid_t spawnPgroup = (pid_t)[items[@"PEPOSIXSpawnPgroup"] intValue];
+    
+    if((spawnFlags & POSIX_SPAWN_SETSID) &&
+       (spawnFlags & POSIX_SPAWN_SETPGROUP))
+    {
+        proctil(kProctilActionUnlock);
+        return nil;
+    }
+    
+    if((spawnFlags & POSIX_SPAWN_SETPGROUP) && spawnPgroup < 0)
+    {
+        proctil(kProctilActionUnlock);
+        return nil;
+    }
+    
+    if((spawnFlags & POSIX_SPAWN_SETPGROUP) && spawnPgroup > 0)
+    {
+        kvo_rdlock(proc);
+        pid_t parentSid = proc_getsid(proc);
+        kvo_unlock(proc);
+        
+        if(!proc_pgrp_exists_in_session(spawnPgroup, parentSid))
+        {
+            proctil(kProctilActionUnlock);
+            return nil;
+        }
+    }
+    
     kvo_rdlock(proc);
     ksurface_trust_identity_t *identity = trust_identity_create_from_path_with_parent_identity([self.executablePath UTF8String], proc->nyx.identity);
-    kvo_unlock(proc);
     if(identity == NULL)
     {
+        kvo_unlock(proc);
         proctil(kProctilActionUnlock);
         return nil;
     }
@@ -87,6 +168,7 @@
         [mutableItems setObject:(__bridge NSArray*)sb_identity->filePermissions forKey:@"PEFilePermissions"];
         items = mutableItems;
     }
+    kvo_unlock(proc);
     
     /* assigning potential bundle information */
     self.applicationObject = nil;
@@ -98,13 +180,12 @@
     self.displayName = self.applicationObject ? self.applicationObject.localizedName : [self.executablePath lastPathComponent];
     
     /* spawning process */
-    self.process = PESpawnFBProcess(items);
+    self.process = PESpawnFBProcess(items, &(self->_pid), &(self->_pidv));
     if(self.process == nil)
     {
         proctil(kProctilActionUnlock);
         return nil;
     }
-    _pid = self.process.pid;
     
     [self.process addObserver:self];
     if(!self.process.running)
@@ -113,14 +194,12 @@
          * prevents a race condition, when we add a observer
          * and it already died then we shall handle the exit.
          */
-        FBProcessManager *manager = [PrivClass(FBProcessManager) sharedInstance];
-        [manager _removeProcess:self.process];
         proctil(kProctilActionUnlock);
         return nil;
     }
     
     ksurface_proc_t *child = NULL;
-    kern_return_t kr = proc_spawn(proc ?: kernel_proc_, &child, self.pid, identity);
+    kern_return_t kr = proc_spawn(proc ?: kernel_proc_, &child, self.pid, self.pidv, identity);
     if(kr != KERN_SUCCESS)
     {
         [self terminate];
@@ -129,6 +208,25 @@
     }
     else
     {
+        if(spawnFlags & POSIX_SPAWN_SETSID)
+        {
+            kvo_wrlock(child);
+            proc_setsid(child, self.pid);
+            proc_setpgid(child, self.pid);
+            child->bsd.kp_proc.p_flag &= ~P_CONTROLT;
+            child->bsd.kp_eproc.e_tdev = -1;
+            child->bsd.kp_eproc.e_tpgid = -1;
+            kvo_unlock(child);
+            PEAttachControllingTTYForSpawn(items, child);
+        }
+        else if(spawnFlags & POSIX_SPAWN_SETPGROUP)
+        {
+            pid_t desiredPgroup = spawnPgroup == 0 ? self.pid : spawnPgroup;
+            kvo_wrlock(child);
+            proc_setpgid(child, desiredPgroup);
+            kvo_unlock(child);
+        }
+        
         self.proc = child;
     }
     

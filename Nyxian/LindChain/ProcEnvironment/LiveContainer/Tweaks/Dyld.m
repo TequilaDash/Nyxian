@@ -32,11 +32,37 @@
 #import <LindChain/ProcEnvironment/Shims/environment.h>
 #import <LindChain/ProcEnvironment/Surface/trust/cdhash.h>
 #import <LindChain/ProcEnvironment/LiveContainer/Tweaks/Tweaks.h>
+#import <LindChain/ProcEnvironment/LiveContainer/Tweaks/DyldHook.h>
 #import <LindChain/Utils/CFTools.h>
-#import <LiveShim/LiveShimSyscall.h>
-#import <LiveShim/dyld.h>
+#import <LiveProcessLegacy/LPLSyscall.h>
+#import <LiveProcessLegacy/LPLLSPatchcache.h>
+#import <LiveProcessLegacy/LPLLSDyld.h>
 #import <ksurface_config.h>
 #import <ksurface_abi.h>
+#import <Broadpatch/Broadpatch.h>
+#include <Frameworks/libpatchfind/libpatchfind.h>
+
+static const char *gHostImageNeedles[] = {
+    "/Nyxian.app/PlugIns/LiveProcess.appex/LiveProcess",
+    "/Nyxian.app/PlugIns/LiveProcess.appex/Frameworks/LiveShim.framework/LiveShim",
+    "/mntfs/bootfs/rtpatch"
+};
+
+static bool isHostImagePath(const char *path)
+{
+    if(!path)
+    {
+        return false;
+    }
+    for(size_t i = 0; i < sizeof(gHostImageNeedles)/sizeof(*gHostImageNeedles); i++)
+    {
+        if(strstr(path, gHostImageNeedles[i]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 typedef struct {
     uint32_t platform;
@@ -50,20 +76,54 @@ uint32_t guestAppSdkVersionSet = 0;
 
 void* appExecutableHandle = 0;
 void overwriteAppExecutableFileType(void);
+static inline bool isHiddenReal(uint32_t r);
 
-static inline int translateImageIndex(int origin)
+DEFINE_HOOK(_dyld_image_count, uint32_t, (void)) {
+    if(appMainImageIndex == 0)
+    {
+        return ORIG_FUNC(_dyld_image_count)();
+    }
+    uint32_t real = ORIG_FUNC(_dyld_image_count)(), hidden = 0;
+    for(uint32_t r = 0; r < real; r++)
+    {
+        if(isHiddenReal(r))
+        {
+            hidden++;
+        }
+    }
+    return real - hidden;
+}
+
+static uint32_t translateImageIndex(uint32_t guestIndex)
 {
-    if(origin == lcImageIndex)
+    if(appMainImageIndex == 0)
+    {
+        return guestIndex;
+    }
+    if(guestIndex == 0)
     {
         overwriteAppExecutableFileType();
         return appMainImageIndex;
     }
-    return origin;
-}
-
-DEFINE_HOOK(_dyld_image_count, uint32_t, (void))
-{
-    return ORIG_FUNC(_dyld_image_count)() - 1;
+    
+    uint32_t real = ORIG_FUNC(_dyld_image_count)();
+    uint32_t seen = 0;
+    for(uint32_t r = 0; r < real; r++)
+    {
+        if(r == appMainImageIndex)
+        {
+            continue;
+        }
+        if(isHiddenReal(r))
+        {
+            continue;
+        }
+        if(++seen == guestIndex)
+        {
+            return r;
+        }
+    }
+    return real ? real - 1 : 0;
 }
 
 DEFINE_HOOK(_dyld_get_image_header, const struct mach_header*, (uint32_t image_index))
@@ -114,8 +174,18 @@ DEFINE_HOOK(_dyld_get_image_name, const char*, (uint32_t image_index))
     __attribute__((musttail)) return ORIG_FUNC(_dyld_get_image_name)(translateImageIndex(image_index));
 }
 
-DEFINE_HOOK(dlopen, void *, (const char * __path,
-                             int __mode))
+static inline bool isHiddenReal(uint32_t r)
+{
+    if(r == appMainImageIndex)
+    {
+        return false;
+    }
+    return isHostImagePath(ORIG_FUNC(_dyld_get_image_name)(r));
+}
+
+LIBKERN_PATCH(void *, dlopen_hook, (void* dyldApiInstancePtr,
+                                    const char *__path,
+                                    int __mode),
 {
     /* check CS */
     LCMachO *machO = LCMapMachO(__path, true);
@@ -140,8 +210,8 @@ DEFINE_HOOK(dlopen, void *, (const char * __path,
     
 just_try:
     /* continue with opening */
-    return ORIG_FUNC(dlopen)(__path, __mode);
-}
+    return LIBKERN_ORIG(dlopen_hook)(dyldApiInstancePtr, __path, __mode);
+});
 
 bool hook_dyld_program_sdk_at_least(void* dyldApiInstancePtr,
                                     dyld_build_version_t version)
@@ -161,98 +231,6 @@ bool hook_dyld_program_sdk_at_least(void* dyldApiInstancePtr,
 uint32_t hook_dyld_get_program_sdk_version(void* dyldApiInstancePtr)
 {
     return guestAppSdkVersion;
-}
-
-bool performHookDyldApi(const char* functionName, uint32_t adrpOffset, void** origFunction, void* hookFunction)
-{
-    
-    uint32_t* baseAddr = dlsym(RTLD_DEFAULT, functionName);
-    assert(baseAddr != 0);
-    uint32_t* adrpInstPtr = baseAddr + adrpOffset;
-
-    // find the following instruction pattern: 1 adrp + 2 ldr
-    // adrp    x8, 0x1e6cf0000
-    // ldr     x0, [x8, #0x30]  {dyld4::gAPIs}
-    // ldr     x16, [x0]
-    
-    static long adrpExtraOffset = -1;
-    if(adrpExtraOffset == -1)
-    {
-        // let't hope the function is not longer than 200 instructions
-        uint32_t* end = baseAddr + 200;
-        for(uint32_t* cur = adrpInstPtr;cur < end;++cur)
-        {
-            if((*cur & 0x9f000000) != 0x90000000)
-            {
-                continue;
-            }
-            if((*(cur+1) & 0xFFC00000) != 0xF9400000)
-            {
-                continue;
-            }
-            if((*(cur+2) & 0xFFC00000) != 0xF9400000)
-            {
-                continue;
-            }
-            adrpExtraOffset = cur - adrpInstPtr;
-            break;
-        }
-        assert(adrpExtraOffset != -1);
-    }
-    
-    adrpInstPtr += adrpExtraOffset;
-
-    void* gdyldPtr = (void*)aarch64_emulate_adrp_ldr(*adrpInstPtr, *(adrpInstPtr + 1), (uint64_t)adrpInstPtr);
-    
-    assert(gdyldPtr != 0);
-    assert(*(void**)gdyldPtr != 0);
-    void* vtablePtr = **(void***)gdyldPtr;
-    
-    void* vtableFunctionPtr = 0;
-    uint32_t* movInstPtr = adrpInstPtr + 6;
-
-    if((*movInstPtr & 0x7F800000) == 0x52800000)
-    {
-        // arm64e, mov imm + add + ldr
-        uint32_t imm16 = (*movInstPtr & 0x1FFFE0) >> 5;
-        vtableFunctionPtr = vtablePtr + imm16;
-    }
-    else if ((*movInstPtr & 0xFFE00C00) == 0xF8400C00)
-    {
-        // arm64e, ldr immediate Pre-index 64bit
-        uint32_t imm9 = (*movInstPtr & 0x1FF000) >> 12;
-        vtableFunctionPtr = vtablePtr + imm9;
-    }
-    else
-    {
-        // arm64
-        uint32_t* ldrInstPtr2 = adrpInstPtr + 3;
-        assert((*ldrInstPtr2 & 0xBFC00000) == 0xB9400000);
-        uint32_t size2 = (*ldrInstPtr2 & 0xC0000000) >> 30;
-        uint32_t imm12_2 = (*ldrInstPtr2 & 0x3FFC00) >> 10;
-        vtableFunctionPtr = vtablePtr + (imm12_2 << size2);
-    }
-    
-    kern_return_t ret = builtin_vm_protect(mach_task_self(), (mach_vm_address_t)vtableFunctionPtr, sizeof(uintptr_t), false, PROT_READ | PROT_WRITE | VM_PROT_COPY);
-    if(ret != KERN_SUCCESS)
-    {
-        assert(os_tpro_is_supported());
-        os_thread_self_restrict_tpro_to_rw();
-    }
-    
-    if(origFunction != NULL)
-    {
-        *origFunction = (void*)*(void**)vtableFunctionPtr;
-    }
-    
-    *(uint64_t*)vtableFunctionPtr = (uint64_t)hookFunction;
-    builtin_vm_protect(mach_task_self(), (mach_vm_address_t)vtableFunctionPtr, sizeof(uintptr_t), false, PROT_READ);
-    if(ret != KERN_SUCCESS)
-    {
-        assert(os_tpro_is_supported());
-        os_thread_self_restrict_tpro_to_ro();
-    }
-    return true;
 }
 
 void overwriteAppExecutableFileType(void)
@@ -313,11 +291,6 @@ static dyld_build_version_t getDyldImageBuildVersion(const struct mach_header *m
     }
 
     return result;
-}
-
-void* getGuestAppHeader(void)
-{
-    return (void*)ORIG_FUNC(_dyld_get_image_header)(appMainImageIndex);
 }
 
 bool initGuestSDKVersionInfo(void)
@@ -382,108 +355,35 @@ bool initGuestSDKVersionInfo(void)
     return true;
 }
 
-void DyldHooksInit(void)
+LIBKERN_DEFINE_PATCHABLE(void, DyldHooksInit, (void))
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        PEEntitlement ownEntitlements = liveshim_syscall(SYS_pectl, kPECTLCategoryCodeSigning, kPECTLCodeSigningGetEntitlements, NULL, NULL, MACH_PORT_NULL);
-        if(entitlement_got_entitlement(ownEntitlements, kPEEntitlementDyldHideLiveProcess))
+        int imageCount = _dyld_image_count();
+        for(int i = 0; i < imageCount; ++i)
         {
-            int imageCount = _dyld_image_count();
-            for(int i = 0; i < imageCount; ++i)
+            const struct mach_header* currentImageHeader = _dyld_get_image_header(i);
+            if(currentImageHeader->filetype == MH_EXECUTE)
             {
-                const struct mach_header* currentImageHeader = _dyld_get_image_header(i);
-                if(currentImageHeader->filetype == MH_EXECUTE)
-                {
-                    lcImageIndex = i;
-                    break;
-                }
+                lcImageIndex = i;
+                break;
             }
-            
-            DO_HOOK_GLOBAL(dlsym);
-            DO_HOOK_GLOBAL(_dyld_image_count);
-            DO_HOOK_GLOBAL(_dyld_get_image_header);
-            DO_HOOK_GLOBAL(_dyld_get_image_vmaddr_slide);
-            DO_HOOK_GLOBAL(_dyld_get_image_name);
-            DO_HOOK_GLOBAL(dlopen);
         }
         
-        guestAppSdkVersion = getDyldImageBuildVersion(getGuestAppHeader()).version;
+        DO_HOOK_GLOBAL(dlsym);
+        DO_HOOK_GLOBAL(_dyld_image_count);
+        DO_HOOK_GLOBAL(_dyld_get_image_header);
+        DO_HOOK_GLOBAL(_dyld_get_image_vmaddr_slide);
+        DO_HOOK_GLOBAL(_dyld_get_image_name);
+        LIBKERN_INSTALL_PATCH(dlopen_hook);
+        
+        guestAppSdkVersion = getDyldImageBuildVersion((void*)ORIG_FUNC(_dyld_get_image_header)(appMainImageIndex)).version;
         if(!initGuestSDKVersionInfo() ||
-           !performHookDyldApi("dyld_program_sdk_at_least", 1, NULL, hook_dyld_program_sdk_at_least) ||
-           !performHookDyldApi("dyld_get_program_sdk_version", 0, NULL, hook_dyld_get_program_sdk_version))
+           !performHookDyldApiFast(kDyldProgramSDKAtLeastVTFN, NULL, hook_dyld_program_sdk_at_least) ||
+           !performHookDyldApiFast(kDyldGetProgramSDKVersionVTFN, NULL, hook_dyld_get_program_sdk_version))
         {
             exit(0);
         }
         return;
     });
-}
-
-#pragma mark - Fix black screen
-
-void dyld_verifier_failed_callback(int fd,
-                                   bool *deny_open)
-{
-    /* rolling back */
-    if(liveshim_syscall(SYS_pectl, kPECTLCategoryCodeSigning, kPECTLCodeSigningDropAllEntitlements, NULL, NULL, MACH_PORT_NULL) != 0 ||
-       liveshim_syscall(SYS_setgid, 501) != 0 ||
-       liveshim_syscall(SYS_setuid, 501) != 0)
-    {
-        /* didn't succeed in rolling back primitives, trying to make dlopen fail */
-        *deny_open = true;
-    }
-}
-
-static void *lockPtrToIgnore;
-void hook_libdyld_os_unfair_recursive_lock_lock_with_options(void *ptr, void* lock, uint32_t options)
-{
-    if(!lockPtrToIgnore)
-        lockPtrToIgnore = lock;
-    if(lock != lockPtrToIgnore)
-        os_unfair_recursive_lock_lock_with_options(lock, options);
-}
-void hook_libdyld_os_unfair_recursive_lock_unlock(void *ptr, void* lock)
-{
-    if(lock != lockPtrToIgnore)
-        os_unfair_recursive_lock_unlock(lock);
-}
-
-void *dlopenBypassingLockWithTrust(const char *path,
-                                   int mode,
-                                   const char *expectedCdhash)
-{
-    /* this shit made by Duy Tran costs 20~30 ms, making this faster would save those */
-    const char *libdyldPath = "/usr/lib/system/libdyld.dylib";
-    mach_header_u *libdyldHeader = LCGetLoadedImageHeader(0, libdyldPath);
-    assert(libdyldHeader != NULL);
-    void **lockUnlockPtr = NULL;
-    void **vtableLibSystemHelpers = litehook_find_dsc_symbol(libdyldPath, "__ZTVN5dyld416LibSystemHelpersE");
-    void *lockFunc = litehook_find_dsc_symbol(libdyldPath, "__ZNK5dyld416LibSystemHelpers42os_unfair_recursive_lock_lock_with_optionsEP26os_unfair_recursive_lock_s24os_unfair_lock_options_t");
-    #if DEBUG
-    void *unlockFunc = litehook_find_dsc_symbol(libdyldPath, "__ZNK5dyld416LibSystemHelpers31os_unfair_recursive_lock_unlockEP26os_unfair_recursive_lock_s");
-    #endif /* DEBUG */
-    while(!lockUnlockPtr)
-    {
-        if(vtableLibSystemHelpers[0] == lockFunc)
-        {
-            lockUnlockPtr = vtableLibSystemHelpers;
-            NSCAssert(vtableLibSystemHelpers[1] == unlockFunc, @"dyld has changed: lock and unlock functions are not next to each other");
-            break;
-        }
-        vtableLibSystemHelpers++;
-    }
-    kern_return_t ret;
-    ret = builtin_vm_protect(mach_task_self(), (mach_vm_address_t)lockUnlockPtr, sizeof(uintptr_t[2]), false, PROT_READ | PROT_WRITE | VM_PROT_COPY);
-    assert(ret == KERN_SUCCESS);
-    void *origLockPtr = lockUnlockPtr[0], *origUnlockPtr = lockUnlockPtr[1];
-    lockUnlockPtr[0] = hook_libdyld_os_unfair_recursive_lock_lock_with_options;
-    lockUnlockPtr[1] = hook_libdyld_os_unfair_recursive_lock_unlock;
-    void *result = expectedCdhash == NULL ? dlopen(path, mode) : dlopen_cdhash_verified(path, mode, expectedCdhash, dyld_verifier_failed_callback);
-    ret = builtin_vm_protect(mach_task_self(), (mach_vm_address_t)lockUnlockPtr, sizeof(uintptr_t[2]), false, PROT_READ | PROT_WRITE);
-    assert(ret == KERN_SUCCESS);
-    lockUnlockPtr[0] = origLockPtr;
-    lockUnlockPtr[1] = origUnlockPtr;
-    ret = builtin_vm_protect(mach_task_self(), (mach_vm_address_t)lockUnlockPtr, sizeof(uintptr_t[2]), false, PROT_READ);
-    assert(ret == KERN_SUCCESS);
-    return result;
 }

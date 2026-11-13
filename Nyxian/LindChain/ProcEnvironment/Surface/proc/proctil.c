@@ -1,27 +1,28 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
+#include <LindChain/ProcEnvironment/Surface/libkern/kpanic.h>
 #include <LindChain/ProcEnvironment/Surface/proc/proctil.h>
 #include <LindChain/ProcEnvironment/Surface/surface.h>
-#include <LindChain/ProcEnvironment/Shims/panic.h>
 #include <stdatomic.h>
 #include <os/lock.h>
 
@@ -52,7 +53,7 @@ kern_return_t proctil(ProctilAction action)
             {
                 if(cur == 0)
                 {
-                    environment_panic("process count did underflow");
+                    kpanic("process count did underflow");
                 }
             }
             while(!atomic_compare_exchange_weak_explicit(&counter, &cur, cur - 1, memory_order_release, memory_order_relaxed));

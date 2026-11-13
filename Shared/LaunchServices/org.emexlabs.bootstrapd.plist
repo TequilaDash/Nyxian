@@ -6,13 +6,9 @@
 	<string>org.emexlabs.bootstrapd</string>
 	<key>PEShouldAutorestart</key>
 	<true/>
+	<key>PEEnabled</key>
+	<true/>
 	<key>PEExecutablePath</key>
-	<string>/usr/libexec/bootstrapd</string>
-	<key>PEUserIdentifier</key>
-	<integer>0</integer>
-	<key>PEGroupIdentifier</key>
-	<integer>0</integer>
-	<key>PEIntegratedServiceClass</key>
-	<string>LDEApplicationWorkspaceProxy</string>
+	<string>$(NXROOT)/boot/libexec/bootstrapd</string>
 </dict>
 </plist>

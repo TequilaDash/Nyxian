@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <Foundation/Foundation.h>
@@ -27,13 +28,12 @@
 #import <LindChain/ProcEnvironment/litehook/litehook.h>
 #import <LindChain/ProcEnvironment/LiveContainer/LCUtils.h>
 #import <LindChain/ProcEnvironment/LiveContainer/ZSign/zsigner.h>
-#import <LindChain/ProcEnvironment/LiveContainer/Tweaks/libproc.h>
-#import <LiveShim/LiveShimSyscall.h>
+#import <LiveProcessLegacy/LPLSyscall.h>
+#import <Broadpatch/Broadpatch.h>
 #import <fcntl.h>
 #import <ksurface_config.h>
 #include <ksurface_abi.h>
-
-#if KSURFACE_SYS_PROC_ENABLED
+#include <sys/stat.h>
 
 #pragma mark - posix_spawn helper
 
@@ -131,13 +131,40 @@ NSDictionary<NSString*,NSString*> *NSDictionaryFromCDictionary(char *const envp[
 
 #pragma mark - posix_spawn implementation
 
-int environment_posix_spawn(pid_t *process_identifier,
-                            const char *path,
-                            const posix_spawn_file_actions_t *fa,
-                            const posix_spawnattr_t *spawn_attr,
-                            char *const argv[],
-                            char *const envp[])
-{    
+LIBKERN_PATCH(int, posix_spawn, (pid_t *process_identifier,
+                                 const char *path,
+                                 const posix_spawn_file_actions_t *fa,
+                                 const posix_spawnattr_t *spawn_attr,
+                                 char *const argv[],
+                                 char *const envp[]),
+{
+    short spawnFlags = 0;
+    pid_t spawnPgroup = 0;
+    
+    if(spawn_attr != NULL)
+    {
+        int attrRet = posix_spawnattr_getflags(spawn_attr, &spawnFlags);
+        if(attrRet != 0)
+        {
+            return attrRet;
+        }
+        
+        if((spawnFlags & POSIX_SPAWN_SETSID) &&
+           (spawnFlags & POSIX_SPAWN_SETPGROUP))
+        {
+            return EINVAL;
+        }
+        
+        if(spawnFlags & POSIX_SPAWN_SETPGROUP)
+        {
+            attrRet = posix_spawnattr_getpgroup(spawn_attr, &spawnPgroup);
+            if(attrRet != 0)
+            {
+                return attrRet;
+            }
+        }
+    }
+    
     /*
      * resolving realpath of the executable, to prevent
      * weird file bugs to happen, this is standard
@@ -207,6 +234,27 @@ int environment_posix_spawn(pid_t *process_identifier,
      */
     PEFileTable *fileTable = [PEFileTable currentTable];
     
+    NSMutableIndexSet *closeOnExec = [NSMutableIndexSet indexSet];
+    bool cloexecDefault = false;
+#ifdef POSIX_SPAWN_CLOEXEC_DEFAULT
+    cloexecDefault = (spawnFlags & POSIX_SPAWN_CLOEXEC_DEFAULT) != 0;
+#endif
+    for(NSNumber *key in fileTable.fd_map.allKeys)
+    {
+        int fd = key.intValue;
+        if(fd < 0)
+        {
+            continue;
+        }
+        
+        int fdFlags = fcntl(fd, F_GETFD);
+        if(cloexecDefault ||
+           (fdFlags >= 0 && (fdFlags & FD_CLOEXEC)))
+        {
+            [closeOnExec addIndex:(NSUInteger)fd];
+        }
+    }
+    
     /*
      * nullified cwd buffer, because of the case where a posix
      * file actions sets the buffer via PSFA_CHDIR, if not we
@@ -234,18 +282,46 @@ int environment_posix_spawn(pid_t *process_identifier,
         {
             case PSFA_OPEN:
                 [fileTable openWithFileDescriptor:action->psfaa_filedes withPath:action->psfaa_openargs.psfao_path withFlags:action->psfaa_openargs.psfao_oflag withMode:action->psfaa_openargs.psfao_mode];
+                if(action->psfaa_filedes >= 0)
+                {
+                    if(action->psfaa_openargs.psfao_oflag & O_CLOEXEC)
+                    {
+                        [closeOnExec addIndex:(NSUInteger)action->psfaa_filedes];
+                    }
+                    else
+                    {
+                        [closeOnExec removeIndex:(NSUInteger)action->psfaa_filedes];
+                    }
+                }
                 break;
             case PSFA_CLOSE:
                 [fileTable closeWithFileDescriptor:action->psfaa_filedes];
+                if(action->psfaa_filedes >= 0)
+                {
+                    [closeOnExec removeIndex:(NSUInteger)action->psfaa_filedes];
+                }
                 break;
             case PSFA_DUP2:
                 [fileTable dup2WithOldFileDescriptor:action->psfaa_filedes withNewFileDescriptor:action->psfaa_dup2args.psfad_newfiledes];
+                /* dup2 (also onto itself) clears close-on-exec of the target */
+                if(action->psfaa_dup2args.psfad_newfiledes >= 0)
+                {
+                    [closeOnExec removeIndex:(NSUInteger)action->psfaa_dup2args.psfad_newfiledes];
+                }
                 break;
             case PSFA_INHERIT:
                 [fileTable appendFileDescriptor:action->psfaa_filedes];
+                if(action->psfaa_filedes >= 0)
+                {
+                    [closeOnExec removeIndex:(NSUInteger)action->psfaa_filedes];
+                }
                 break;
             case PSFA_FILEPORT_DUP2:
                 [fileTable appendFilePort:action->psfaa_fileport withMappingToLoc:action->psfaa_dup2args.psfad_newfiledes];
+                if(action->psfaa_dup2args.psfad_newfiledes >= 0)
+                {
+                    [closeOnExec removeIndex:(NSUInteger)action->psfaa_dup2args.psfad_newfiledes];
+                }
                 break;
             case PSFA_CHDIR:
                 /* not available on iOS but shrug, add it anyways */
@@ -268,6 +344,10 @@ int environment_posix_spawn(pid_t *process_identifier,
     
 skip_fileactions:
     
+    [closeOnExec enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+        [fileTable closeWithFileDescriptor:(int)idx];
+    }];
+    
     if(cwd[0] == '\0')
     {
         getcwd(cwd, PATH_MAX);
@@ -285,7 +365,7 @@ skip_fileactions:
      * trying to spawn process via old ass ServerSession API, which
      * then triggers the subsystem LDEProcess on the host side.
      */
-    int64_t pid = environment_proxy_spawn_process_at_path([NSString stringWithCString:resolved encoding:NSUTF8StringEncoding], NSArrayFromCArray(argv), NSDictionaryFromCDictionary(envp), fileTable, nsCwd);
+    int64_t pid = environment_proxy_spawn_process_at_path([NSString stringWithCString:resolved encoding:NSUTF8StringEncoding], NSArrayFromCArray(argv), NSDictionaryFromCDictionary(envp), fileTable, nsCwd, spawnFlags, spawnPgroup);
     if(pid < 0)
     {
         /* lacking entitlements? */
@@ -303,19 +383,19 @@ skip_fileactions:
     
     free(resolved);
     return 0;
-}
+});
 
 /*
  * https://github.com/Apple-FOSS-Mirror/Libc/blob/2ca2ae74647714acfc18674c3114b1a5d3325d7d/sys/posix_spawn.c#L1358
  *
  * skidded from apple them selves..
  */
-int environment_posix_spawnp(pid_t * __restrict pid,
-                             const char * __restrict file,
-                             const posix_spawn_file_actions_t *file_actions,
-                             const posix_spawnattr_t * __restrict attrp,
-                             char *const argv[ __restrict],
-                             char *const envp[ __restrict])
+LIBKERN_PATCH(int, posix_spawnp, (pid_t * __restrict pid,
+                                  const char * __restrict file,
+                                  const posix_spawn_file_actions_t *file_actions,
+                                  const posix_spawnattr_t * __restrict attrp,
+                                  char *const argv[ __restrict],
+                                  char *const envp[ __restrict]),
 {
     const char *env_path;
     char *bp;
@@ -390,7 +470,7 @@ int environment_posix_spawnp(pid_t * __restrict pid,
         path_buf[lp + ln + 1] = '\0';
         
     retry:
-        err = environment_posix_spawn(pid, bp, file_actions, attrp, argv, envp);
+        err = posix_spawn(pid, bp, file_actions, attrp, argv, envp);
         switch(err)
         {
             case E2BIG:
@@ -431,14 +511,12 @@ int environment_posix_spawnp(pid_t * __restrict pid,
     
 done:
     return err;
-}
+});
 
 #pragma mark - Initilizer
 
 void environment_posix_spawn_init(void)
 {
-    litehook_rebind_symbol(LITEHOOK_REBIND_GLOBAL, posix_spawn, environment_posix_spawn, nil);
-    litehook_rebind_symbol(LITEHOOK_REBIND_GLOBAL, posix_spawnp, environment_posix_spawnp, nil);
+    LIBKERN_INSTALL_PATCH(posix_spawn);
+    LIBKERN_INSTALL_PATCH(posix_spawnp);
 }
-
-#endif /* KSURFACE_SYS_PROC_ENABLED */

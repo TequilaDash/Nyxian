@@ -1,27 +1,29 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <LindChain/WindowServer/Window/NXWindow.h>
 #import <LindChain/WindowServer/Window/NXResizeHandle.h>
 #import <LindChain/WindowServer/Window/NXWindowBar.h>
+#import <LindChain/WindowServer/NXWindowServer.h>
 #import <LindChain/Private/UIKitPrivate.h>
 
 @implementation NXWindow {
@@ -57,7 +59,7 @@
     _session.isFullscreen = NO;
     _delegate = delegate;
     
-    self.view = [[UIStackView alloc] initWithFrame:[_session startWindowRect]];
+    self.view = [[UIStackView alloc] initWithFrame:[_delegate window:self wantsToChangeToRect:[_session startWindowRect]]];
     self.view.backgroundColor = UIColor.clearColor;
     self.view.autoresizingMask = UIViewAutoresizingNone;
     
@@ -97,6 +99,11 @@
         [weakSelf maximizeWindow:YES];
     }];
     self.session.window = self;
+    
+    if(NXWindowServer.shared.presentationState != NXWindowServerPresentationStateDefault)
+    {
+        [_windowBar changeFocus:NO];
+    }
     
     [_contentStack addArrangedSubview:_windowBar];
     
@@ -367,6 +374,7 @@
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateFailed:
             [self updateOriginalFrame];
+            [self.session windowDidMove];
         default:
             break;
     }
@@ -404,7 +412,7 @@ static inline CGSize EVSizeForAspect(CGSize base,
         case UIGestureRecognizerStateBegan:
             [self focusWindow];
             [gesture setTranslation:CGPointZero inView:self.view.superview];
-            [self.session beginInteractiveResize];
+            [self.session windowBeganResizing];
             [_windowBar collapseIsland];
             if(self.ratioLocked)
             {
@@ -480,7 +488,7 @@ static inline CGSize EVSizeForAspect(CGSize base,
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateFailed:
             [self updateOriginalFrame];
-            [self.session commitInteractiveResize];
+            [self.session windowEndedResizing];
             break;
         default:
             break;

@@ -4,17 +4,6 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.kdt.livecontainer.extensionurlscheme</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>liveprocess</string>
-			</array>
-		</dict>
-	</array>
 	<key>GCSupportedGameControllers</key>
 	<array>
 		<dict>
@@ -75,5 +64,16 @@
 		<key>_ProcessType</key>
 		<string>App</string>
 	</dict>
+	<key>NXLiveProcessBootstrapVersion</key>
+	<integer>1</integer>
+	<key>NXLiveProcessBrokerVersion</key>
+	<integer>1</integer>
+	<key>NXLiveProcessABI</key>
+	<integer>1</integer>
+	<key>NXLiveProcessExecutionPaths</key>
+	<array>
+		<string>legacy</string>
+		<string>libsystem-v1</string>
+	</array>
 </dict>
 </plist>

@@ -1,43 +1,54 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <Foundation/Foundation.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/kpanic.h>
 #import <LindChain/ProcEnvironment/Surface/trust/presets.h>
 
 CFDictionaryRef kPEEntitlementsNXT2PresetsKernel;
 CFDictionaryRef kPEEntitlementsNXT2PresetsDaemonBootstrap;
+CFDictionaryRef kPEEntitlementsNXT2PresetsDaemonCompiler;
 
 __attribute__((constructor))
-void TrustPresetsInit(void)
+static void TrustPresetsInit(void)
 {
-    kPEEntitlementsNXT2PresetsKernel = (__bridge CFDictionaryRef)@{
+    kPEEntitlementsNXT2PresetsKernel = (__bridge_retained CFDictionaryRef)@{
         /* platformization */
-        (__bridge NSString*)kNXT2EntitlementPlatform: @(YES),
+        (__bridge NSString*)kNXT2EntitlementPlatform: @(YES),   /* needed so trust layer allows creation of other platform identities */
+        
+        /* debugging */
+        (__bridge NSString*)kNXT2EntitlementGetTaskAllow: @(NO),
     };
     
-    kPEEntitlementsNXT2PresetsDaemonBootstrap = (__bridge CFDictionaryRef)@{
+    kPEEntitlementsNXT2PresetsDaemonBootstrap = (__bridge_retained CFDictionaryRef)@{
         /* platformization */
         (__bridge NSString*)kNXT2EntitlementPlatform: @(YES),
-        (__bridge NSString*)kNXT2EntitlementPlatformUser: @(0), /* make sure once set they cannot go back up */
-        (__bridge NSString*)kNXT2EntitlementPlatformGroup: @(0),
+        (__bridge NSString*)kNXT2EntitlementPlatformRoot: @(YES),
+        
+        /* debugging */
+        (__bridge NSString*)kNXT2EntitlementGetTaskAllow: @(NO),
+        
+        /* management */
+        (__bridge NSString*)kNXT2EntitlementManagementProcEnvironment: @(YES),  /* needed to open apps for other processes that issue a request */
         
         /* launch services */
         (__bridge NSString*)kNXT2EntitlementLaunchServicesSetEndpointAllowList: @[
@@ -46,9 +57,25 @@ void TrustPresetsInit(void)
         
         /* sandbox */
         (__bridge NSString*)kNXT2EntitlementSandboxFileReadWrite: @[
-            @"$(ROOTFS)"
+            @"$(NXROOT)/usr/bin",               /* needs access to fastpath binaries */
+            @"$(NXROOT)/var/containers",        /* needs access to application bundles */
+            @"$(NXROOT)/var/mobile/Containers", /* needs access to application data containers */
+            @"$(NXROOT)/var/mobile/tmp",        /* needs access to tmp of root home */
         ],
-        (__bridge NSString*)kNXT2EntitlementSandboxFileRead: @[],
-        (__bridge NSString*)kNXT2EntitlementSandboxNoContainer: @(YES),
+    };
+    
+    kPEEntitlementsNXT2PresetsDaemonCompiler = (__bridge_retained CFDictionaryRef)@{
+        /* platformization */
+        (__bridge NSString*)kNXT2EntitlementPlatform: @(YES),
+        (__bridge NSString*)kNXT2EntitlementPlatformRoot: @(YES),
+        
+        /* debugging */
+        (__bridge NSString*)kNXT2EntitlementGetTaskAllow: @(NO),
+        
+        /* launch services */
+        (__bridge NSString*)kNXT2EntitlementLaunchServicesSetEndpoint: @(YES),  /* needed so it can set the unique service */
+        
+        /* sandbox */
+        (__bridge NSString*)kNXT2EntitlementSandboxHost: @(YES),                /* allows file access to all of Nyxian, EXTREMELY POWERFUL */
     };
 }

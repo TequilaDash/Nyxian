@@ -22,19 +22,19 @@
  * SOFTWARE.
  */
 
-#ifndef MDKFILESOURCELOCATION_H
-#define MDKFILESOURCELOCATION_H
+#ifndef MOBILEDEVELOPMENTKIT_MDKFILESOURCELOCATION_H
+#define MOBILEDEVELOPMENTKIT_MDKFILESOURCELOCATION_H
 
 #import <MobileDevelopmentKit/MDKCFType.h>
-#import <CoreCompiler/CCFileSourceLocation.h>
+#import <MobileDevelopmentKit/MDKSourceLocation.h>
 
-@interface MDKFileSourceLocation : MDKCFType
+@interface MDKFileSourceLocation : MDKCFType <NSSecureCoding>
 
 @property (nonatomic, readonly) NSURL *fileURL;
-@property (nonatomic, readonly) CCSourceLocation location;
+@property (nonatomic, readonly) MDKSourceLocation location;
 
-+ (instancetype)fileSourceLocationWithFileURL:(NSURL*)fileURL withSourceLocation:(CCSourceLocation)location;
++ (instancetype)fileSourceLocationWithFileURL:(NSURL*)fileURL withSourceLocation:(MDKSourceLocation)location;
 
 @end
 
-#endif /* MDKFILESOURCELOCATION_H */
+#endif /* MOBILEDEVELOPMENTKIT_MDKFILESOURCELOCATION_H */

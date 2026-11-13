@@ -33,24 +33,27 @@
 
 + (instancetype)runnerWithEngine:(MDKPhaseEngine*)engine
 {
-    return [[self alloc] initWithEngine:engine];
-}
-
-- (instancetype)initWithEngine:(MDKPhaseEngine*)engine
-{
-    self = [super init];
-    if(self)
+    MDKPhaseRunner *phaseRunner = super.alloc.init;
+    if(phaseRunner)
     {
-        _engine = engine;
+        phaseRunner->_engine = engine;
     }
-    return self;
+    return phaseRunner;
 }
 
 - (BOOL)runJob:(MDKJob*)job withinPhase:(MDKPhase*)phase
 {
     NSArray<MDKDiagnostic*> *diagnostic = nil;
     NSString *mainSource = nil;
-    BOOL success = [job executeJobWithOutDiagnostics:&diagnostic withOutMainSource:&mainSource];
+    BOOL success = NO;
+    if([_delegate respondsToSelector:@selector(runner:phase:executeJob:withOutDiagnostics:withOutMainSource:)])
+    {
+        success = [_delegate runner:self phase:phase executeJob:job withOutDiagnostics:&diagnostic withOutMainSource:&mainSource];
+    }
+    else
+    {
+        success = [job executeJobWithOutDiagnostics:&diagnostic withOutMainSource:&mainSource];
+    }
     
     /*
      * when delegation is passed then we

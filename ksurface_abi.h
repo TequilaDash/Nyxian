@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #ifndef KSURFACE_ABI_H
@@ -40,18 +41,38 @@
  */
 
 /* additional nyxian syscalls for now */
-#define SYS_proctb      750     /* MARK: deprecated, use SYS_sysctl instead */
-#define SYS_getent      751     /* MARK: deprecated, use SYS_pectl instead */
-#define SYS_gethostname 752     /* MARK: deprecated, use SYS_sysctl instead */
-#define SYS_sethostname 753     /* MARK: deprecated, use SYS_sysctl instead */
-#define SYS_gettask     754     /* gets task port */
-#define SYS_procpath    755     /* gets process path of a pid */
-#define SYS_procbsd     756     /* MARK: deprecated, use SYS_sysctl instead */
-#define SYS_handoffep   757     /* handoff exception port to kvirt */
-#define SYS_setent      758     /* MARK: deprecated, use SYS_pectl instead */
-#define SYS_waittask    759     /* waits till task port of a task is available */
-#define SYS_pectl       760     /* utility for many proc environment operations */
-#define SYS_sign        761     /* this is to be able to sign the binary */
+#define SYS_proctb          750 /* MARK: deprecated, use SYS_sysctl instead */
+#define SYS_getent          751 /* MARK: deprecated, use SYS_pectl instead */
+#define SYS_gethostname     752 /* MARK: deprecated, use SYS_sysctl instead */
+#define SYS_sethostname     753 /* MARK: deprecated, use SYS_sysctl instead */
+#define SYS_task_for_pid    754 /* gets task port */
+#define SYS_procpath        755 /* MARK: deprecated, use SYS_proc_info instead */
+#define SYS_procbsd         756 /* MARK: deprecated, use SYS_sysctl instead */
+#define SYS_handoffep       757 /* handoff exception port to kvirt */
+#define SYS_setent          758 /* MARK: deprecated, use SYS_pectl instead */
+#define SYS_waittask        759 /* waits till task port of a task is available */
+#define SYS_pectl           760 /* utility for many proc environment operations */
+#define SYS_sign            761 /* this is to be able to sign the binary */
+#define SYS_openpty         762 /* opens new pseudo terminal */
+#define SYS_loginctl        763 /* process login-name control */
+#define SYS_groupctl        764 /* supplementary group control */
+#define SYS_vroot           765 /* tells guests where Nyxian's root lives at */
+
+typedef CF_ENUM(UInt16, PELoginCTLAction) {
+    kPELoginCTLGetLength = 0,
+    kPELoginCTLGetWord = 1,
+    kPELoginCTLSetWord = 2,
+    kPELoginCTLCommit = 3,
+    kPELoginCTLClear = 4,
+};
+
+typedef CF_ENUM(UInt16, PEGroupCTLAction) {
+    kPEGroupCTLGetCount = 0,
+    kPEGroupCTLGetAt = 1,
+    kPEGroupCTLSetAt = 2,
+    kPEGroupCTLCommit = 3,
+    kPEGroupCTLClear = 4,
+};
 
 /* proc environment control mappings */
 /* categories */
@@ -80,10 +101,15 @@ typedef CF_ENUM(UInt16, PECTLCodeSigning) {
     kPECTLCodeSigningGetEntitlements = 5,
     kPECTLCodeSigningSetEntitlements = 6,
     kPECTLCodeSigningDropAllEntitlements = 7,
+    
+    /* heavily guarded kernel development utilities */
+    kPECTLCodeSigningLoadKernelExtension = 8,
+    kPECTLCodeSigningUnloadKernelExtension = 9,
 };
 
 typedef CF_ENUM(UInt16, PECTLUserInterface) {
     kPECTLUserInterfaceInit = 0,
+    kPECTLUserInterfaceOpenBundleIdentifier = 1,
 };
 
 typedef CF_ENUM(UInt16, PECTLUserspace) {

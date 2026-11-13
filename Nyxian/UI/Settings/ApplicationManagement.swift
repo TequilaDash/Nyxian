@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 import UIKit
@@ -34,8 +35,8 @@ extension UTType {
     }
 }
 
-class ApplicationManagementViewController: UIThemedTableViewController, UITextFieldDelegate, UIDocumentPickerDelegate, UIAdaptivePresentationControllerDelegate {
-    @objc static var shared: ApplicationManagementViewController = ApplicationManagementViewController(style: .insetGrouped)
+class ApplicationManagementViewController: NXUITableViewController, UITextFieldDelegate, UIDocumentPickerDelegate, UIAdaptivePresentationControllerDelegate, LDEApplicationWorkspaceObserver {
+    
     var applications: [LDEApplicationObject] = []
     
     override init(style: UITableView.Style) {
@@ -52,6 +53,14 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
         LDEApplicationWorkspace.shared().ping()
         self.title = "Applications"
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "square.and.arrow.down.fill"), target: self, action: #selector(plusButtonPressed))
+        
+        DispatchQueue.global().async {
+            self.applications = LDEApplicationWorkspace.shared().allApplicationObjects()
+            LDEApplicationWorkspace.shared().add(self)
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -65,14 +74,14 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let application: LDEApplicationObject = self.applications[indexPath.row]
         let cell: ProjectTableCell = self.tableView.dequeueReusableCell(withIdentifier: ProjectTableCell.reuseIdentifier) as! ProjectTableCell
-        cell.configure(displayName: application.localizedName, bundleIdentifier: application.bundleIdentifier, appIcon: application.icon ?? UIImage(named: "DefaultIcon"), showArrow: false)
+        cell.configure(displayName: application.localizedName, bundleIdentifier: application.bundleIdentifier, appIcon: application.icon, darkAppIcon: application.darkIcon, showArrow: false)
         return cell
     }
     
     override func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let application = self.applications[indexPath.row]
         
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak application] _ in
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self, weak application] _ in
             // MARK: Open Menu
             let openMenu: UIMenuElement = UIAction(title: "Open", image: UIImage(systemName: "arrow.up.right.square.fill")) { _ in
                 guard let application = application else { return }
@@ -102,7 +111,23 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
                 }
             }
             
-            menu.append(contentsOf: [clearContainerAction, deleteAction])
+            let browseBundle = UIAction(title: "Browse Bundle", image: UIImage(systemName: "arrow.forward.folder.fill")) { [weak self] _ in
+                guard let self = self,
+                      let application = application else { return }
+                
+                self.navigationController?.pushViewController(FileListViewController(isSublink: true, path: application.bundlePath), animated: true)
+            }
+            
+            let browseContainer = UIAction(title: "Browse Container", image: UIImage(systemName: "arrow.forward.folder.fill")) { [weak self] _ in
+                guard let self = self,
+                      let application = application else { return }
+                
+                self.navigationController?.pushViewController(FileListViewController(isSublink: true, path: application.containerPath), animated: true)
+            }
+            
+            // TODO: add a info panel for it like in files Get Info
+            menu.append(UIMenu(options: .displayInline, children: [browseBundle, browseContainer]))
+            menu.append(UIMenu(options: .displayInline, children: [clearContainerAction, deleteAction]))
             
             return UIMenu(title: "", children: menu)
         }
@@ -111,7 +136,10 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let application = self.applications[indexPath.row]
-        PEProcessManager.shared().spawnProcess(withBundleIdentifier: application.bundleIdentifier, withItems: [:], withKernelSurfaceProcess: nil, doRestartIfRunning: false)
+        let processIdentifier: pid_t = PEProcessManager.shared().spawnProcess(withBundleIdentifier: application.bundleIdentifier, withItems: [:], withKernelSurfaceProcess: nil, doRestartIfRunning: false)
+        if processIdentifier < 0 {
+            NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "\"\(application.localizedName ?? "Unknown")\" Is No Longer Available", withDelay: 0.0)
+        }
     }
     
     @objc func plusButtonPressed() {
@@ -152,23 +180,30 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
                 let contents: [String] = try FileManager.default.contentsOfDirectory(atPath: payloadDir)
                 
                 guard let appBundlePathComponent = contents.first(where: { ($0 as NSString).pathExtension == "app" }) else {
-                    NotificationServer.NotifyUser(level: .error, notification: "Failed to install application: no .app bundle found")
+                    alert.dismiss(animated: true) {
+                        NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "Failed to install application: no .app bundle found", withDelay: 0.0)
+                    }
                     return
                 }
                 
                 let appBundleFullPath = payloadDir.appending("/\(appBundlePathComponent)")
                 
                 guard let bundle = Bundle(path: appBundleFullPath) else {
-                    NotificationServer.NotifyUser(level: .error, notification: "Failed to install application: invalid bundle path")
+                    alert.dismiss(animated: true) {
+                        NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "Failed to install application: invalid bundle path", withDelay: 0.0)
+                    }
                     return
                 }
                 
                 guard let executablePath = bundle.executablePath else {
-                    NotificationServer.NotifyUser(level: .error, notification: "Failed to install application: invalid executable path")
+                    alert.dismiss(animated: true) {
+                        NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "Failed to install application: invalid executable path", withDelay: 0.0)
+                    }
                     return
                 }
                 
                 var final: [String: Any] = [:]
+                var isRootCATrusted: Bool = false;
                 if let executablePath = bundle.executablePath {
                     var ent: [String: Any] = [:]
                     var trust_nxt2 = ksurface_nxt2()
@@ -183,32 +218,38 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
                             let nsDict = cfDict as NSDictionary
                             if let swiftDict = nsDict as? [String: Any] {
                                 ent = swiftDict
+                                withUnsafeBytes(of: trust_nxt2.cdhash) { rawBuffer in
+                                    let uint8Pointer = rawBuffer.bindMemory(to: UInt8.self).baseAddress!
+                                    if trust_nxt2.isValid && trust_nxt2.isCdHashValid && CDHashMatchesCodeDirectoryOfPath(executablePath, uint8Pointer) == KERN_SUCCESS {
+                                        isRootCATrusted = trust_nxt2.isSigned || trust_nxt2.needsResign
+                                    }
+                                }
                             }
                         }
                     }
                     
-                    var appleEnt: [String: Any] = [:]
-                    var outError: OSStatus = 0
-                    let unmanagedDict: Unmanaged<CFDictionary>? = CopyAppleCSEntitlementsForPath(executablePath as CFString, &outError);
-                    if let cfDict = unmanagedDict?.takeRetainedValue() {
-                        let nsDict = cfDict as NSDictionary
-                        if let swiftDict = nsDict as? [String: Any] {
-                            appleEnt = swiftDict
+                    if !ent.isEmpty {
+                        final = ent
+                    } else {
+                        var appleEnt: [String: Any] = [:]
+                        var outError: OSStatus = 0
+                        let unmanagedDict: Unmanaged<CFDictionary>? = CopyAppleCSEntitlementsForPath(executablePath as CFString, &outError);
+                        if let cfDict = unmanagedDict?.takeRetainedValue() {
+                            let nsDict = cfDict as NSDictionary
+                            if let swiftDict = nsDict as? [String: Any] {
+                                appleEnt = swiftDict
+                            }
                         }
-                    }
-                    
-                    var extractedEnt: [String: Any] = [:]
-                    let unmanagedDict2: Unmanaged<CFDictionary>? = ExtractNXT2OutOfAppleCSEntitlements(appleEnt as CFDictionary);
-                    if let cfDict = unmanagedDict2?.takeRetainedValue() {
-                        let nsDict = cfDict as NSDictionary
-                        if let swiftDict = nsDict as? [String: Any] {
-                            extractedEnt = swiftDict
+                        
+                        var extractedEnt: [String: Any] = [:]
+                        let unmanagedDict2: Unmanaged<CFDictionary>? = ExtractNXT2OutOfAppleCSEntitlements(appleEnt as CFDictionary);
+                        if let cfDict = unmanagedDict2?.takeRetainedValue() {
+                            let nsDict = cfDict as NSDictionary
+                            if let swiftDict = nsDict as? [String: Any] {
+                                extractedEnt = swiftDict
+                            }
                         }
-                    }
-                    
-                    final = ent
-                    final.merge(extractedEnt) { _, new in
-                        new
+                        final = extractedEnt
                     }
                 }
                 
@@ -241,7 +282,7 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
                                     if result {
                                         PEProcessManager.shared().closeIfRunning(usingBundleIdentifier: bundle.bundleIdentifier)
                                         
-                                        trust_nxt2_sign((executablePath as NSString).utf8String, final as CFDictionary, true)
+                                        trust_nxt2_sign((executablePath as NSString).utf8String, final as CFDictionary, true, nil)
                                         
                                         if LDEApplicationWorkspace.shared().installApplication(atBundlePath: bundle.bundleURL.path) {
                                             DispatchQueue.main.async {
@@ -250,14 +291,14 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
                                         } else {
                                             DispatchQueue.main.async {
                                                 alert.dismiss(animated: true) {
-                                                    NotificationServer.NotifyUser(level: .error, notification: "Failed to sign or install application.")
+                                                    NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "Failed to sign or install application.", withDelay: 0.0)
                                                 }
                                             }
                                         }
                                     } else {
                                         DispatchQueue.main.async {
                                             alert.dismiss(animated: true) {
-                                                NotificationServer.NotifyUser(level: .error, notification: "Failed to sign or install application.")
+                                                NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "Failed to sign or install application.", withDelay: 0.0)
                                             }
                                         }
                                     }
@@ -270,36 +311,54 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
                 // The app indeed wants something bruh
                 DispatchQueue.main.async {
                     alert.dismiss(animated: true) {
-                        let displayName = bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? bundle.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "Unknown"
-                        let alert = UIAlertController(
-                            title: "Install \"\(displayName)\"?",
-                            message: nil,
-                            preferredStyle: .alert
-                        )
-                        
-                        let fullMessage = NSMutableAttributedString()
-                        fullMessage.append(KSurfaceNXT2CreateEntitlementSummary(final))
-                        alert.setValue(fullMessage, forKey: "attributedMessage")
-                        
-                        alert.addAction(UIAlertAction(title: "Install", style: .default) { _ in
+                        if !final.isEmpty, !isRootCATrusted {
+                            let displayName = bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? bundle.object(forInfoDictionaryKey: "CFBundleName") as? String ?? "Unknown"
+                            let alert = UIAlertController(
+                                title: "Install \"\(displayName)\"?",
+                                message: nil,
+                                preferredStyle: .alert
+                            )
+                            
+                            let fullMessage = NSMutableAttributedString()
+                            fullMessage.append(KSurfaceNXT2CreateEntitlementSummary(final))
+                            alert.setValue(fullMessage, forKey: "attributedMessage")
+                            
+                            alert.addAction(UIAlertAction(title: "Install", style: .default) { _ in
+                                DispatchQueue.global().async {
+                                    _ = proceedWithInstall()
+                                }
+                            })
+                            
+                            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                            
+                            self.present(alert, animated: true)
+                        } else {
                             DispatchQueue.global().async {
                                 _ = proceedWithInstall()
                             }
-                        })
-                        
-                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-                        
-                        self.present(alert, animated: true)
+                        }
                     }
                 }
                 
             } catch {
-                NotificationServer.NotifyUser(level: .error, notification: "Failed to install application: \(error.localizedDescription)")
+                NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "Failed to install application: \(error.localizedDescription)", withDelay: 0.0)
             }
         }
     }
     
-    @objc func applicationWasInstalled(_ app: LDEApplicationObject!) {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if #available(iOS 26.0, *) {
+            return 80
+        } else {
+            return 70
+        }
+    }
+    
+    func applicationInitialPopulationDone() {
+        self.applications = LDEApplicationWorkspace.shared().allApplicationObjects()
+    }
+    
+    func applicationWasInstalled(_ app: LDEApplicationObject!) {
         DispatchQueue.main.async {
             if let index = self.applications.firstIndex(of: app) {
                 self.applications[index] = app
@@ -318,7 +377,7 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
         }
     }
     
-    @objc func application(withBundleIdentifierWasUninstalled bundleIdentifier: String!) {
+    func application(withBundleIdentifierWasUninstalled bundleIdentifier: String!) {
         DispatchQueue.main.async {
             let temp = LDEApplicationObject()
             temp.bundleIdentifier = bundleIdentifier
@@ -329,14 +388,6 @@ class ApplicationManagementViewController: UIThemedTableViewController, UITextFi
                     with: .automatic
                 )
             }
-        }
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if #available(iOS 26.0, *) {
-            return 80
-        } else {
-            return 70
         }
     }
     

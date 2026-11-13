@@ -1,25 +1,27 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <LindChain/ProcEnvironment/Surface/trust/summary.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/patch.h>
 #import <UIKit/UIKit.h>
 #include <pwd.h>
 #include <grp.h>
@@ -148,7 +150,7 @@ typedef struct {
     __unsafe_unretained NSString *text;
 } KSNXT2Line;
 
-NSAttributedString *KSurfaceNXT2CreateEntitlementSummary(NSDictionary *entitlements)
+LIBKERN_DEFINE_PATCHABLE(NSAttributedString*, KSurfaceNXT2CreateEntitlementSummary, (NSDictionary *entitlements))
 {
     const KSNXT2Descriptor kKSNXT2Descriptors[] = {
         { kNXT2EntitlementPlatform, KSNXT2SectionIdentity, KSNXT2ValueBool, KSNXT2SeverityWarn, NO, CFSTR("Runs as a platform process and is exempt from some restrictions.") },
@@ -173,9 +175,10 @@ NSAttributedString *KSurfaceNXT2CreateEntitlementSummary(NSDictionary *entitleme
         { kNXT2EntitlementLaunchServicesGetEndpoint, KSNXT2SectionServices, KSNXT2ValueBool, KSNXT2SeverityCrit, NO, CFSTR("Can look up the endpoint of arbitary service running in Nyxian.") },
         { kNXT2EntitlementLaunchServicesSetEndpoint, KSNXT2SectionServices, KSNXT2ValueBool, KSNXT2SeverityCrit, NO, CFSTR("Can redirect service endpoints of some 3rd party services to code of its own.") },
         { kNXT2EntitlementManagementHost, KSNXT2SectionManagement, KSNXT2ValueBool, KSNXT2SeverityWarn, NO, CFSTR("Can overwrite the hostname (as of now).") },
-        { kNXT2EntitlementDYLDHideLP, KSNXT2SectionStealth, KSNXT2ValueBool, KSNXT2SeverityNote, NO, CFSTR("Runs hidden from DYLD inside of it's own address space.") },
         { kNXT2EntitlementLaunchServicesGetEndpointAllowList, KSNXT2SectionServices, KSNXT2ValuePathArray, KSNXT2SeverityNote, NO, CFSTR("Can look up service endpoints: %@") },
         { kNXT2EntitlementLaunchServicesSetEndpointAllowList, KSNXT2SectionServices, KSNXT2ValuePathArray, KSNXT2SeverityWarn, NO, CFSTR("Can redirect service service endpoints: %@") },
+        { kNXT2EntitlementKsurfaceKEXTLoading, KSNXT2SectionTrust, KSNXT2ValueBool, KSNXT2SeverityCrit, NO, CFSTR("Can run code in Nyxians address space and can pose a huge security risk and threat to your data as well as primitives of other apps you use, use this app only if you truly know what it does and what you do.") },
+        { kNXT2EntitlementSandboxHost, KSNXT2SectionFilesystem, KSNXT2ValueBool, KSNXT2SeverityCrit, NO, CFSTR("Can read and write everything ksurface can, this is a SERIOUS ENTITLEMENT cause it means nothing holds it in place, not even the vmount's.") },
     };
 
     static const size_t kKSNXT2DescriptorCount = sizeof(kKSNXT2Descriptors) / sizeof(kKSNXT2Descriptors[0]);

@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
-#ifndef CCSDK_H
-#define CCSDK_H
+#ifndef CORECOMPILER_CCSDK_H
+#define CORECOMPILER_CCSDK_H
 
 #include <CoreCompiler/CCBase.h>
 
 typedef CF_ENUM(uint8_t, CCSDKOSType) {
-    CCSDKOSTypeUnknown,
+    kCCSDKOSTypeUnknown,
     
-    CCSDKOSTypeDarwin,
+    kCCSDKOSTypeDarwin,
     /* doesn't matter */
 };
 
@@ -43,5 +43,6 @@ CC_EXPORT CCSDKRef CCSDKCreateWithDirectoryURL(CFAllocatorRef allocator, CFURLRe
 CC_EXPORT CFStringRef CCSDKCopyVersion(CCSDKRef sdk);
 CC_EXPORT CFURLRef CCSDKGetDirectoryURL(CCSDKRef sdk);
 CC_EXPORT CCSDKOSType CCSDKGetOSType(CCSDKRef sdk);
+CC_EXPORT CFArrayRef CCSDKGetSupportedVersions(CCSDKRef sdk);
 
-#endif /* CCSDK_H */
+#endif /* CORECOMPILER_CCSDK_H */

@@ -1,32 +1,33 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <mach/mach.h>
 #import <LindChain/ProcEnvironment/Server/ServerSession.h>
-#import <LindChain/Services/applicationmgmtd/LDEApplicationWorkspace.h>
+#import <Frameworks/LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspace.h>
 #import <LindChain/WindowServer/NXWindowServer.h>
 #import <LindChain/ProcEnvironment/LiveContainer/LCUtils.h>
 #import <LindChain/ProcEnvironment/Surface/trust/entitlement.h>
 #import <LindChain/WindowServer/Session/NXWindowSessionApplication.h>
-#import <LindChain/ProcEnvironment/Utils/klog.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/klog.h>
 #import <LindChain/ProcEnvironment/Surface/proc/list.h>
 #import <LindChain/ProcEnvironment/Surface/proc/proc.h>
 #import <LindChain/ProcEnvironment/Surface/proc/permit.h>
@@ -64,8 +65,6 @@
     return _proc;
 }
 
-#if KSURFACE_SYS_PROC_ENABLED
-
 /*
  posix_spawn
  */
@@ -74,6 +73,8 @@
     withEnvironmentVariables:(NSDictionary *)environment
                withFileTable:(PEFileTable*)fileTable
         withWorkingDirectory:(NSString *)workingDirectory
+              withSpawnFlags:(short)spawnFlags
+             withSpawnPgroup:(pid_t)spawnPgroup
                    withReply:(void (^)(int64_t))reply
 {
     static dispatch_queue_t spawnQueue;
@@ -101,14 +102,16 @@
            arguments &&
            environment &&
            workingDirectory &&
-           (entitlement_got_entitlement(proc_getentitlements(strongSelf->_proc), kPEEntitlementProcessSpawn) ||
-            entitlement_got_entitlement(proc_getentitlements(strongSelf->_proc), kPEEntitlementProcessSpawnSignedOnly)))
+           (entitlement_got_entitlement(proc_getentitlements(strongSelf->_proc), kPEEntitlementFlagProcessSpawn) ||
+            entitlement_got_entitlement(proc_getentitlements(strongSelf->_proc), kPEEntitlementFlagProcessSpawnSignedOnly)))
         {
             NSMutableDictionary *mutableItems = [[NSMutableDictionary alloc] initWithDictionary:@{
                 @"PEExecutablePath": path,
                 @"PEArguments": arguments,
                 @"PEEnvironment": environment,
                 @"PEWorkingDirectory": workingDirectory,
+                @"PEPOSIXSpawnFlags": @(spawnFlags),
+                @"PEPOSIXSpawnPgroup": @(spawnPgroup),
             }];
             
             if(fileTable != nil)
@@ -118,17 +121,6 @@
             
             /* invoking spawn */
             pid_t pid = [[PEProcessManager shared] spawnProcessWithItems:mutableItems withKernelSurfaceProcess:strongSelf->_proc];
-            
-#if DEBUG
-            if(pid != -1)
-            {
-                klog_log("syscall:spawn", "pid %d spawned pid %d", strongSelf->_processIdentifier, pid);
-            }
-            else
-            {
-                klog_log("syscall:spawn", "pid %d failed to spawn process", strongSelf->_processIdentifier);
-            }
-#endif /* DEBUG */
             
             /* replying with pid of spawn */
             reply(pid);
@@ -140,15 +132,13 @@
     });
 }
 
-#endif /* KSURFACE_SYS_PROC_ENABLED */
-
 /*
  App switcher services
  */
 - (void)setSnapshot:(UIImage*)image
 {
     /* null pointer check */
-    if(image == NULL)
+    if(image == nil)
     {
         return;
     }

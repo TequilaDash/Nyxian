@@ -1,39 +1,42 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
  Copyright (C) 2026 zipgod24
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
+#import <LindChain/ProcEnvironment/Surface/libkern/patch.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/klog.h>
 #import <LindChain/ProcEnvironment/Surface/trust/entitlement.h>
 #import <LindChain/ProcEnvironment/Surface/proc/spawn.h>
+#import <LindChain/ProcEnvironment/Surface/proc/remove.h>
 #import <LindChain/ProcEnvironment/Surface/proc/insert.h>
 #import <LindChain/ProcEnvironment/Surface/proc/def.h>
-#import <LindChain/ProcEnvironment/Utils/klog.h>
-#import <LindChain/ProcEnvironment/Surface/proc/remove.h>
 #import <LindChain/ProcEnvironment/PEProcessManager.h>
 #import <LindChain/ProcEnvironment/PEUserspaceManager.h>
 #include <ksurface_config.h>
 
-kern_return_t proc_spawn(ksurface_proc_t *parent,
-                         ksurface_proc_t **child,
-                         pid_t child_pid,
-                         ksurface_trust_identity_t *identity)
+LIBKERN_DEFINE_PATCHABLE(kern_return_t, proc_spawn, (ksurface_proc_t *parent,
+                                                     ksurface_proc_t **child,
+                                                     pid_t child_pid,
+                                                     int child_pidv,
+                                                     ksurface_trust_identity_t *identity))
 {
     assert(parent != NULL && child != NULL && identity != NULL);
     
@@ -45,49 +48,54 @@ kern_return_t proc_spawn(ksurface_proc_t *parent,
 
     proc_setppid(child_new, proc_getpid(child_new));    /* as the child is the copy of the parent the current pid is the ppid */
     proc_setpid(child_new, child_pid);      /* function passed pid of child */
+    proc_setpidv(child_new, child_pidv);
     
     child_new->nyx.identity = identity;
     
+    child_new->nyx.entitlements = trust_identity_entitlement_flags_from_entitlements(identity->entitlements);
+    child_new->nyx.maxEntitlements = child_new->nyx.entitlements;
+    
     if(parent == kernel_proc_)
     {
-        /* process needs new credentials */
+        /* process needs fresh credentials */
         proc_setmobilecred(child_new);
         proc_setsid(child_new, proc_getpid(child_new));
+        proc_setpgid(child_new, proc_getpid(child_new));
     }
     
-#if KSURFACE_SYS_UCRED_ENABLED
-    
-    /* only platform processes can use those */
     if(CFDictionaryGetValue(identity->entitlements, kNXT2EntitlementPlatform) == kCFBooleanTrue)
     {
-        /*
-         * child process exeuctable is platform binary and has
-         * the special platform root entitlement.
-         */
+        /* only platform processes can use those */
+        
         if(CFDictionaryGetValue(identity->entitlements, kNXT2EntitlementPlatformRoot) == kCFBooleanTrue)
         {
+            /*
+             * child process exeuctable is platform binary and has
+             * the special platform root entitlement which overweighs
+             * the platform user and group entitlement.
+             */
             proc_setrootcred(child_new);
         }
-        
-        /* special user and group entitlement */
-        CFNumberRef entitlementUserIdentifier = CFDictionaryGetValue(identity->entitlements, kNXT2EntitlementPlatformUser);
-        CFNumberRef entitlementGroupIdentifier = CFDictionaryGetValue(identity->entitlements, kNXT2EntitlementPlatformGroup);
-        int32_t identifier;
-        if(entitlementUserIdentifier != NULL && CFNumberGetValue(entitlementUserIdentifier, kCFNumberSInt32Type, &identifier))
+        else
         {
-            proc_setruid(child_new, identifier);
-            proc_seteuid(child_new, identifier);
-            proc_setsvuid(child_new, identifier);
-        }
-        if(entitlementGroupIdentifier != NULL && CFNumberGetValue(entitlementGroupIdentifier, kCFNumberSInt32Type, &identifier))
-        {
-            proc_setrgid(child_new, identifier);
-            proc_setegid(child_new, identifier);
-            proc_setsvgid(child_new, identifier);
+            /* special user and group entitlement handling */
+            CFNumberRef entitlementUserIdentifier = CFDictionaryGetValue(identity->entitlements, kNXT2EntitlementPlatformUser);
+            CFNumberRef entitlementGroupIdentifier = CFDictionaryGetValue(identity->entitlements, kNXT2EntitlementPlatformGroup);
+            int32_t identifier;
+            if(entitlementUserIdentifier != NULL && CFNumberGetValue(entitlementUserIdentifier, kCFNumberSInt32Type, &identifier))
+            {
+                proc_setruid(child_new, identifier);
+                proc_seteuid(child_new, identifier);
+                proc_setsvuid(child_new, identifier);
+            }
+            if(entitlementGroupIdentifier != NULL && CFNumberGetValue(entitlementGroupIdentifier, kCFNumberSInt32Type, &identifier))
+            {
+                proc_setrgid(child_new, identifier);
+                proc_setegid(child_new, identifier);
+                proc_setsvgid(child_new, identifier);
+            }
         }
     }
-    
-#endif /* KSURFACE_SYS_UCRED_ENABLED */
         
     /* FIXME: argv[0] shall be used for p_comm and not the last path component */
     const char *name = strrchr(identity->path, '/');
@@ -97,7 +105,7 @@ kern_return_t proc_spawn(ksurface_proc_t *parent,
     /* insert will retain the child process */
     if(proc_insert(child_new) != KERN_SUCCESS)
     {
-        klog_log("proc:fork", "[%d] fork failed process %p failed to be inserted", proc_getpid(child_new), child);
+        klog_log("ksurface:proc:spawn", "failed to insert process %p into process table", child);
         
         /* releasing child process because of failed insert */
         kvo_release(child_new);
@@ -151,8 +159,8 @@ kern_return_t proc_spawn(ksurface_proc_t *parent,
     return KERN_SUCCESS;
 }
 
-kern_return_t proc_kill(ksurface_proc_t *child,
-                        int sig)
+LIBKERN_DEFINE_PATCHABLE(kern_return_t, proc_kill, (ksurface_proc_t *child,
+                                                    int sig))
 {
     if(child == NULL)
     {
@@ -196,7 +204,7 @@ kern_return_t proc_kill(ksurface_proc_t *child,
     return KERN_SUCCESS;
 }
 
-kern_return_t proc_reap(ksurface_proc_t *proc)
+static inline kern_return_t proc_reap_nolock(ksurface_proc_t *proc)
 {
     assert(proc != NULL && proc != kernel_proc_);
     
@@ -227,7 +235,7 @@ kern_return_t proc_reap(ksurface_proc_t *proc)
         pthread_mutex_unlock(&(proc->children.mutex));
         
         /* calling exit on the child */
-        proc_reap(child);
+        proc_reap_nolock(child);
         
         /* releasing reference previously retained */
         kvo_release(child);
@@ -291,7 +299,7 @@ kern_return_t proc_reap(ksurface_proc_t *proc)
     pid_t pid = proc_getpid(proc);
     
     /* TODO: Completely move to tree-based system, which is possible now */
-    proc_remove_by_pid(pid);  /* remove from global table */
+    proc_remove_by_pid__nolock(pid);  /* remove from global table */
     
     /* release our working reference */
     kvo_release(proc);
@@ -300,10 +308,19 @@ kern_return_t proc_reap(ksurface_proc_t *proc)
     PEProcess *process = [[PEProcessManager shared] processForProcessIdentifier:pid];
     if(process != NULL)
     {
-        [process terminate];
+        [process forceTerminate];
     }
     
     return KERN_SUCCESS;
+}
+
+kern_return_t proc_reap(ksurface_proc_t *proc)
+{
+    assert(proc != NULL && proc != kernel_proc_);
+    proc_table_wrlock();
+    kern_return_t kr = proc_reap_nolock(proc);
+    proc_table_unlock();
+    return kr;
 }
 
 kern_return_t proc_zombify(ksurface_proc_t *proc)
@@ -360,8 +377,8 @@ kern_return_t proc_zombify(ksurface_proc_t *proc)
     kvo_unlock(proc);
     
     ksurface_proc_t *parent = NULL;
-    kern_return_t ksr = proc_parent_for_proc(proc, &parent);
-    if(ksr == KERN_SUCCESS)
+    kern_return_t kr = proc_parent_for_proc(proc, &parent);
+    if(kr == KERN_SUCCESS)
     {
         kvo_event_trigger(parent, kProcEventTypeWait4, (uintptr_t)proc);
         
@@ -383,10 +400,10 @@ kern_return_t proc_state_change(ksurface_proc_t *proc,
                                 int64_t status)
 {
     ksurface_proc_t *parent = NULL;
-    kern_return_t ksr = proc_parent_for_proc(proc, &parent);
-    if(ksr != KERN_SUCCESS)
+    kern_return_t kr = proc_parent_for_proc(proc, &parent);
+    if(kr != KERN_SUCCESS)
     {
-        return ksr;
+        return kr;
     }
     
     pthread_mutex_lock(&(parent->children.mutex));

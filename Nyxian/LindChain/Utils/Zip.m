@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <LindChain/Utils/Zip.h>
@@ -40,7 +41,8 @@ struct archive_entry {};
 #define ARCHIVE_EXTRACT_ACL     4
 #define ARCHIVE_EXTRACT_FFLAGS  8
 
-#define ARCHIVE_OK 0
+#define ARCHIVE_OK  0
+#define ARCHIVE_EOF 1
 
 // Reader functions
 archive* archive_read_new(void);
@@ -52,6 +54,7 @@ int archive_read_next_header(archive *a, archive_entry **entry);
 int archive_read_data_block(archive *a, const void **buff, size_t *size, long long *offset);
 int archive_read_close(archive *a);
 int archive_read_free(archive *a);
+int archive_write_finish_entry(struct archive *);
 
 // Writer functions
 archive* archive_write_disk_new(void);
@@ -129,43 +132,184 @@ BOOL unzipArchiveAtPath(NSString *zipPath, NSString *destinationPath) {
     return YES;
 }
 
-BOOL unzipArchiveFromFileDescriptor(int fd, NSString *destinationPath) {
+BOOL unzipArchiveAtPathWithoutParentDirectory(NSString *zipPath,
+                                              NSString *destinationPath)
+{
+    return unzipArchiveAtPathWithoutParentDirectoryWithError(zipPath, destinationPath, NULL);
+}
+
+static void NXZipReportExtractionError(NSError **error,
+                                       struct archive *archive,
+                                       NSString *operation,
+                                       NSString *path)
+{
+    if(!error || *error)
+    {
+        return;
+    }
+    
+    const char *detail = archive_error_string(archive);
+    NSString *reason = detail ? [NSString stringWithUTF8String:detail] : @"libarchive returned no error description";
+    *error = [NSError errorWithDomain:@"org.emexlabs.nyxian.zip" code:1 userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"ZIP extraction failed while %@ (%@): %@", operation, path, reason]}];
+}
+
+BOOL unzipArchiveAtPathWithoutParentDirectoryWithError(NSString *zipPath,
+                                                       NSString *destinationPath,
+                                                       NSError **error)
+{
+    if(error)
+    {
+        *error = nil;
+    }
+    struct archive *a = archive_read_new();
+    struct archive *ext = archive_write_disk_new();
+    struct archive_entry *entry;
+    int r;
+    
+    archive_read_support_format_all(a);
+    archive_read_support_filter_all(a);
+    
+    archive_write_disk_set_options(ext, ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_ACL | ARCHIVE_EXTRACT_FFLAGS);
+    r = archive_read_open_filename(a, [zipPath fileSystemRepresentation], 10240);
+    if(r != ARCHIVE_OK)
+    {
+        NSLog(@"archive_read_open_filename() failed: %s", archive_error_string(a));
+        NXZipReportExtractionError(error, a, @"opening the archive", zipPath);
+        archive_read_free(a);
+        archive_write_free(ext);
+        return NO;
+    }
+    
+    BOOL success = YES;
+    
+    while((r = archive_read_next_header(a, &entry)) == ARCHIVE_OK)
+    {
+        const char *entryPath = archive_entry_pathname(entry);
+        if(!entryPath)
+        {
+            continue;
+        }
+        
+        NSString *relativePath = [NSString stringWithUTF8String:entryPath];
+        NSArray<NSString *> *components = [relativePath pathComponents];
+        
+        if(components.count <= 1)
+        {
+            continue;
+        }
+        
+        NSArray<NSString *> *remainingComponents = [components subarrayWithRange:NSMakeRange(1, components.count - 1)];
+        
+        BOOL unsafe = !relativePath || relativePath.isAbsolutePath || [components containsObject:@".."];
+        NSString *strippedPath = [NSString pathWithComponents:remainingComponents];
+        NSString *fullPath = [destinationPath stringByAppendingPathComponent:strippedPath];
+        
+        if(unsafe)
+        {
+            NSLog(@"Skipping unsafe archive path: %@", relativePath);
+            if(error && !*error)
+            {
+                *error = [NSError errorWithDomain:@"org.emexlabs.nyxian.zip" code:2 userInfo:@{NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Unsafe ZIP entry: %@", relativePath]}];
+            }
+            success = NO;
+            continue;
+        }
+        
+        archive_entry_set_pathname(entry, [fullPath fileSystemRepresentation]);
+        archive_entry_set_perm(entry, 0777);
+        
+        r = archive_write_header(ext, entry);
+        
+        if(r < ARCHIVE_OK)
+        {
+            NSLog(@"archive_write_header() warning: %s", archive_error_string(ext));
+        }
+        
+        if(r == ARCHIVE_OK)
+        {
+            const void *buff;
+            size_t size;
+            la_int64_t offset;
+            while((r = archive_read_data_block(a, &buff, &size, &offset)) == ARCHIVE_OK)
+            {
+                int writeResult = archive_write_data_block(ext, buff, size, offset);
+                if(writeResult != ARCHIVE_OK)
+                {
+                    NSLog(@"archive_write_data_block() failed: %s", archive_error_string(ext));
+                    NXZipReportExtractionError(error, ext, @"writing entry data", fullPath);
+                    success = NO;
+                    break;
+                }
+            }
+            
+            if(r != ARCHIVE_EOF && r != ARCHIVE_OK)
+            {
+                NSLog(@"archive_read_data_block() failed: %s", archive_error_string(a));
+                NXZipReportExtractionError(error, a, @"reading entry data", relativePath);
+                success = NO;
+            }
+        }
+        
+        archive_write_finish_entry(ext);
+    }
+    
+    if(r != ARCHIVE_EOF)
+    {
+        NSLog(@"archive_read_next_header() failed: %s", archive_error_string(a));
+        NXZipReportExtractionError(error, a, @"reading the next entry", zipPath);
+        success = NO;
+    }
+    
+    archive_read_close(a);
+    archive_read_free(a);
+    
+    archive_write_close(ext);
+    archive_write_free(ext);
+    
+    return success;
+}
+
+BOOL unzipArchiveFromFileDescriptor(int fd,
+                                    NSString *destinationPath)
+{
     struct archive *a;
     struct archive *ext;
     struct archive_entry *entry;
     int r;
-
+    
     a = archive_read_new();
     archive_read_support_format_all(a);
     archive_read_support_filter_all(a);
-
+    
     ext = archive_write_disk_new();
     archive_write_disk_set_options(ext, ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_ACL | ARCHIVE_EXTRACT_FFLAGS);
-
-    // Open archive from file descriptor
-    if ((r = archive_read_open_fd(a, fd, 10240))) { // block size = 10240
+    
+    if((r = archive_read_open_fd(a, fd, 10240)))
+    {
         NSLog(@"archive_read_open_fd() failed: %s", archive_error_string(a));
         archive_read_free(a);
         archive_write_free(ext);
         return NO;
     }
-
-    while ((r = archive_read_next_header(a, &entry)) == ARCHIVE_OK) {
-        NSString *fullPath = [destinationPath stringByAppendingPathComponent:
-                              [NSString stringWithUTF8String:archive_entry_pathname(entry)]];
+    
+    while((r = archive_read_next_header(a, &entry)) == ARCHIVE_OK)
+    {
+        NSString *fullPath = [destinationPath stringByAppendingPathComponent:[NSString stringWithUTF8String:archive_entry_pathname(entry)]];
         archive_entry_set_pathname(entry, [fullPath fileSystemRepresentation]);
         archive_entry_set_perm(entry, 0777);
         r = archive_write_header(ext, entry);
-        if (r == ARCHIVE_OK) {
+        if(r == ARCHIVE_OK)
+        {
             const void *buff;
             size_t size;
             la_int64_t offset;
-            while (archive_read_data_block(a, &buff, &size, &offset) == ARCHIVE_OK) {
+            while(archive_read_data_block(a, &buff, &size, &offset) == ARCHIVE_OK)
+            {
                 archive_write_data_block(ext, buff, size, offset);
             }
         }
     }
-
+    
     archive_read_close(a);
     archive_read_free(a);
     archive_write_close(ext);

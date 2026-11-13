@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #ifndef TRUST_ENTITLEMENT_H
@@ -33,96 +34,74 @@
 #include <fcntl.h>
 
 /* ----------------------------------------------------------------------
- *  Project Headers
- * -------------------------------------------------------------------- */
-#include <ksurface_config.h>
-
-/* ----------------------------------------------------------------------
  *  Constants
  * -------------------------------------------------------------------- */
 /*!
  @enum PEEntitlement
- @abstract Entitlements which are responsible for the permitives of the environment hostsided
+ @abstract Entitlements which are responsible for the primitives of the environment
  */
-typedef CF_OPTIONS(uint64_t, PEEntitlement) {
+typedef CF_OPTIONS(uint64_t, PEEntitlementFlags) {
     /*! No entitlements at all */
-    kPEEntitlementNone                              = 0,
+    kPEEntitlementFlagNone                          = 0,
     
     /*! Grants other processes with appropriate permitives to get task port of process .*/
-    kPEEntitlementGetTaskAllowed                    = 1ull << 0,
+    kPEEntitlementFlagGetTaskAllowed                = 1ull << 0,
     
     /*! Grants process to get task port of processes. */
-    kPEEntitlementTaskForPid                        = 1ull << 1,
-    
-    /*
-     * MARK: banned, because too powerful and replaced with PEEntitlementPlatform
-     *
-     * PEEntitlementTaskForPidHost                  = 1ull << 2,
-     */
+    kPEEntitlementFlagTaskForPid                    = 1ull << 1,
     
     /*! Grants process to enumerate processes. */
-    kPEEntitlementProcessEnumeration                = 1ull << 3,
+    kPEEntitlementFlagProcessEnumeration            = 1ull << 3,
     
     /*! Grants process to kill other processes. */
-    kPEEntitlementProcessKill                       = 1ull << 5,
+    kPEEntitlementFlagProcessKill                   = 1ull << 5,
     
     /*! Grants process to spawn other processes. */
-    kPEEntitlementProcessSpawn                      = 1ull << 6,
+    kPEEntitlementFlagProcessSpawn                  = 1ull << 6,
     
     /*! Grants process to spawn other processes, under the condition that the binary must be signed. */
-    kPEEntitlementProcessSpawnSignedOnly            = 1ull << 7,
+    kPEEntitlementFlagProcessSpawnSignedOnly        = 1ull << 7,
     
     /*! Grants process to elevate permitive. */
-    kPEEntitlementProcessElevate                    = 1ull << 8,
+    kPEEntitlementFlagProcessElevate                = 1ull << 8,
     
     /*! Grants process to manage host. */
-    kPEEntitlementHostManager                       = 1ull << 9,
+    kPEEntitlementFlagHostManager                   = 1ull << 9,
     
     /*! Grants process to manage credentials. */
-    kPEEntitlementCredentialsManager                = 1ull << 10,
+    kPEEntitlementFlagCredentialsManager            = 1ull << 10,
     
     /*! Grants process to start launch services. */
-    kPEEntitlementLaunchServicesStart               = 1ull << 11,
+    kPEEntitlementFlagLaunchServicesStart           = 1ull << 11,
     
     /*! Grants process to stop launch services. */
-    kPEEntitlementLaunchServicesStop                = 1ull << 12,
+    kPEEntitlementFlagLaunchServicesStop            = 1ull << 12,
     
     /*! Grants process to manage launch services. */
-    kPEEntitlementLaunchServicesToggle              = 1ull << 13,
+    kPEEntitlementFlagLaunchServicesToggle          = 1ull << 13,
     
     /*! Grants process to get endpoint of launch services. */
-    kPEEntitlementLaunchServicesGetEndpoint         = 1ull << 14,
+    kPEEntitlementFlagLaunchServicesGetEndpoint     = 1ull << 14,
     
     /*! Grants process to set endpoint of launch services. */
-    kPEEntitlementLaunchServicesSetEndpoint         = 1ull << 15,
-    
-    /*! Grants process to manage launch services. */
-    kPEEntitlementLaunchServicesManager             = kPEEntitlementLaunchServicesStart | kPEEntitlementLaunchServicesStop | kPEEntitlementLaunchServicesToggle | kPEEntitlementLaunchServicesSetEndpoint | kPEEntitlementLaunchServicesGetEndpoint,
-    
-    /*
-     * MARK: there is no device spoofing currently, but preserving for the future
-     *
-     * PEEntitlementEnforceDeviceSpoof                 = 1ull << 17,
-     */
-    
-    /*! Hides LiveProcess in DYLD Api. (recommended) */
-    kPEEntitlementDyldHideLiveProcess               = 1ull << 18,   /* TODO: this is the opposite of a capability, better rename to PEEntitlementDyldDontHideEnvironment */
+    kPEEntitlementFlagLaunchServicesSetEndpoint     = 1ull << 15,
     
     /*! Makes a process retain entitlements across processes, made for sandboxed applications and such. Its a security feature. */
-    kPEEntitlementProcessSpawnInheriteEntitlements  = 1ull << 19,
+    kPEEntitlementFlagProcessSpawnInheriteEntitlements  = 1ull << 19,
     
     /*! Security feature for daemons and such */
-    kPEEntitlementPlatform                          = 1ull << 20,
+    kPEEntitlementFlagPlatform                      = 1ull << 20,
     
     /*! Security feature for daemons to start as root process, requires `PEEntitlementPlatform` to be present */
-    kPEEntitlementPlatformRoot                      = 1ull << 21,
+    kPEEntitlementFlagPlatformRoot                  = 1ull << 21,
     
-    /*! New experimentation flags   */
-    kPEEntitlementFileRootRW                        = 1ull << 22,
-    kPEEntitlementFileBundleRW                      = 1ull << 23,
-    kPEEntitlementFileContainerRW                   = 1ull << 24,
+    /*! Grants process to get task port of any process. */
+    kPEEntitlementFlagSystemTaskPorts               = 1ull << 22,
     
-    kPEEntitlementAll                               = kPEEntitlementGetTaskAllowed | kPEEntitlementTaskForPid | kPEEntitlementProcessEnumeration | kPEEntitlementProcessKill | kPEEntitlementProcessSpawn | kPEEntitlementProcessSpawnSignedOnly | kPEEntitlementProcessElevate | kPEEntitlementHostManager | kPEEntitlementCredentialsManager | kPEEntitlementLaunchServicesStart | kPEEntitlementLaunchServicesStop | kPEEntitlementLaunchServicesToggle | kPEEntitlementLaunchServicesGetEndpoint | kPEEntitlementLaunchServicesSetEndpoint | kPEEntitlementDyldHideLiveProcess | kPEEntitlementProcessSpawnInheriteEntitlements | kPEEntitlementPlatform | kPEEntitlementPlatformRoot | kPEEntitlementFileRootRW | kPEEntitlementFileBundleRW | kPEEntitlementFileContainerRW,
+    /*! Grants a process to load a kernel extension */
+    kPEEntitlementFlagLoadKEXT                      = 1ull << 23,
+    
+    kPEEntitlementFlagAll                           = kPEEntitlementFlagGetTaskAllowed | kPEEntitlementFlagTaskForPid | kPEEntitlementFlagProcessEnumeration | kPEEntitlementFlagProcessKill | kPEEntitlementFlagProcessSpawn | kPEEntitlementFlagProcessSpawnSignedOnly | kPEEntitlementFlagProcessElevate | kPEEntitlementFlagHostManager | kPEEntitlementFlagCredentialsManager | kPEEntitlementFlagLaunchServicesStart | kPEEntitlementFlagLaunchServicesStop | kPEEntitlementFlagLaunchServicesToggle | kPEEntitlementFlagLaunchServicesGetEndpoint | kPEEntitlementFlagLaunchServicesSetEndpoint | kPEEntitlementFlagProcessSpawnInheriteEntitlements | kPEEntitlementFlagPlatform | kPEEntitlementFlagPlatformRoot | kPEEntitlementFlagSystemTaskPorts,
 };
 
 /* new NXT2 entitlements */
@@ -138,9 +117,6 @@ extern NXT2Entitlement const kNXT2EntitlementTaskForPid;
 extern NXT2Entitlement const kNXT2EntitlementSUGID;
 extern NXT2Entitlement const kNXT2EntitlementSystemTaskPorts;
 
-/* dyld */
-extern NXT2Entitlement const kNXT2EntitlementDYLDHideLP;
-
 /* process */
 extern NXT2Entitlement const kNXT2EntitlementProcessEnumeration;
 extern NXT2Entitlement const kNXT2EntitlementProcessKill;
@@ -150,6 +126,7 @@ extern NXT2Entitlement const kNXT2EntitlementProcessSpawnInheriteEntitlements;
 
 /* management */
 extern NXT2Entitlement const kNXT2EntitlementManagementHost;
+extern NXT2Entitlement const kNXT2EntitlementManagementProcEnvironment;
 
 /* launch services */
 extern NXT2Entitlement const kNXT2EntitlementLaunchServicesStart;                   /* unimplemented */
@@ -164,24 +141,18 @@ extern NXT2Entitlement const kNXT2EntitlementLaunchServicesSetEndpointAllowList;
 extern NXT2Entitlement const kNXT2EntitlementSandboxFileRead;                       /* has to be CFArray filled with CFString */
 extern NXT2Entitlement const kNXT2EntitlementSandboxFileReadWrite;                  /* has to be CFArray filled with CFString */
 extern NXT2Entitlement const kNXT2EntitlementSandboxNoContainer;                    /* unfinished, container path here needs to default to $(ROOTFS)/var/mobile */
+extern NXT2Entitlement const kNXT2EntitlementSandboxHost;                           /* EXTREMELY POWERFUL ENTITLEMENT, GIVES CHILD AS MUCH FILE ACCESS AS HOST */
+
+/* ksurface */
+extern NXT2Entitlement const kNXT2EntitlementKsurfaceKEXTLoading;
 
 /* ----------------------------------------------------------------------
  *  Types
  * -------------------------------------------------------------------- */
 typedef struct ksurface_proc ksurface_proc_t;
-typedef struct ksurface_nxtr_blob ksurface_nxtr_blob_t;
-typedef struct ksurface_nxtr_result ksurface_nxtr_result_t;
 typedef struct ksurface_nxt2_blob_header ksurface_nxt2_blob_header_t;
 typedef struct ksurface_nxt2_blob_footer ksurface_nxt2_blob_footer_t;
 typedef struct ksurface_nxt2 ksurface_nxt2_t;
-    
-struct __attribute__((packed)) ksurface_nxtr_blob {
-    PEEntitlement entitlement;
-    char cdhash[USER_FSIGNATURES_CDHASH_LEN];
-    uint64_t nonce;
-    uint8_t mac[72];
-    size_t mac_len;
-};
 
 /* header contains everything signed  */
 struct __attribute__((packed)) ksurface_nxt2_blob_header {
@@ -201,14 +172,9 @@ struct ksurface_nxt2 {
     bool isValid;       /* unlike in nxtr a valid blob in nxt2 means it passes sanity checks! */
     bool isSigned;      /* means the blob is signed */
     bool isCdHashValid;
+    bool needsResign;   /* trust will resign the executable entirely when set */
     char cdhash[USER_FSIGNATURES_CDHASH_LEN];
     CFDictionaryRef entitlements;
-};
-
-struct ksurface_nxtr_result {
-    struct ksurface_nxtr_blob blob;
-    bool cdhash_valid;
-    bool blob_valid;
 };
 
 /* ----------------------------------------------------------------------
@@ -220,15 +186,7 @@ struct ksurface_nxtr_result {
 /* ----------------------------------------------------------------------
  *  Function Prototypes
  * -------------------------------------------------------------------- */
-kern_return_t entitlement_token_mach_gen(ksurface_nxtr_blob_t *blob, const char *cdhash, PEEntitlement entitlement);
-kern_return_t entitlement_mach_verify(ksurface_nxtr_result_t *mach, uint8_t *pub_key, size_t pub_key_len);
-PEEntitlement entitlement_get_path(const char *path, bool *wasLocallySigned);
-bool entitlement_set_path(const char *path, PEEntitlement entitlement);
 
-#if KSURFACE_CS_SANITIZE_ENTITLEMENTS
-PEEntitlement entitlement_sanitize(PEEntitlement base);
-#else
-#define entitlement_sanitize(base) (base)
-#endif /* KSURFACE_CS_SANITIZE_ENTITLEMENTS */
+PEEntitlementFlags entitlement_sanitize(PEEntitlementFlags base);
 
 #endif /* TRUST_ENTITLEMENT_H */

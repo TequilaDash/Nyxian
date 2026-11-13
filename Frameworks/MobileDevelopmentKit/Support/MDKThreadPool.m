@@ -32,7 +32,9 @@
 static inline void *pthreadBlockTrampoline(void *ptr)
 {
     void (^block)(void) = (__bridge_transfer void (^)(void))ptr;
-    block();
+    @autoreleasepool {
+        block();
+    }
     return NULL;
 }
 
@@ -85,13 +87,15 @@ static void *MDKWorkerThreadMain(void *arg)
         pthread_mutex_unlock(&worker->mutex);
         
         /* checking if there is code to execute */
-        if(code)
-        {
-            code();
-        }
-        if(completion)
-        {
-            completion();
+        @autoreleasepool {
+            if(code)
+            {
+                code();
+            }
+            if(completion)
+            {
+                completion();
+            }
         }
     }
     

@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #include <LindChain/ProcEnvironment/Surface/sys/compat/waittask.h>
@@ -38,7 +39,7 @@ bool waittask_proc_event_handler(uint32_t type,
         case kvObjEventDeinit:
         case kProcEventTypeWaitTask:    /* task port available */
             errno = 0;
-            send_reply(&(payload->buffer->header), 0, NULL, 0, true, 0);
+            syscall_send_reply(&(payload->buffer->header), 0, NULL, 0, true, 0);
             return true;
         case kvObjEventUnregister:
             mach_port_mod_refs(mach_task_self(), payload->task, MACH_PORT_RIGHT_SEND, -1);
@@ -54,21 +55,19 @@ bool waittask_proc_event_handler(uint32_t type,
 DEFINE_SYSCALL_HANDLER(waittask)
 {
     /* prepare arguments */
-    pid_t pid = (pid_t)args[0];
-    
-    /* need process visibility */
-    proc_visibility_t vis = proc_get_proc_visibility(sys_proc_snapshot_);
+    pid_t u_pid = (pid_t)args[0];
     
     /* getting target requested for caller */
     ksurface_proc_t *target;
-    kern_return_t ksr = proc_for_pid(pid, &target);
-    if(ksr != KERN_SUCCESS)
+    kern_return_t kr = proc_for_pid(u_pid, &target);
+    if(kr != KERN_SUCCESS)
     {
         sys_return_failure_with_errno(ECHILD);
     }
     
     /* visibility check */
     kvo_rdlock(target);
+    proc_visibility_t vis = proc_get_proc_visibility(sys_proc_snapshot_);
     if(!proc_can_see_proc(sys_proc_snapshot_, target, vis))
     {
         goto out_nochild;
@@ -89,7 +88,7 @@ DEFINE_SYSCALL_HANDLER(waittask)
     }
     kvo_unlock(target);
     
-    /* looking if state is already set */
+    /* looking if task is already there (cuz the caller wants to wait till that is the case) */
     if(target->task != MACH_PORT_NULL)
     {
         kvo_release(target);
@@ -98,14 +97,13 @@ DEFINE_SYSCALL_HANDLER(waittask)
     
     /* creating payload */
     waittask_payload_t *payload = malloc(sizeof(waittask_payload_t));
-    
     if(payload == NULL)
     {
         kvo_release(target);
         sys_return_failure_with_errno(ENOMEM);
     }
     
-    kern_return_t kr = mach_port_mod_refs(mach_task_self(), sys_task_, MACH_PORT_RIGHT_SEND, 1);
+    kr = mach_port_mod_refs(mach_task_self(), sys_task_, MACH_PORT_RIGHT_SEND, 1);
     if(kr != KERN_SUCCESS)
     {
         goto out_again;
@@ -116,8 +114,8 @@ DEFINE_SYSCALL_HANDLER(waittask)
     payload->buffer = *recv_buffer;
     
     /* register event */
-    ksr = kvo_event_register(target, kProcEventTypeWaitTask, waittask_proc_event_handler, payload, NULL);
-    if(ksr != KERN_SUCCESS)
+    kr = kvo_event_register(target, kProcEventTypeWaitTask, waittask_proc_event_handler, payload, NULL);
+    if(kr != KERN_SUCCESS)
     {
         mach_port_deallocate(mach_task_self(), sys_task_);  /* drop the reference, created prior */
     out_again:

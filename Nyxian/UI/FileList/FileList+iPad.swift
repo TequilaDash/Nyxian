@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 import UIKit
@@ -307,13 +308,13 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
     let resizeHandle = {
         let logTopBorder = UIHitTestExtendedView()
         logTopBorder.translatesAutoresizingMaskIntoConstraints = false
-        logTopBorder.backgroundColor = currentTheme?.gutterHairlineColor ?? UIColor.white.withAlphaComponent(0.2)
+        logTopBorder.backgroundColor = LDETheme.currentTheme?.gutterHairlineColor ?? UIColor.white.withAlphaComponent(0.2)
         return logTopBorder
     }()
     
     let emptyEditorVC: UIViewController = {
         let emptyEditorVC: UIViewController = UIViewController()
-        emptyEditorVC.view.backgroundColor = currentTheme?.backgroundColor
+        emptyEditorVC.view.backgroundColor = LDETheme.currentTheme?.backgroundColor
         let label: UILabel = UILabel()
         label.text = "Empty Editor"
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -391,7 +392,7 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
             if #available(iOS 27.0, *) {
                 let leftEdge = UIView()
                 leftEdge.translatesAutoresizingMaskIntoConstraints = false
-                leftEdge.backgroundColor = currentTheme?.gutterHairlineColor ?? UIColor.white.withAlphaComponent(0.2)
+                leftEdge.backgroundColor = LDETheme.currentTheme?.gutterHairlineColor ?? UIColor.white.withAlphaComponent(0.2)
                 vc.view.addSubview(leftEdge)
                 
                 NSLayoutConstraint.activate([
@@ -404,7 +405,7 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
                 vc.view.layer.cornerRadius = 20
                 vc.view.layer.cornerCurve = .continuous
                 vc.view.layer.borderWidth = 1.0
-                vc.view.layer.borderColor = currentTheme?.backgroundColor.cgColor ?? UIColor.white.withAlphaComponent(0.2).cgColor
+                vc.view.layer.borderColor = LDETheme.currentTheme?.backgroundColor.cgColor ?? UIColor.white.withAlphaComponent(0.2).cgColor
                 vc.view.layer.masksToBounds = true
             }
             
@@ -433,7 +434,7 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
         if let existingTab = tabs.first(where: { $0.url == url }) {
             self.childButton = existingTab
             self.childVC = existingTab.vc
-            (self.childVC as! CodeEditorViewController).goto(location: CCSourceLocationMake(line, column))
+            (self.childVC as! CodeEditorViewController).goto(location: MDKSourceLocationMake(line, column))
             updateTabSelection(selectedTab: existingTab)
             return
         }
@@ -548,7 +549,7 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = currentTheme?.gutterBackgroundColor
+        self.view.backgroundColor = LDETheme.currentTheme?.gutterBackgroundColor
         
         /* setting up logview */
         logView = NXConsoleView()
@@ -559,13 +560,13 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
                 logView!.layer.cornerRadius = 20
                 logView!.layer.cornerCurve = .continuous
                 logView!.layer.borderWidth = 1.0
-                logView!.layer.borderColor = currentTheme?.gutterHairlineColor.cgColor ?? UIColor.white.withAlphaComponent(0.2).cgColor
+                logView!.layer.borderColor = LDETheme.currentTheme?.gutterHairlineColor.cgColor ?? UIColor.white.withAlphaComponent(0.2).cgColor
                 logView!.layer.masksToBounds = true
             }
         }
         logView!.translatesAutoresizingMaskIntoConstraints = false
-        logView!.backgroundColor = currentTheme?.backgroundColor
-        logView!.textColor = currentTheme?.textColor
+        logView!.backgroundColor = LDETheme.currentTheme?.backgroundColor
+        logView!.textColor = LDETheme.currentTheme?.textColor
         self.view.addSubview(logView!)
         
         if #available(iOS 27.0, *) {
@@ -577,7 +578,7 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
             
             let logLeftBorder = UIView()
             logLeftBorder.translatesAutoresizingMaskIntoConstraints = false
-            logLeftBorder.backgroundColor = currentTheme?.gutterHairlineColor ?? UIColor.white.withAlphaComponent(0.2)
+            logLeftBorder.backgroundColor = LDETheme.currentTheme?.gutterHairlineColor ?? UIColor.white.withAlphaComponent(0.2)
             self.view.addSubview(logLeftBorder)
             
             NSLayoutConstraint.activate([
@@ -638,9 +639,9 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
         
         registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, previousTraitCollection: UITraitCollection) in
             if let vc = self.childVCMaster {
-                vc.view.layer.borderColor = currentTheme?.backgroundColor.cgColor ?? UIColor.white.withAlphaComponent(0.2).cgColor
+                vc.view.layer.borderColor = LDETheme.currentTheme?.backgroundColor.cgColor ?? UIColor.white.withAlphaComponent(0.2).cgColor
             }
-            self.logView?.layer.borderColor = currentTheme?.backgroundColor.cgColor ?? UIColor.white.withAlphaComponent(0.2).cgColor
+            self.logView?.layer.borderColor = LDETheme.currentTheme?.backgroundColor.cgColor ?? UIColor.white.withAlphaComponent(0.2).cgColor
         }
     }
     
@@ -691,9 +692,9 @@ class SplitScreenDetailViewController: UIViewController, PEProcessObserver {
         let selectedColor: UIColor
         
         if #available(iOS 26.0, *) {
-            selectedColor = currentTheme?.appTableCell ?? UIColor.systemGray2
+            selectedColor = LDETheme.currentTheme?.appTableCell ?? UIColor.systemGray2
         } else {
-            selectedColor = currentTheme?.appTableCell ?? UIColor.systemGray2
+            selectedColor = LDETheme.currentTheme?.appTableCell ?? UIColor.systemGray2
         }
         
         let unselectedColor: UIColor = .clear
@@ -779,7 +780,7 @@ class UIButtonTab: UIButton {
         ])
         
         self.setTitle(self.url.lastPathComponent, for: .normal)
-        self.setTitleColor(currentTheme?.textColor, for: .normal)
+        self.setTitleColor(LDETheme.currentTheme?.textColor, for: .normal)
         self.titleLabel?.font = .systemFont(ofSize: 13)
         self.contentHorizontalAlignment = .center
         self.contentVerticalAlignment = .center
@@ -818,7 +819,7 @@ class UIButtonTab: UIButton {
         let closeButton = UIButton(type: .system)
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: 10, weight: .medium)), for: .normal)
-        closeButton.tintColor = currentTheme?.textColor.withAlphaComponent(0.6)
+        closeButton.tintColor = LDETheme.currentTheme?.textColor.withAlphaComponent(0.6)
         closeButton.addAction(UIAction { [weak self] _ in
             guard let s = self else { return }
             closeAction(s)

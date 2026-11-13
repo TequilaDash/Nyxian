@@ -22,21 +22,20 @@
  * SOFTWARE.
  */
 
-#ifndef MDKPHASE_H
-#define MDKPHASE_H
+#ifndef MOBILEDEVELOPMENTKIT_MDKPHASE_H
+#define MOBILEDEVELOPMENTKIT_MDKPHASE_H
 
 #import <Foundation/Foundation.h>
 #import <MobileDevelopmentKit/MDKJob.h>
 
 @interface MDKPhase : NSObject
 
-@property (nonatomic, readonly) CCJobType type;
+@property (nonatomic, readonly) MDKJobType type;
 @property (nonatomic, readonly) BOOL isMultithreadingSupported;
 @property (nonatomic, readonly, nonnull) NSArray<MDKJob*> *jobs;
 
-+ (instancetype _Nonnull)phaseWithJobs:(NSArray<MDKJob*> * _Nonnull)jobs withJobType:(CCJobType)type withMultithreadingSupport:(BOOL)isMultithreadingSupported;
-- (instancetype _Nonnull)initWithJobs:(NSArray<MDKJob*> * _Nonnull)jobs withJobType:(CCJobType)type withMultithreadingSupport:(BOOL)isMultithreadingSupported;
++ (instancetype _Nonnull)phaseWithJobs:(NSArray<MDKJob*> * _Nonnull)jobs withJobType:(MDKJobType)type withMultithreadingSupport:(BOOL)isMultithreadingSupported;
 
 @end
 
-#endif /* MDKPHASE_H */
+#endif /* MOBILEDEVELOPMENTKIT_MDKPHASE_H */

@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef MDKPHASEENGINE_H
-#define MDKPHASEENGINE_H
+#ifndef MOBILEDEVELOPMENTKIT_MDKPHASEENGINE_H
+#define MOBILEDEVELOPMENTKIT_MDKPHASEENGINE_H
 
 #import <Foundation/Foundation.h>
 #import <MobileDevelopmentKit/MDKPhase.h>
@@ -37,12 +37,8 @@
 + (instancetype _Nonnull)engineWithClangFlags:(NSArray<NSString*> * _Nonnull)clangFlags withOtherLinkerFlags:(NSArray<NSString*> * _Nonnull)linkerFlags;
 + (instancetype _Nonnull)engineWithSwiftFlags:(NSArray<NSString*> * _Nonnull)swiftFlags withOtherClangFlags:(NSArray<NSString*> * _Nonnull)clangFlags withOtherLinkerFlags:(NSArray<NSString*> * _Nonnull)linkerFlags;
 
-- (instancetype _Nonnull)initWithDriver:(MDKDriver * _Nonnull)driver withOtherClangFlags:(NSArray<NSString*> * _Nonnull)clangFlags withOtherLinkerFlags:(NSArray<NSString*> * _Nonnull)linkerFlags;
-- (instancetype _Nonnull)initWithClangFlags:(NSArray<NSString*> * _Nonnull)clangFlags withOtherLinkerFlags:(NSArray<NSString*> * _Nonnull)linkerFlags;
-- (instancetype _Nonnull)initWithSwiftFlags:(NSArray<NSString*> * _Nonnull)swiftFlags withOtherClangFlags:(NSArray<NSString*> * _Nonnull)clangFlags withOtherLinkerFlags:(NSArray<NSString*> * _Nonnull)linkerFlags;
-
 - (NSArray * _Nullable)generatePhases;
 
 @end
 
-#endif /* MDKPHASEENGINE_H */
+#endif /* MOBILEDEVELOPMENTKIT_MDKPHASEENGINE_H */

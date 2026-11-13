@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <LindChain/ProcEnvironment/Surface/sys/compat/sign.h>
@@ -37,7 +38,7 @@ DEFINE_SYSCALL_HANDLER(sign)
      * used to only allow the spawn of binaries which are already signed.
      * all this is done to ensure the user does consent do these things!
      */
-    if(!entitlement_got_entitlement(proc_getentitlements(sys_proc_), kPEEntitlementProcessSpawn))
+    if(!entitlement_got_entitlement(proc_getentitlements(sys_proc_), kPEEntitlementFlagProcessSpawn))
     {
         sys_return_failure_with_errno(EPERM);
     }
@@ -64,25 +65,47 @@ DEFINE_SYSCALL_HANDLER(sign)
     }
     
     char path[MAXPATHLEN];
-    int ret = fcntl(fd, F_GETPATH, path);
-    close(fd);
-    if(ret != 0)
+    if(fcntl(fd, F_GETPATH, path) != 0)
     {
+        close(fd);
+        sys_return_failure_with_errno(EBADF);
+    }
+    
+    uint8_t cdhash[USER_FSIGNATURES_CDHASH_LEN];
+    bool success = CDHashOfFD(fd, (uint8_t*)&cdhash);
+    close(fd);
+    if(!success)
+    {
+        sys_return_failure_with_errno(ENOEXEC);
+    }
+    
+    int vfd = vnode_inaccessible_open(path, O_RDWR);
+    if(CDHashMatchesCodeDirectoryFD(vfd, (const unsigned char*)cdhash) != KERN_SUCCESS)
+    {
+        vnode_inaccessible_close(vfd, false);
+        sys_return_failure_with_errno(EIO); /* file got swapped */
+    }
+    
+    if(fcntl(vfd, F_GETPATH, path) != 0)
+    {
+        vnode_inaccessible_close(vfd, false);
         sys_return_failure_with_errno(EBADF);
     }
     
     NSString *nsPath = [NSString stringWithCString:path encoding:NSUTF8StringEncoding];
     if(nsPath == nil)
     {
+        vnode_inaccessible_close(vfd, false);
         sys_return_failure_with_errno(ENOMEM);
     }
     
     /* signing that shit */
     if(![LCUtils signMachOAtURL:[NSURL fileURLWithPath:nsPath]])
     {
+        vnode_inaccessible_close(vfd, false);
         sys_return_failure_with_errno(ENOEXEC);
     }
-    vnode_refresh_at_path([nsPath UTF8String]);
+    vnode_inaccessible_close(vfd, true);
     
     sys_return;
 }

@@ -22,18 +22,20 @@
  * SOFTWARE.
  */
 
-#ifndef MDKDEPENDENCYSCANNER_H
-#define MDKDEPENDENCYSCANNER_H
+#ifndef MOBILEDEVELOPMENTKIT_MDKDEPENDENCYSCANNER_H
+#define MOBILEDEVELOPMENTKIT_MDKDEPENDENCYSCANNER_H
 
 #import <MobileDevelopmentKit/MDKCFType.h>
 #import <MobileDevelopmentKit/MDKFile.h>
+#import <MobileDevelopmentKit/MDKDependency.h>
 
 @interface MDKDependencyScanner : MDKCFType
 
 + (instancetype)dependencyScannerWithArguments:(NSArray<NSString*>*)arguments;
 
 - (NSArray<MDKFile*>*)headerFilesForFile:(MDKFile*)file;
+- (BOOL)dependenciesForFile:(MDKFile*)file withHeaderFilePaths:(NSArray<MDKFile*>**)headerFilePaths withDependencies:(NSArray<MDKDependency*>**)dependencies;
 
 @end
 
-#endif /* MDKDEPENDENCYSCANNER_H */
+#endif /* MOBILEDEVELOPMENTKIT_MDKDEPENDENCYSCANNER_H */

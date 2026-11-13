@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PEServiceIdentifier</key>
+	<string>org.emexlabs.compilerd</string>
+	<key>PEShouldAutorestart</key>
+	<false/>
+	<key>PEEnabled</key>
+	<false/>
+	<key>PEIsMultiInstanceDaemon</key>
+	<true/>
+	<key>PEExecutablePath</key>
+	<string>$(NXROOT)/boot/libexec/MobileDevelopmentService</string>
+</dict>
+</plist>

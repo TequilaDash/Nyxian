@@ -1,28 +1,29 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 import UIKit
 import UniformTypeIdentifiers
 
-@objc class FileListViewController: UIThemedTableViewController, UIDocumentPickerDelegate {
+class FileListViewController: NXUITableViewController, UIDocumentPickerDelegate {
     let project: NXProject?
     let path: String
     var entries: [FileListEntry]
@@ -33,12 +34,10 @@ import UniformTypeIdentifiers
     
     var observation: NSKeyValueObservation?
 
-    init(
-        isSublink: Bool = false,
-        project: NXProject?,
-        path: String? = nil,
-        isReadOnly: Bool = false
-    ) {
+    init(isSublink: Bool = false,
+         project: NXProject?,
+         path: String? = nil,
+         isReadOnly: Bool = false) {
         self.isReadOnly = isReadOnly
         self.project = project
         
@@ -57,11 +56,10 @@ import UniformTypeIdentifiers
         self.refreshControl?.addTarget(self, action: #selector(performRefresh), for: .valueChanged)
     }
     
-    @objc init(
-        isSublink: Bool = false,
-        path: String,
-        isReadOnly: Bool = false
-    ) {
+    init(isSublink: Bool = false,
+         path: String,
+         isReadOnly: Bool = false)
+    {
         self.project = nil
         self.path = path
         self.entries = FileListEntry.getEntries(ofPath: self.path)
@@ -426,7 +424,19 @@ import UniformTypeIdentifiers
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] suggestedActions in
             guard let self = self else { return UIMenu() }
             
-            let copyAction = UIAction(title: "Copy", image: UIImage(systemName: "document.on.clipboard")) { action in
+            let getInfoAction = UIAction(title: "Get Info", image: UIImage(systemName: "info")) { [weak self] action in
+                guard let self = self else { return }
+                do {
+                    let nav: UINavigationController = UINavigationController(rootViewController: try FileInfoViewController(fileEntry: self.entries[indexPath.row]))
+                    nav.modalPresentationStyle = .formSheet
+                    self.present(nav, animated: true)
+                } catch {
+                    NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "Error Opening File Info View: \(error.localizedDescription)", withDelay: 0.0)
+                }
+            }
+            
+            let copyAction = UIAction(title: "Copy", image: UIImage(systemName: "document.on.clipboard")) { [weak self] action in
+                guard let self = self else { return }
                 PasteBoardServices.copy(mode: .copy, paths: [self.entries[indexPath.row].path])
             }
             let moveAction = UIAction(title: "Move", image: UIImage(systemName: "arrow.right")) { [weak self] action in
@@ -493,6 +503,7 @@ import UniformTypeIdentifiers
             }
             
             var children: [UIMenu] = []
+            children.append(UIMenu(options: .displayInline, children: [getInfoAction]))
             children.append(UIMenu(options: .displayInline, children: self.isReadOnly ? [copyAction] : [copyAction, moveAction, renameAction]))
             children.append(UIMenu(options: .displayInline, children: [shareAction]))
             if !self.isReadOnly {
@@ -535,7 +546,7 @@ import UniformTypeIdentifiers
                         self.entries.append(FileListEntry.getEntry(ofPath: folder.path))
                         self.tableView.reloadData()
                     } else {
-                        NotificationServer.NotifyUser(level: .error, notification: "Failed to unzip \(fileListEntry.path)")
+                        NXAlertDiagnosticPresenter.notifyUser(with: .error, withMessage: "Failed to unzip \(fileListEntry.path)", withDelay: 0.0)
                     }
                 }
             } else {

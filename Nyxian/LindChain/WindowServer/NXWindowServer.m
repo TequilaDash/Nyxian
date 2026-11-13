@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <LindChain/WindowServer/NXWindowServer.h>
@@ -160,10 +161,17 @@
 
     [window.view.layer removeAllAnimations];
     
-    [UIView animateWithDuration:0.3 animations:^{
-        window.view.alpha = 0.0;
+    [UIView animateKeyframesWithDuration:0.25 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeCubic animations:^{
+        [UIView addKeyframeWithRelativeStartTime:0.0 relativeDuration:0.25 animations:^{
+            window.view.alpha = 0.8;
+            window.view.transform = CGAffineTransformMakeScale(1.05, 1.05);
+        }];
+        [UIView addKeyframeWithRelativeStartTime:0.25 relativeDuration:0.75 animations:^{
+            window.view.alpha = 0.0;
+            window.view.transform = CGAffineTransformMakeScale(0.6, 0.6);
+        }];
     } completion:^(BOOL finished) {
-        window.view.hidden = YES;
+        [window.view removeFromSuperview];
         window.view.alpha = 1.0;
         window.view.transform = CGAffineTransformIdentity;
         [window.session deactivateWindow];
@@ -307,7 +315,6 @@
     
     NXWindow *window = self.windows[@(_activeWindowIdentifier)];
     if(window != nil &&
-       _activeWindowIdentifier != window.identifier &&
        [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
     {
         // close first the old one and wait
@@ -868,6 +875,11 @@
 
 - (void)windowWantsToClose:(NXWindow *)window
 {
+    if(_presentationState == NXWindowServerPresentationStateFullScreen && _fullScreenWindow == window)
+    {
+        _fullScreenWindow = nil;
+        _presentationState = NXWindowServerPresentationStateDefault;
+    }
     if(_activeWindow == window)
     {
         _activeWindow = nil;

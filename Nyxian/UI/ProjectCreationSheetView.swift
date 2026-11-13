@@ -1,23 +1,24 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2026 Kyle-Ye
  Copyright (C) 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 import SwiftUI
@@ -44,7 +45,7 @@ struct ProjectCreationSheetView: View {
         VStack(spacing: 0) {
             header
             Rectangle()
-                .fill(Color(uiColor: currentTheme!.gutterHairlineColor))
+                .fill(Color(uiColor: LDETheme.currentTheme!.gutterHairlineColor))
                 .frame(height: 1 / UIScreen.main.scale)
             ScrollView {
                 Group {
@@ -57,11 +58,11 @@ struct ProjectCreationSheetView: View {
                 .padding(.vertical, 16)
             }
             Rectangle()
-                .fill(Color(uiColor: currentTheme!.gutterHairlineColor))
+                .fill(Color(uiColor: LDETheme.currentTheme!.gutterHairlineColor))
                 .frame(height: 1 / UIScreen.main.scale)
             controls
         }
-        .background(Color(uiColor: currentTheme!.backgroundColor))
+        .background(Color(uiColor: LDETheme.currentTheme!.backgroundColor))
         .onAppear {
             NXWindowServer.shared().windowsGetOutOfMyWay()
         }
@@ -78,7 +79,7 @@ struct ProjectCreationSheetView: View {
             .padding(.horizontal, 20)
             .padding(.top, 20)
             .padding(.bottom, 14)
-            .foregroundColor(Color(currentTheme!.textColor))
+            .foregroundColor(Color(LDETheme.currentTheme!.textColor))
     }
     
     private var controls: some View {
@@ -120,10 +121,10 @@ private struct ProjectCreationLegacyPrimaryButtonStyle: ButtonStyle {
             .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, 18)
             .frame(minHeight: 44)
-            .foregroundStyle(Color(uiColor: currentTheme!.backgroundColor))
+            .foregroundStyle(Color(uiColor: LDETheme.currentTheme!.backgroundColor))
             .background {
                 Capsule(style: .continuous)
-                    .fill(Color(uiColor: currentTheme!.textColor))
+                    .fill(Color(uiColor: LDETheme.currentTheme!.textColor))
                     .opacity(buttonOpacity(isPressed: configuration.isPressed))
             }
     }
@@ -161,14 +162,14 @@ private struct ProjectCreationLegacySecondaryButtonStyle: ButtonStyle {
             .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, 18)
             .frame(minHeight: 44)
-            .foregroundStyle(Color(uiColor: currentTheme!.textColor))
+            .foregroundStyle(Color(uiColor: LDETheme.currentTheme!.textColor))
             .background {
                 Capsule(style: .continuous)
-                    .fill(Color(uiColor: currentTheme!.backgroundColor))
+                    .fill(Color(uiColor: LDETheme.currentTheme!.backgroundColor))
                     .overlay {
                         Capsule(style: .continuous)
                             .strokeBorder(
-                                Color(uiColor: currentTheme!.gutterHairlineColor),
+                                Color(uiColor: LDETheme.currentTheme!.gutterHairlineColor),
                                 lineWidth: 1
                             )
                     }

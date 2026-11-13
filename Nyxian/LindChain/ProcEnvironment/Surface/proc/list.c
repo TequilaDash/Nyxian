@@ -1,23 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
- Copyright (C) 2026 semvis123
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #include <LindChain/ProcEnvironment/Surface/proc/list.h>
@@ -42,7 +42,12 @@ proc_visibility_t proc_get_proc_visibility(ksurface_proc_snapshot_t *caller)
      * if its a entitled process the ofc show em
      * all we got.
      */
-    if(entitlement_got_entitlement(proc_getentitlements(caller), kPEEntitlementProcessEnumeration))
+    if(entitlement_got_entitlement(proc_getentitlements(caller), kPEEntitlementFlagProcessEnumeration))
+    {
+        return PROC_VIS_ALL;
+    }
+    
+    if(trust_enforcement_overrides(proc_getpid(caller), kPEEntitlementFlagProcessEnumeration, "process enumeration"))
     {
         return PROC_VIS_ALL;
     }
@@ -92,6 +97,8 @@ bool proc_is_flavour_matching(ksurface_proc_t *target,
             return dsid == proc_getsid(target);
         case PROC_FLV_RUID:
             return dsid == proc_getruid(target);
+        case PROC_FLV_PGID:
+            return target->bsd.kp_proc.p_stat != SZOMB && dsid == proc_getpgid(target);
         default:
             return false;
     }
@@ -129,6 +136,75 @@ void proc_list_radix_walker_callback(uint64_t ident,
     kvo_release(proc);
 }
 
+typedef struct {
+    pid_t pgid;
+    pid_t sid;
+    bool check_sid;
+    bool found;
+} proc_pgrp_lookup_ctx_t;
+
+static void proc_pgrp_lookup_callback(uint64_t ident,
+                                      void *value,
+                                      void *ctx)
+{
+    proc_pgrp_lookup_ctx_t *lookup = ctx;
+    ksurface_proc_t *proc = value;
+    
+    if(lookup->found || !kvo_retain(proc))
+    {
+        return;
+    }
+    
+    kvo_rdlock(proc);
+    bool match = proc->bsd.kp_proc.p_stat != SZOMB && proc_getpgid(proc) == lookup->pgid;
+    if(match && lookup->check_sid)
+    {
+        match = proc_getsid(proc) == lookup->sid;
+    }
+    kvo_unlock(proc);
+    
+    if(match)
+    {
+        lookup->found = true;
+    }
+    
+    kvo_release(proc);
+}
+
+static bool proc_pgrp_lookup(pid_t pgid,
+                             pid_t sid,
+                             bool check_sid)
+{
+    if(pgid <= 0)
+    {
+        return false;
+    }
+    
+    proc_pgrp_lookup_ctx_t ctx = {
+        .pgid = pgid,
+        .sid = sid,
+        .check_sid = check_sid,
+        .found = false,
+    };
+    
+    proc_table_rdlock();
+    radix_walk(&(ksurface->proc_info.tree), proc_pgrp_lookup_callback, &ctx);
+    proc_table_unlock();
+    
+    return ctx.found;
+}
+
+bool proc_pgrp_exists(pid_t pgid)
+{
+    return proc_pgrp_lookup(pgid, 0, false);
+}
+
+bool proc_pgrp_exists_in_session(pid_t pgid,
+                                 pid_t sid)
+{
+    return proc_pgrp_lookup(pgid, sid, true);
+}
+
 kern_return_t proc_list(ksurface_proc_snapshot_t *proc_copy,
                         kinfo_proc_t **kp,
                         size_t *len,
@@ -138,21 +214,31 @@ kern_return_t proc_list(ksurface_proc_snapshot_t *proc_copy,
     assert(proc_copy != NULL && kp != NULL && len != NULL);
     
     proc_visibility_t vis = proc_get_proc_visibility(proc_copy);
-    
-    /* in case its none we dont even have to iterrate */
     if(vis == PROC_VIS_NONE)
     {
+        /*
+         * don't have to iterrate anything, it is none
+         * it cannot see shit.
+         */
         *len = 0;
         *kp = NULL;
         return KERN_SUCCESS;
     }
     
-    /* optimized path for pid query */
+    /* optimized path for single pid query */
     if(flavour == PROC_FLV_PID)
     {
         ksurface_proc_t *proc;
-        kern_return_t ksr = proc_for_pid(dsid, &proc);
-        if(ksr != KERN_SUCCESS)
+        kern_return_t kr = proc_for_pid(dsid, &proc);
+        if(kr != KERN_SUCCESS)
+        {
+            *len = 0;
+            *kp = NULL;
+            return KERN_SUCCESS;    /* returning success so that sysctl does give a empty buffer */
+        }
+        
+        /* can we see bro? */
+        if(!proc_can_see_proc(proc_copy, proc, vis))
         {
             *len = 0;
             *kp = NULL;
@@ -200,7 +286,7 @@ kern_return_t proc_list(ksurface_proc_snapshot_t *proc_copy,
      */
     proc_table_rdlock();
     
-    w->kp = malloc(sizeof(kinfo_proc_t) * ksurface->proc_info.proc_count);
+    w->kp = malloc(sizeof(kinfo_proc_t) * ksurface->proc_info.proc_count);  /* have to lock cause proc_count is guarded under the proc table lock */
     if(w->kp == NULL)
     {
         proc_table_unlock();

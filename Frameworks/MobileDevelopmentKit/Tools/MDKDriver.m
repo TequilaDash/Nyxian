@@ -72,14 +72,30 @@ static const void *MDKDriverDelegateKey = &MDKDriverDelegateKey;
 }
 
 + (instancetype)driverWithArguments:(NSArray<NSString*>*)arguments
-                           withType:(CCDriverType)type
+                           withType:(MDKDriverType)type
 {
-    return (__bridge_transfer MDKDriver*)CCDriverCreate(kCFAllocatorSystemDefault, (__bridge CFArrayRef)arguments, type);
+    return (__bridge_transfer MDKDriver*)CCDriverCreate(kCFAllocatorSystemDefault, (__bridge CFArrayRef)arguments, type == MDKDriverTypeClang ? kCCDriverTypeClang : kCCDriverTypeSwift);
 }
 
 - (NSArray<MDKJob*>*)generateJobs
 {
-    return (__bridge_transfer NSArray<MDKJob*>*)CCDriverCreateJobs((__bridge CCDriverRef)self);
+    NSArray<MDKJob*> *jobs = (__bridge_transfer NSArray<MDKJob*>*)CCDriverCreateJobs(kCFAllocatorSystemDefault, (__bridge CCDriverRef)self);
+    if(jobs == nil)
+    {
+        return nil;
+    }
+    
+    MDKWeakWrapper *wrapper = objc_getAssociatedObject(self, MDKDriverDelegateKey);
+    if([wrapper.delegate respondsToSelector:@selector(driver:editJobListForJobList:)])
+    {
+        jobs = [wrapper.delegate driver:self editJobListForJobList:jobs];
+        if(jobs == nil)
+        {
+            return nil;
+        }
+    }
+    
+    return jobs;
 }
 
 - (NSURL*)sysrootURL
@@ -90,6 +106,11 @@ static const void *MDKDriverDelegateKey = &MDKDriverDelegateKey;
 - (MDKSDK*)sdk
 {
     return (__bridge_transfer MDKSDK*)CCDriverCopySDK((__bridge CCDriverRef)self);
+}
+
+- (MDKDriverType)type
+{
+    return CCDriverGetType((__bridge CCDriverRef)self) == kCCDriverTypeClang ? MDKDriverTypeClang : MDKDriverTypeSwift;
 }
 
 - (void)setDelegate:(id<MDKDriverDelegate>)delegate

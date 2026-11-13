@@ -22,12 +22,13 @@
  * SOFTWARE.
  */
 
-#ifndef CCUTILS_H
-#define CCUTILS_H
+#ifndef CORECOMPILER_CCUTILS_H
+#define CORECOMPILER_CCUTILS_H
 
 #include <CoreCompiler/CCBase.h>
 
 CC_EXPORT CFIndex CCGetMaximumPerformanceCores(void);
 CC_EXPORT void CCInstallLLVMFatalErrorHandler(void);
+CC_EXPORT void CCInitializeSwiftModulesOnce(void);
 
-#endif /* CCUTILS_H */
+#endif /* CORECOMPILER_CCUTILS_H */

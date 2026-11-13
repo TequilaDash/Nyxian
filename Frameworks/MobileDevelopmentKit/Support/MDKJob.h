@@ -22,22 +22,33 @@
  * SOFTWARE.
  */
 
-#ifndef MDKJOB_H
-#define MDKJOB_H
+#ifndef MOBILEDEVELOPMENTKIT_MDKJOB_H
+#define MOBILEDEVELOPMENTKIT_MDKJOB_H
 
 #import <MobileDevelopmentKit/MDKCFType.h>
 #import <MobileDevelopmentKit/MDKDiagnostic.h>
-#import <CoreCompiler/CCJob.h>
 
-@interface MDKJob : MDKCFType
+typedef NS_ENUM(UInt8, MDKJobType) {
+    MDKJobTypeCompiler = 0,
+    MDKJobTypeDriver,
+    MDKJobTypeSwiftCompiler,
+    MDKJobTypeSwiftDriver,
+    MDKJobTypeLinker,
+    MDKJobTypeUnknown
+};
 
-@property (nonatomic, readonly) CCJobType type;
-@property (nonatomic, readonly) NSArray<NSString*> *arguments;
+@interface MDKJob : MDKCFType <NSSecureCoding>
 
-+ (instancetype)jobWithType:(CCJobType)type withArguments:(NSArray<NSString*>*)arguments;
+@property (nonatomic, readonly) MDKJobType type;
+@property (nonatomic, readonly) NSArray<NSString*> *baseArguments;
+@property (nonatomic, readonly) NSArray<NSURL*> *inputFileURLs;
+@property (nonatomic, readonly) NSURL *outputFileURL;
+@property (nonatomic, readonly, copy) NSArray<NSString*> *arguments;
+
++ (instancetype)jobWithType:(MDKJobType)type withArguments:(NSArray<NSString*>*)arguments withInputFileURLs:(NSArray<NSURL*>*)inputFileURLs withOutputFileURL:(NSURL*)outputFileURL;
 
 - (BOOL)executeJobWithOutDiagnostics:(NSArray<MDKDiagnostic*>**)outDiagnostic withOutMainSource:(NSString**)outMainSource;
 
 @end
 
-#endif /* MDKJOB_H */
+#endif /* MOBILEDEVELOPMENTKIT_MDKJOB_H */

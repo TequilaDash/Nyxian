@@ -1,28 +1,31 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <Foundation/Foundation.h>
 #import <LindChain/Utils/Swizzle.h>
 #import <LindChain/Private/UIKitPrivate.h>
-#import <LindChain/Services/applicationmgmtd/LDEApplicationWorkspace.h>
+#import <Frameworks/LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspace.h>
+#import <Frameworks/LiveProcessLegacy/LindChain/Services/bootstrapd/ISIcon.h>
+#import <LindChain/Utils/IconUtils.h>
 
 /* WIP TO A HUGE EXTEND! */
 
@@ -33,7 +36,7 @@
 @property (readonly, nullable, nonatomic) NSNumber *sharedUsage;
 @end
 
-@interface LSApplicationSpoofProxy : NSObject
+@interface LDEApplicationProxy : NSObject
 
 @property (nonatomic, readonly) LDEApplicationObject *applicationObject;
 @property (nonatomic, readonly) NSNumber *ODRDiskUsage;
@@ -260,12 +263,12 @@
 
 @end
 
-@implementation LSApplicationSpoofProxy
+@implementation LDEApplicationProxy
 
 /* inits */
 + (id)applicationProxyForLDEObject:(LDEApplicationObject*)object
 {
-    LSApplicationSpoofProxy *applicationProxy = [[LSApplicationSpoofProxy alloc] init];
+    LDEApplicationProxy *applicationProxy = [[LDEApplicationProxy alloc] init];
     if(self)
     {
         applicationProxy->_applicationObject = object;
@@ -508,7 +511,7 @@
 
 - (bool)isRestricted
 {
-    return true;
+    return false;
 }
 
 - (bool)isContainerized
@@ -533,7 +536,7 @@
 
 - (NSString*)teamID
 {
-    return @"nya";
+    return @"";
 }
 
 - (NSString*)sdkVersion
@@ -543,7 +546,7 @@
 
 - (NSDictionary<NSString*,id<NSCoding>>*)entitlements
 {
-    return @{};
+    return _applicationObject.entitlements;
 }
 
 - (NSURL*)bundleContainerURL
@@ -569,7 +572,7 @@
 
 - (NSString*)minimumSystemVersion
 {
-    return @"";
+    return _applicationObject.minimumSystemVersion;
 }
 
 - (NSURL*)bundleURL
@@ -601,7 +604,7 @@
 
 - (NSString*)shortVersionString
 {
-    return _applicationObject.bundleShortVersion;
+    return _applicationObject.shortVersionString;
 }
 
 - (NSDictionary*)iconsDictionary
@@ -609,20 +612,57 @@
     return _applicationObject.iconDictionary;
 }
 
-/*- (id)handlerRankOfClaimForContentType:(id)arg1;
-- (bool)hasMIDBasedSINF;
-- (id)iconDataForVariant:(int)arg1;
-- (id)iconDataForVariant:(int)arg1 withOptions:(int)arg2;
-- (bool)iconIsPrerendered;
-- (bool)iconUsesAssetCatalog;
-- (id)initWithCoder:(id)arg1;
-- (id)installFailureReason;
-- (id)installProgress;
-- (id)installProgressSync;
-- (unsigned long long)installType;
-- (bool)isAppUpdate;
-- (bool)isDeletableIgnoringRestrictions;
-- (bool)isDeviceBasedVPP;
+- (id)handlerRankOfClaimForContentType:(id)arg1
+{
+    return nil;
+}
+
+- (bool)hasMIDBasedSINF
+{
+    return false;
+}
+
+- (bool)iconIsPrerendered
+{
+    return _applicationObject.icon == nil;
+}
+
+- (bool)iconUsesAssetCatalog
+{
+    return false;   /* FIXME: properly check for it in LDEApplicationObject */
+}
+
+- (id)installFailureReason
+{
+    return nil; /* no reason */
+}
+
+- (id)installProgress
+{
+    return nil; /* no progress */
+}
+
+- (id)installProgressSync
+{
+    return nil;
+}
+
+- (unsigned long long)installType
+{
+    return 0;
+}
+
+- (bool)isAppUpdate
+{
+    return false;
+}
+
+- (bool)isDeletableIgnoringRestrictions
+{
+    return false;
+}
+
+/*
 - (bool)isGameCenterEnabled;
 - (bool)isNewsstandApp;
 - (bool)isPlaceholder;
@@ -683,6 +723,49 @@
     return PrivClass(LSApplicationProxy);
 }
 
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
+{
+    NSMethodSignature *sig = [super methodSignatureForSelector:sel];
+    if(sig)
+    {
+        return sig;
+    }
+    return [PrivClass(LSApplicationProxy) instanceMethodSignatureForSelector:sel];
+}
+
+- (void)forwardInvocation:(NSInvocation *)inv
+{
+    SEL sel = inv.selector;
+    static NSMutableSet *seen;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{ seen = [NSMutableSet set]; });
+    NSString *name = NSStringFromSelector(sel);
+    @synchronized(seen)
+    {
+        if(![seen containsObject:name])
+        {
+            [seen addObject:name];
+        }
+    }
+
+    NSUInteger len = inv.methodSignature.methodReturnLength;
+    if(len)
+    {
+        void *buf = calloc(1, len);
+        [inv setReturnValue:buf];
+        free(buf);
+    }
+}
+
+- (BOOL)respondsToSelector:(SEL)sel
+{
+    if([super respondsToSelector:sel])
+    {
+        return YES;
+    }
+    return [PrivClass(LSApplicationProxy) instancesRespondToSelector:sel];
+}
+
 @end
 
 @interface LSApplicationWorkspaceHooks: NSObject
@@ -704,32 +787,38 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         SwizzleObjCMethod(@selector(allApplications), PrivClass(LSApplicationWorkspace), @selector(hook_allApplications), [LSApplicationWorkspaceHooks class], kSwizzleMethodTypeInstance);
-        SwizzleObjCMethod(@selector(allInstalledApplications), PrivClass(LSApplicationWorkspace), @selector(hook_allApplications), [LSApplicationWorkspaceHooks class], kSwizzleMethodTypeInstance);
+        SwizzleObjCMethod(@selector(allInstalledApplications), PrivClass(LSApplicationWorkspace), @selector(hook_allInstalledApplications), [LSApplicationWorkspaceHooks class], kSwizzleMethodTypeInstance);
         SwizzleObjCMethod(@selector(uninstallApplication:withOptions:error:usingBlock:), PrivClass(LSApplicationWorkspace), @selector(hook_uninstallApplication:withOptions:error:usingBlock:), [LSApplicationWorkspaceHooks class], kSwizzleMethodTypeInstance);
+        SwizzleObjCMethod(@selector(openApplicationWithBundleID:), PrivClass(LSApplicationWorkspace), @selector(hook_openApplicationWithBundleID:), [LSApplicationWorkspaceHooks class], kSwizzleMethodTypeInstance);
         SwizzleObjCMethod(@selector(_applicationIconImageForBundleIdentifier:format:scale:), [UIImage class], @selector(hook_iconForBundleID:format:scale:), [UIImage class], kSwizzleMethodTypeClass);
     });
     return [self hook_defaultWorkspace];
 }
 
-- (NSArray<LSApplicationSpoofProxy*>*)hook_allApplications
++ (NSArray<LDEApplicationProxy*>*)giveAllApps
 {
     LDEApplicationWorkspace *workspace = [LDEApplicationWorkspace shared];
     [workspace ping];
     
     NSArray<LDEApplicationObject*> *allApplicationObjects = [workspace allApplicationObjects];
-    NSMutableArray<LSApplicationSpoofProxy*> *apps = [NSMutableArray array];
+    NSMutableArray<LDEApplicationProxy*> *apps = [NSMutableArray array];
     for(LDEApplicationObject *object in allApplicationObjects)
     {
-        LSApplicationSpoofProxy *proxy = [LSApplicationSpoofProxy applicationProxyForLDEObject:object];
+        LDEApplicationProxy *proxy = [LDEApplicationProxy applicationProxyForLDEObject:object];
         [apps addObject:proxy];
     }
     
     return apps;
 }
 
-- (BOOL)openApplicationWithBundleID:(NSString*)bundleIdentifier
+- (NSArray<LDEApplicationProxy*>*)hook_allApplications
 {
-    return NO;  /* no call path to do that externally yet */
+    return [LSApplicationWorkspaceHooks giveAllApps];
+}
+
+- (NSArray<LDEApplicationProxy*>*)hook_allInstalledApplications
+{
+    return [LSApplicationWorkspaceHooks giveAllApps];
 }
 
 - (BOOL)hook_uninstallApplication:(NSString *)bundleID
@@ -740,14 +829,14 @@
     return [[LDEApplicationWorkspace shared] deleteApplicationWithBundleID:bundleID];
 }
 
+- (BOOL)hook_openApplicationWithBundleID:(NSString*)bundleIdentifier
+{
+    return [[LDEApplicationWorkspace shared] openApplicationWithBundleID:bundleIdentifier];
+}
+
 @end
 
 @implementation UIImage (PrivateHook)
-
-+ (void)lazyLoad
-{
-    SwizzleObjCMethod(@selector(_applicationIconImageForBundleIdentifier:format:scale:), [UIImage class], @selector(hook_iconForBundleID:format:scale:), [UIImage class], kSwizzleMethodTypeClass);
-}
 
 + (UIImage *)hook_iconForBundleID:(NSString *)bundleIdentifier
                            format:(int)format
@@ -756,17 +845,71 @@
     LDEApplicationObject *obj = [[LDEApplicationWorkspace shared] applicationObjectForBundleID:bundleIdentifier];
     if(obj)
     {
-        UIImage *rawIcon = obj.icon;
-        CGRect r = (CGRect){ .size = rawIcon.size };
-        UIBezierPath *mask = [UIBezierPath bezierPathWithRoundedRect:r cornerRadius:rawIcon.size.width * 0.2237];
-        UIGraphicsImageRendererFormat *fmt = [UIGraphicsImageRendererFormat defaultFormat];
-        fmt.scale = scale;
-        UIGraphicsImageRenderer *rr = [[UIGraphicsImageRenderer alloc] initWithSize:rawIcon.size format:fmt];
-        UIImage *curvedImage = [rr imageWithActions:^(UIGraphicsImageRendererContext *ctx){
-            [mask addClip];
-            [rawIcon drawInRect:r];
-        }];
-        return curvedImage;
+        CGSize targetSize;
+        {
+            static NSMutableDictionary<NSString *, NSValue *> *sizeCache;
+            static dispatch_once_t once;
+            dispatch_once(&once, ^{
+                sizeCache = [NSMutableDictionary new];
+            });
+            
+            NSString *key = [NSString stringWithFormat:@"%d@%.1f", format, scale];
+            @synchronized(sizeCache)
+            {
+                NSValue *found = sizeCache[key];
+                if(found)
+                {
+                    targetSize = found.CGSizeValue;
+                    goto got_size;
+                }
+            }
+            
+            /* dw apple tells us what their size and scale is dw ^^ */
+            UIImage *probe = [self hook_iconForBundleID:@"com.apple.Preferences" format:format scale:scale];
+            targetSize = probe ? probe.size : CGSizeMake(60, 60);
+            
+            @synchronized(sizeCache)
+            {
+                sizeCache[key] = [NSValue valueWithCGSize:targetSize];
+            }
+        }
+    got_size:
+        if(obj.icon == nil)
+        {
+            UIImage *generic = Gib26FallbackIcon(targetSize, scale);
+            if(generic != nil)
+            {
+                return generic;
+            }
+        }
+        else
+        {
+            if(@available(iOS 26.0, *))
+            {
+                /* the asking apple way */
+                UIImage *image = Gib26Icon(obj.icon, obj.darkIcon, targetSize, scale);
+                if(image == nil)
+                {
+                    goto manual_way;
+                }
+                return image;
+            }
+            
+        manual_way:
+            {
+                /* the doing it my self way */
+                CGRect r = (CGRect){ .origin = CGPointZero, .size = targetSize };
+                UIBezierPath *mask = [UIBezierPath bezierPathWithRoundedRect:r cornerRadius:targetSize.width * 0.2237];
+                UIGraphicsImageRendererFormat *fmt = [UIGraphicsImageRendererFormat defaultFormat];
+                fmt.scale = scale;
+                UIGraphicsImageRenderer *rr = [[UIGraphicsImageRenderer alloc] initWithSize:targetSize format:fmt];
+                UIImage *curvedImage = [rr imageWithActions:^(UIGraphicsImageRendererContext *ctx){
+                    [mask addClip];
+                    [obj.icon drawInRect:r];
+                }];
+                return curvedImage;
+            }
+        }
     }
     return [self hook_iconForBundleID:bundleIdentifier format:format scale:scale];
 }

@@ -10,3 +10,7 @@ Nyxian/LindChain/JBSupport/libroot.h
 Nyxian/LindChain/JBSupport/tshelper
 *.xcuserstate
 xcuserdata/
+Shared/kernel
+TrustStore
+.fuse_hidden*
+__pycache__/

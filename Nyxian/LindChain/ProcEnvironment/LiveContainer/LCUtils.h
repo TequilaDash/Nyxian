@@ -28,6 +28,9 @@
 
 int dyld_get_program_sdk_version(void);
 
+#if defined(BOOT)
+__attribute__((objc_runtime_name("NXBootLCUtils")))
+#endif
 @interface LCUtils : NSObject
 
 @property (class, nonatomic, readwrite, strong) NSData *certificateData;
@@ -36,9 +39,14 @@ int dyld_get_program_sdk_version(void);
 
 + (NSProgress *)signAppBundleWithZSign:(NSURL *)path completionHandler:(void (^)(BOOL success, NSError *error))completionHandler;
 + (BOOL)signMachOAtURL:(NSURL *)url;
++ (BOOL)signMachOWithoutPatchAtURL:(NSURL *)url;
 + (int)validateCertificateWithCompletionHandler:(void(^)(int status, NSString *error))completionHandler;
 + (int)validateCertificateWithCertificateData:(NSData*)data withPassword:(NSString*)password WithCompletionHandler:(void(^)(int status, NSString *error))completionHandler;
 
 @end
 
+BOOL NXSignMachOAuto(NSURL *url);
+
 #endif /* LIVECONTAINER_LCUTILS_H */
+
+BOOL NXSignMachOWithIdentity(NSURL *url, NSData *profile, NSData *certificate, NSString *password);

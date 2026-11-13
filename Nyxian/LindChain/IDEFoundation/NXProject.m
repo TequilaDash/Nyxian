@@ -1,26 +1,26 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <LindChain/IDEFoundation/NXProject.h>
-#import <LindChain/Utils/Utils.h>
 #import <LindChain/IDEFoundation/NXCodeTemplate.h>
 #import <LindChain/IDEFoundation/NXUser.h>
 #import <LindChain/IDEFoundation/NXUtils.h>
@@ -32,7 +32,7 @@
 {
     return @[
         @"-target",
-        @"apple-arm64-ios26.4",
+        @"apple-arm64-ios27.0",
         @"-isysroot",
         NXBootstrap.shared.sdkURL.path,
         @"-resource-dir",
@@ -79,7 +79,8 @@
         _bundleid = [self.dictionary objectForKey:@"NXBundleIdentifier" withDefaultObject:[NSString stringWithFormat:@"app.nyxian.%@.%@", [[NXUser shared] username], [self executable]]];
         _deploymentTarget = [self.dictionary objectForKey:@"NXDeploymentTarget" withDefaultObject:@"25.0"];
         _outputPath = [self.dictionary varObjectForKey:@"NXOutputPath"];
-        _signMachOWithNyxianEntitlements = [self.dictionary booleanForKey:@"NXSignMachOWithNyxianEntitlements" withDefaultValue:true];
+        _signMachOWithNyxianEntitlements = [self.dictionary booleanForKey:@"NXSignMachOWithNyxianEntitlements" withDefaultValue:YES];
+        _linkFrameworksAutomatically = [self.dictionary booleanForKey:@"NXLinkFrameworksAutomatically" withDefaultValue:NO];
         
         /* MARK: info plist data */
         NSMutableDictionary *mutableInfoDictionary = [[self.dictionary objectForKey:@"NXBundleInfo" withDefaultObject:@{}] mutableCopy];
@@ -148,7 +149,9 @@
         @"SRCROOT": url.path,
         @"SDKROOT": NXBootstrap.shared.sdkURL.path,
         @"BSROOT": NXBootstrap.shared.rootURL.path,
-        @"CACHEROOT": _cacheURL.path
+        @"NXROOT": NXBootstrap.shared.rootfsURL.path,
+        @"CACHEROOT": _cacheURL.path,
+        @"SHDROOT": [[NSBundle.mainBundle.bundleURL URLByAppendingPathComponent:@"Shared"] path],
     }];
     _entitlementsConfig = [[NXEntitlementsConfig alloc] initWithPlistPath:[NSString stringWithFormat:@"%@/Config/Entitlements.plist", self.url.path] withVariables:nil];
     return self;
@@ -251,11 +254,12 @@
         @"NXDisplayName": name,
         @"NXOrganizationPrefix": organizationIdentifierValue,
         @"NXBundleIdentifier": bundleIdentifierValue,
-        @"NXDeploymentTarget": version.versionString ?: @"26.5",
+        @"NXDeploymentTarget": version.versionString ?: @"27.0",
         @"NXClangFlags": NXCompilerFlagsForCodeTemplateLanguage(schemeKind, languageKind),
         @"NXLinkerFlags": @[],
         @"NXSwiftFlags": NXSwiftFlagsForCodeTemplateLanguage(schemeKind, languageKind),
-        @"NXSignMachOWithNyxianEntitlements": @(YES) /* FIXME: when enabled certain signers outside of zsign may fail to sign the MachO although its usually allowed to have trailing bits after the MachO ended, ldid has a weird non standard check that even is not inside of apples code sign cuz i tried to sign a MachO in strict mode and it passed including the trailing bits. */
+        @"NXSignMachOWithNyxianEntitlements": @(YES),   /* FIXME: when enabled certain signers outside of zsign may fail to sign the MachO although its usually allowed to have trailing bits after the MachO ended, ldid has a weird non standard check that even is not inside of apples code sign cuz i tried to sign a MachO in strict mode and it passed including the trailing bits. */
+        @"NXLinkFrameworksAutomatically": schemeKind == NXProjectSchemeKindKSurfaceKext ? @(NO) : @(YES),
     }];
     
     switch(schemeKind)
@@ -273,12 +277,26 @@
                 @"NXOutputPath": @"$(CACHEROOT)/$(NXExecutable)"
             }];
             break;
+        case NXProjectSchemeKindKSurfaceKext:
+            [projConfigPlist setValuesForKeysWithDictionary:@{
+                @"NXBundleInfo": @{
+                    @"CFBundleExecutable": @"$(NXExecutable)",
+                    @"CFBundleIdentifier": @"$(NXBundleIdentifier)",
+                    @"CFBundleVersion": @"$(NXBundleVersion)",
+                    @"CFBundleShortVersionString": @"$(NXBundleShortVersion)",
+                },
+                @"NXBundleVersion": @"1.0",
+                @"NXBundleShortVersion": @"1.0",
+                @"NXOutputPath": @"$(CACHEROOT)/Payload/$(NXBundleIdentifier).kext/$(NXExecutable)"
+            }];
+            [projConfigPlist removeObjectForKey:@"NXSignMachOWithNyxianEntitlements"];
+            break;
         default:
             [defaultFileManager removeItemAtURL:projectURL error:nil];
             return nil;
     }
     
-    NSDictionary *plistList = @{
+    NSMutableDictionary *plistList = [@{
         @"/Config/Project.plist": projConfigPlist,
         @"/Config/Entitlements.plist": @{
             /* foundational */
@@ -288,9 +306,6 @@
             (__bridge NSString*)kNXT2EntitlementTaskForPid: @(NO),
             (__bridge NSString*)kNXT2EntitlementSUGID: @(NO),
             (__bridge NSString*)kNXT2EntitlementSystemTaskPorts: @(NO),
-            
-            /* dyld */
-            (__bridge NSString*)kNXT2EntitlementDYLDHideLP: @(NO),
             
             /* process */
             (__bridge NSString*)kNXT2EntitlementProcessEnumeration: @(NO),
@@ -316,7 +331,12 @@
             (__bridge NSString*)kNXT2EntitlementSandboxFileReadWrite: @[],
             (__bridge NSString*)kNXT2EntitlementSandboxNoContainer: @(NO),
         }
-    };
+    } mutableCopy];
+    
+    if(schemeKind == NXProjectSchemeKindKSurfaceKext)
+    {
+        [plistList removeObjectForKey:@"/Config/Entitlements.plist"];
+    }
     
     for(NSString *key in plistList)
     {
@@ -336,7 +356,7 @@
     NXProjectLanguage language = NXProjectLanguageFromLanguageKind(languageKind);
     NXProjectInterface interface = NXProjectInterfaceFromInterfaceKind(interfaceKind);
     
-    if(!NXCodeTemplateMakeProjectStructure(scheme, language, interface, name, projectURL))
+    if(!NXCodeTemplateMakeProjectStructure(scheme, language, interface, name, projectURL, bundleid))
     {
         [[NSFileManager defaultManager] removeItemAtURL:projectURL error:nil];
         return nil;
@@ -459,7 +479,13 @@
 
 - (NSURL*)resourcesURL { return [self.url URLByAppendingPathComponent:@"Resources"]; }
 - (NSURL*)payloadURL { return [self.cacheURL URLByAppendingPathComponent:@"Payload"]; }
-- (NSURL*)bundleURL { return [self.payloadURL URLByAppendingPathComponent:[self.projectConfig.executable stringByAppendingPathExtension:@"app"]]; }
+- (NSURL*)bundleURL {
+    if(self.projectConfig.schemeKind == NXProjectSchemeKindKSurfaceKext)
+    {
+        return [self.payloadURL  URLByAppendingPathComponent:[self.projectConfig.bundleid stringByAppendingPathExtension:@"kext"]];
+    }
+    return [self.payloadURL URLByAppendingPathComponent:[self.projectConfig.executable stringByAppendingPathExtension:@"app"]];
+}
 - (NSURL*)machoURL
 {
     if(self.projectConfig.formatKind == NXProjectFormatKindKate)
@@ -484,7 +510,13 @@
         return [NSURL fileURLWithPath:outputPath];
     }
 }
-- (NSURL*)packageURL { return self.projectConfig.schemeKind == NXProjectSchemeKindApp ? [self.cacheURL URLByAppendingPathComponent:[self.projectConfig.executable stringByAppendingPathExtension:@"ipa"]] : self.machoURL; }
+- (NSURL*)packageURL {
+    if(self.projectConfig.schemeKind == NXProjectSchemeKindKSurfaceKext)
+    {
+        return [self.cacheURL URLByAppendingPathComponent:[self.projectConfig.bundleid stringByAppendingPathExtension:@"kext.nipa"]];
+    }
+    return self.projectConfig.schemeKind == NXProjectSchemeKindApp ? [self.cacheURL URLByAppendingPathComponent:[self.projectConfig.executable stringByAppendingPathExtension:@"ipa"]] : self.machoURL;
+}
 
 - (BOOL)reload
 {

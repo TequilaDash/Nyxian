@@ -1,28 +1,29 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 import UIKit
 import CoreCompiler
 
-class ToolChainViewController: UIThemedTableViewController {
+class ToolChainViewController: NXUITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,11 +37,11 @@ class ToolChainViewController: UIThemedTableViewController {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return 4
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (section == 2) ? 2 : 1
+        return (section == 3) ? 2 : 1
     }
     
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
@@ -48,8 +49,10 @@ class ToolChainViewController: UIThemedTableViewController {
         case 0:
             return "An incremental build compiles only the parts of the code that have changed, reducing build times by avoiding a full rebuild of the entire project."
         case 1:
-            return "Threading in compilation refers to the compiler's ability to perform tasks in parallel like parsing, code generation, and optimization across multiple CPU threads to speed up the build process."
+            return "Using a remote daemon process means that Nyxian does not compile the code directly, it hands it over to a remote daemon process that still runs on your device, which means that if LLVM crashes it will not take Nyxian with it and also it would gurantee that the memory is destroyed after compilation and no broken LLVM state is still present."
         case 2:
+            return "Threading in compilation refers to the compiler's ability to perform tasks in parallel like parsing, code generation, and optimization across multiple CPU threads to speed up the build process."
+        case 3:
             return "This clears caches that were created for performance."
         default:
             return nil
@@ -60,7 +63,7 @@ class ToolChainViewController: UIThemedTableViewController {
         switch section {
         case 0:
             return "Features"
-        case 2:
+        case 3:
             return "Actions"
         default:
             return nil
@@ -76,8 +79,12 @@ class ToolChainViewController: UIThemedTableViewController {
             (cell as! ToggleTableCell).configure(title: "Incremental Build", key: "LDEIncrementalBuild", defaultValue: true)
             break
         case 1:
+            cell = tableView.dequeueReusableCell(withIdentifier: ToggleTableCell.reuseIdentifier, for: indexPath) as! ToggleTableCell
+            (cell as! ToggleTableCell).configure(title: "Remote Compilation Daemon", key: "LDERemoteCompileService", defaultValue: true)
+            break
+        case 2:
             let optimCpuCount: Int = (Int)(CCGetMaximumPerformanceCores())
-            cell = StepperTableCell(title: "Use Threads", key: "cputhreads", defaultValue: optimCpuCount, minValue: 1, maxValue: optimCpuCount)
+            cell = StepperTableCell(title: "Threads", key: "cputhreads", defaultValue: optimCpuCount, minValue: 1, maxValue: optimCpuCount)
             break
         default:
             switch(indexPath.row) {
@@ -97,7 +104,7 @@ class ToolChainViewController: UIThemedTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if(indexPath.section == 2) {
+        if(indexPath.section == 3) {
             // TODO: use the indication popup for cache clearing
             switch(indexPath.row) {
             case 0:

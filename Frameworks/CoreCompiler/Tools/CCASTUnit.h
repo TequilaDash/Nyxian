@@ -22,20 +22,25 @@
  * SOFTWARE.
  */
 
-#ifndef CCASTUNIT_T
-#define CCASTUNIT_T
+#ifndef CORECOMPILER_CCASTUNIT_T
+#define CORECOMPILER_CCASTUNIT_T
 
 #include <CoreCompiler/CCBase.h>
 #include <CoreCompiler/CCDiagnostic.h>
 #include <CoreCompiler/CCFile.h>
 #include <CoreCompiler/CCFileSourceLocation.h>
 
+typedef CF_ENUM(UInt8, CCASTUnitType) {
+    kCCASTUnitTypeClang = 0,
+    kCCASTUnitTypeSwift,
+};
+
 typedef struct __CCASTUnit *CCASTUnitRef;
 typedef struct __CCASTUnit *CCMutableASTUnitRef;
 
 CC_EXPORT CFTypeID CCASTUnitGetTypeID(void);
 
-CC_EXPORT CCMutableASTUnitRef CCASTUnitCreateMutable(CFAllocatorRef allocator);
+CC_EXPORT CCMutableASTUnitRef CCASTUnitCreateMutable(CFAllocatorRef allocator, CCASTUnitType type);
 
 CC_EXPORT Boolean CCASTUnitReparse(CCMutableASTUnitRef mutableUnit);
 
@@ -51,4 +56,4 @@ CC_EXPORT CCFileSourceLocationRef CCASTUnitCopyDefinitionAtLocation(CCASTUnitRef
 
 CC_EXPORT CFArrayRef CCASTUnitCopyDiagnostics(CCASTUnitRef unit);
 
-#endif /* CCASTUNIT_T */
+#endif /* CORECOMPILER_CCASTUNIT_T */

@@ -37,3 +37,13 @@ sed -i -e "/BUILD_NUMBER =/ s/= .*/= $new_build_number/" Config.xcconfig
 
 # Remove sed backup
 rm -f Config.xcconfig-e
+
+# Exporting all headers
+KERNEL_SOURCE_DIR="Nyxian"
+SHARED_KERNEL_DIR="Shared/kernel"
+rm -rf "$SHARED_KERNEL_DIR"
+mkdir -p "$SHARED_KERNEL_DIR"
+rsync -am --include='*/' --include='*.h' --exclude='*' "$KERNEL_SOURCE_DIR/" "$SHARED_KERNEL_DIR/"
+KERNEL_SOURCE_DIR="LiveProcess"
+rsync -am --include='*/' --include='*.h' --exclude='*' "$KERNEL_SOURCE_DIR/" "$SHARED_KERNEL_DIR/"
+cp "ksurface_abi.h" "Shared/kernel/ksurface_abi.h"

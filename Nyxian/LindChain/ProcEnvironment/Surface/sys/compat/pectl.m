@@ -1,40 +1,39 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
-#include <LindChain/ProcEnvironment/Surface/sys/compat/pectl.h>
+#import <Foundation/Foundation.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/klog.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/kxld/kxopen.h>
+#import <LindChain/ProcEnvironment/Surface/sys/compat/pectl.h>
 #import <LindChain/ProcEnvironment/PEProcessManager.h>
 #import <LindChain/ProcEnvironment/PEBootstrapRegistry.h>
 #import <LindChain/ProcEnvironment/PELaunchServiceManager.h>
 #import <LindChain/ProcEnvironment/PEUserspaceManager.h>
-#import <LindChain/ProcEnvironment/Server/Server.h>
-#import <Foundation/Foundation.h>
 #import <LindChain/WindowServer/NXWindowServer.h>
 #import <LindChain/WindowServer/Session/NXWindowSessionApplication.h>
 #import <LindChain/ProcEnvironment/LiveContainer/LCUtils.h>
-#include <LindChain/ProcEnvironment/Utils/vnode.h>
+#import <LindChain/ProcEnvironment/Utils/vnode.h>
 #import <ksurface_config.h>
 #import <ksurface_abi.h>
-
-extern mach_port_t xpc_endpoint_copy_listener_port_4sim(NSObject<OS_xpc_object>*);
-extern NSObject<OS_xpc_object> *xpc_endpoint_create_mach_port_4sim(mach_port_t port);
 
 DEFINE_SYSCALL_HANDLER(pectl_launchservice)
 {
@@ -44,7 +43,7 @@ DEFINE_SYSCALL_HANDLER(pectl_launchservice)
         case kPECTLLaunchServiceGetEndpoint:
         {
             userspace_pointer_t userspace_str = (userspace_pointer_t)args[2];
-            char *service_name = mach_syscall_copy_str_in(sys_task_, userspace_str, MAXHOSTNAMELEN);
+            char *service_name = syscall_copy_str_in(sys_task_, userspace_str, MAXHOSTNAMELEN);
             if(service_name == NULL)
             {
                 sys_return_failure_with_errno(ENOMEM);
@@ -57,7 +56,7 @@ DEFINE_SYSCALL_HANDLER(pectl_launchservice)
                 sys_return_failure_with_errno(ENOMEM);
             }
             
-            if(!entitlement_got_entitlement(proc_getentitlements(sys_proc_snapshot_), kPEEntitlementLaunchServicesGetEndpoint))
+            if(!entitlement_got_entitlement(proc_getentitlements(sys_proc_snapshot_), kPEEntitlementFlagLaunchServicesGetEndpoint))
             {
                 kvo_rdlock(sys_proc_);
                 CFArrayRef allowList = CFDictionaryGetValue(sys_proc_->nyx.identity->entitlements, kNXT2EntitlementLaunchServicesGetEndpointAllowList);
@@ -80,13 +79,7 @@ DEFINE_SYSCALL_HANDLER(pectl_launchservice)
             
         allow_get_fastpath:
             {
-                NSXPCListenerEndpoint *endpoint = [[PEBootstrapRegistry shared] getEndpointWithServiceIdentifier:service_nsname];
-                if(endpoint == nil)
-                {
-                    sys_return_failure_with_errno(EACCES);
-                }
-                
-                mach_port_t port = xpc_endpoint_copy_listener_port_4sim(endpoint._endpoint);
+                mach_port_t port = [[PEBootstrapRegistry shared] getMachPortNameWithServiceIdentifier:service_nsname];
                 if(port == MACH_PORT_NULL)
                 {
                     sys_return_failure_with_errno(EACCES);
@@ -98,7 +91,7 @@ DEFINE_SYSCALL_HANDLER(pectl_launchservice)
                     sys_return_failure_with_errno(EACCES);
                 }
                 
-                kr = mach_syscall_payload_create(NULL, sizeof(mach_port_t), (vm_address_t*)out_ports);
+                kr = syscall_payload_create(NULL, sizeof(mach_port_t), (mach_vm_address_t*)out_ports);
                 if(kr != KERN_SUCCESS)
                 {
                     mach_port_deallocate(mach_task_self(), port);
@@ -116,7 +109,7 @@ DEFINE_SYSCALL_HANDLER(pectl_launchservice)
             sys_need_in_ports(1, MACH_MSG_TYPE_MOVE_SEND);
             
             userspace_pointer_t userspace_str = (userspace_pointer_t)args[2];
-            char *service_name = mach_syscall_copy_str_in(sys_task_, userspace_str, MAXHOSTNAMELEN);
+            char *service_name = syscall_copy_str_in(sys_task_, userspace_str, MAXHOSTNAMELEN);
             if(service_name == NULL)
             {
                 sys_return_failure_with_errno(ENOMEM);
@@ -129,7 +122,7 @@ DEFINE_SYSCALL_HANDLER(pectl_launchservice)
                 sys_return_failure_with_errno(ENOMEM);
             }
             
-            if(!entitlement_got_entitlement(proc_getentitlements(sys_proc_snapshot_), kPEEntitlementLaunchServicesSetEndpoint))
+            if(!entitlement_got_entitlement(proc_getentitlements(sys_proc_snapshot_), kPEEntitlementFlagLaunchServicesSetEndpoint))
             {
                 kvo_rdlock(sys_proc_);
                 CFArrayRef allowList = CFDictionaryGetValue(sys_proc_->nyx.identity->entitlements, kNXT2EntitlementLaunchServicesSetEndpointAllowList);
@@ -152,13 +145,6 @@ DEFINE_SYSCALL_HANDLER(pectl_launchservice)
             
         allow_set_fastpath:
             {
-                NSXPCListenerEndpoint *endpoint = [[NSXPCListenerEndpoint alloc] init];
-                endpoint._endpoint = xpc_endpoint_create_mach_port_4sim(sys_in_ports[0]);
-                if(endpoint == nil || endpoint._endpoint == nil)
-                {
-                    sys_return_failure_with_errno(EACCES);
-                }
-                
                 /*
                  * getting existing launch service, because we
                  * have ti make sure that its not a attacker
@@ -171,32 +157,43 @@ DEFINE_SYSCALL_HANDLER(pectl_launchservice)
                 PELaunchService *service = [[PELaunchServiceManager shared] serviceForIdentifier:service_nsname];
                 if(service != nil)
                 {
-                    PEProcess *process = service.process;
+                    BOOL isIncluded = NO;
                     
-                    /*
-                     * in-case there is no process it is
-                     * reserved for the service and cannot
-                     * be overriden by a attacker.
-                     */
-                    if(process == nil)
+                    NSArray<PELaunchServiceInstance*> *instaces = [service.instances copy];
+                    for(PELaunchServiceInstance *instance in instaces)
                     {
-                        /* slot is reserved */
-                        sys_return_failure_with_errno(EACCES);
+                        /*
+                         * in-case there is no process it is
+                         * reserved for the service and cannot
+                         * be overriden by a attacker.
+                         */
+                        if(instance.process == nil)
+                        {
+                            /* slot is reserved */
+                            continue;
+                        }
+                        
+                        /*
+                         * making sure that the right process
+                         * registers the endpoint for the
+                         * service domain.
+                         */
+                        if(instance.process.pid != proc_getpid(sys_proc_snapshot_))
+                        {
+                            /* slot is reserved */
+                            continue;
+                        }
+                        
+                        isIncluded = true;
                     }
                     
-                    /*
-                     * making sure that the right process
-                     * registers the endpoint for the
-                     * service domain.
-                     */
-                    if(process.pid != proc_getpid(sys_proc_snapshot_))
+                    if(!isIncluded)
                     {
-                        /* slot is reserved */
                         sys_return_failure_with_errno(EACCES);
                     }
                 }
                 
-                [[PEBootstrapRegistry shared] setEndpoint:endpoint forServiceIdentifier:service_nsname];
+                [[PEBootstrapRegistry shared] setMachPortName:sys_in_ports[0] forServiceIdentifier:service_nsname];
                 sys_in_ports[0] = MACH_PORT_NULL;   /* prevent mach port reference leak */
                 
                 sys_return;
@@ -219,7 +216,7 @@ DEFINE_SYSCALL_HANDLER(pectl_codesigning)
             userspace_pointer_t key_len_ptr = (userspace_pointer_t)args[3];
             
             size_t key_len = 0;
-            if(!mach_syscall_copy_in(sys_task_, sizeof(size_t), &key_len, key_len_ptr))
+            if(!syscall_copy_in(sys_task_, sizeof(size_t), &key_len, key_len_ptr))
             {
                 sys_return_failure_with_errno(EFAULT);
             }
@@ -229,8 +226,8 @@ DEFINE_SYSCALL_HANDLER(pectl_codesigning)
                 sys_return_failure_with_errno(E2BIG);
             }
             
-            if(!mach_syscall_copy_out(sys_task_, ksurface->pub_key_len, ksurface->pub_key, key_user_ptr) ||
-               !mach_syscall_copy_out(sys_task_, sizeof(size_t), &key_len, key_len_ptr))
+            if(!syscall_copy_out(sys_task_, ksurface->pub_key_len, ksurface->pub_key, key_user_ptr) ||
+               !syscall_copy_out(sys_task_, sizeof(size_t), &key_len, key_len_ptr))
             {
                 sys_return_failure_with_errno(EFAULT);
             }
@@ -253,7 +250,7 @@ DEFINE_SYSCALL_HANDLER(pectl_codesigning)
             }
             
             userspace_pointer_t ch_user_ptr = (userspace_pointer_t)args[2];
-            if(!mach_syscall_copy_out(sys_task_, sizeof(sys_proc_->nyx.identity->cdhash), sys_proc_->nyx.identity->cdhash, ch_user_ptr))
+            if(!syscall_copy_out(sys_task_, sizeof(sys_proc_->nyx.identity->cdhash), sys_proc_->nyx.identity->cdhash, ch_user_ptr))
             {
                 kvo_unlock(sys_proc_);
                 sys_return_failure_with_errno(EFAULT);
@@ -263,7 +260,7 @@ DEFINE_SYSCALL_HANDLER(pectl_codesigning)
             sys_return;
         }
         case kPECTLCodeSigningAllEntitlements:
-            return kPEEntitlementAll;
+            return kPEEntitlementFlagAll;
         case kPECTLCodeSigningGetEntitlements:
         {
             return proc_getentitlements(sys_proc_snapshot_);
@@ -273,10 +270,10 @@ DEFINE_SYSCALL_HANDLER(pectl_codesigning)
             kvo_wrlock(sys_proc_);
             
             /* MARK: THIS IS USER SUPPLIED */
-            PEEntitlement userPassed = (PEEntitlement)args[2];
+            PEEntitlementFlags userPassed = (PEEntitlementFlags)args[2];
             
             /* getting the added mask out of entitlements */
-            PEEntitlement added = (~proc_getentitlements(sys_proc_)) & userPassed;
+            PEEntitlementFlags added = (~proc_getentitlements(sys_proc_)) & userPassed;
             
             /* deny adding entitlements not present in max entitlements */
             if(!entitlement_got_entitlement(proc_getmaxentitlements(sys_proc_), added))
@@ -293,11 +290,14 @@ DEFINE_SYSCALL_HANDLER(pectl_codesigning)
         case kPECTLCodeSigningDropAllEntitlements:
         {
             kvo_wrlock(sys_proc_);
-            proc_setmaxentitlements(sys_proc_, kPEEntitlementNone);
-            proc_setentitlements(sys_proc_, kPEEntitlementNone);
+            proc_setmaxentitlements(sys_proc_, kPEEntitlementFlagNone);
+            proc_setentitlements(sys_proc_, kPEEntitlementFlagNone);
             kvo_unlock(sys_proc_);
             sys_return;
         }
+        case kPECTLCodeSigningLoadKernelExtension:
+        case kPECTLCodeSigningUnloadKernelExtension:
+            sys_return_failure_with_errno(ENOTSUP);
         default:
             sys_return_failure_with_errno(ENOSYS);
     }
@@ -318,7 +318,7 @@ DEFINE_SYSCALL_HANDLER(pectl_userinterface)
                 if(sharedWindowServer == nil)
                 {
                     /* window server is not running yet */
-                    send_reply(&(recv->header), -1, NULL, 0, true, EAGAIN);
+                    syscall_send_reply(&(recv->header), -1, NULL, 0, true, EAGAIN);
                     return;
                 }
                 
@@ -326,7 +326,7 @@ DEFINE_SYSCALL_HANDLER(pectl_userinterface)
                 if(process == nil || process.bundleIdentifier == nil)
                 {
                     /* process must exist in Process Manager */
-                    send_reply(&(recv->header), -1, NULL, 0, true, EACCES);
+                    syscall_send_reply(&(recv->header), -1, NULL, 0, true, EACCES);
                     return;
                 }
                 
@@ -334,14 +334,52 @@ DEFINE_SYSCALL_HANDLER(pectl_userinterface)
                 if(wid < 0)
                 {
                     /* bundle is already presented as a window */
-                    send_reply(&(recv->header), -1, NULL, 0, true, EACCES);
+                    syscall_send_reply(&(recv->header), -1, NULL, 0, true, EACCES);
                     return;
                 }
                 
                 NXWindowSessionApplication *session = [[NXWindowSessionApplication alloc] initWithProcess:process];
                 [sharedWindowServer openWindowWithSession:session withCompletion:^(BOOL finished){
-                    send_reply(&(recv->header), finished ? 0 : -1, NULL, 0, true, 0);
+                    syscall_send_reply(&(recv->header), finished ? 0 : -1, NULL, 0, true, 0);
                 }];
+            });
+            sys_return;
+        }
+        case kPECTLUserInterfaceOpenBundleIdentifier:
+        {
+            kvo_rdlock(sys_proc_);
+            if(CFDictionaryGetValue(sys_proc_->nyx.identity->entitlements, kNXT2EntitlementManagementProcEnvironment) != kCFBooleanTrue)
+            {
+                kvo_unlock(sys_proc_);
+                sys_return_failure_with_errno(EPERM);
+            }
+            kvo_unlock(sys_proc_);
+            
+            userspace_pointer_t bundleid_str = (userspace_pointer_t)args[2];
+            char *bundleid = syscall_copy_str_in(sys_task_, bundleid_str, MAXHOSTNAMELEN);
+            if(bundleid == NULL)
+            {
+                sys_return_failure_with_errno(ENOMEM);
+            }
+            
+            NSString *bundleIdentifier = [NSString stringWithCString:bundleid encoding:NSUTF8StringEncoding];
+            free(bundleid);
+            if(bundleIdentifier == NULL)
+            {
+                sys_return_failure_with_errno(ENOMEM);
+            }
+            
+            recv_buffer_t *recv = *recv_buffer;
+            *recv_buffer = NULL;    /* claiming ownership */
+            dispatch_async(dispatch_get_main_queue(), ^{
+                pid_t pid = [[PEProcessManager shared] spawnProcessWithBundleIdentifier:bundleIdentifier withItems:@{} withKernelSurfaceProcess:kernel_proc_ doRestartIfRunning:NO];
+                if(pid < 0)
+                {
+                    syscall_send_reply(&(recv->header), -1, NULL, 0, true, EAGAIN);
+                    return;
+                }
+                
+                syscall_send_reply(&(recv->header), 0, NULL, 0, true, 0);
             });
             sys_return;
         }
@@ -356,11 +394,11 @@ DEFINE_SYSCALL_HANDLER(pectl_userspace)
     switch(action)
     {
         case kPECTLUserspaceReboot:
-            if(!entitlement_got_entitlement(proc_getmaxentitlements(sys_proc_snapshot_), kPEEntitlementPlatform))
+            if(!entitlement_got_entitlement(proc_getmaxentitlements(sys_proc_snapshot_), kPEEntitlementFlagPlatform))
             {
                 sys_return_failure_with_errno(EPERM);
             }
-            [[PEUserspaceManager shared] rebootUserspaceWithType:kPEUserspaceRebootTypeDefault];
+            [[PEUserspaceManager shared] rebootUserspace];
             sys_return;
         case kPECTLUserspaceGetMode:
             return [[PEUserspaceManager shared] mode];

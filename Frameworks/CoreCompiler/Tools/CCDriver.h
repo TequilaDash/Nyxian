@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef CCDRIVER_H
-#define CCDRIVER_H
+#ifndef CORECOMPILER_CCDRIVER_H
+#define CORECOMPILER_CCDRIVER_H
 
 #include <CoreCompiler/CCBase.h>
 #include <CoreCompiler/CCJob.h>
@@ -41,7 +41,9 @@ CC_EXPORT CFTypeID CCDriverGetTypeID(void);
 
 CC_EXPORT CCDriverRef CCDriverCreate(CFAllocatorRef allocator, CFArrayRef arguments, CCDriverType type);
 
-CC_EXPORT CFArrayRef CCDriverCreateJobs(CCDriverRef driver);
+CC_EXPORT CCDriverType CCDriverGetType(CCDriverRef driver);
+
+CC_EXPORT CFArrayRef CCDriverCreateJobs(CFAllocatorRef allocator, CCDriverRef driver);
 
 CC_EXPORT void CCDriverSetOutputPathCallback(CCDriverRef driver, CCOutputPathCallback callback, void *context);
 CC_EXPORT void *CCDriverGetOutputPathCallbackContext(CCDriverRef driver);
@@ -49,4 +51,4 @@ CC_EXPORT void *CCDriverGetOutputPathCallbackContext(CCDriverRef driver);
 CC_EXPORT CFURLRef CCDriverCopySysrootURL(CCDriverRef driver);
 CC_EXPORT CCSDKRef CCDriverCopySDK(CCDriverRef driver);
 
-#endif /* CCDRIVER_H */
+#endif /* CORECOMPILER_CCDRIVER_H */

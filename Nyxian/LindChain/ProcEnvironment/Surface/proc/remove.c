@@ -1,33 +1,33 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #include <LindChain/ProcEnvironment/Surface/proc/remove.h>
 
-kern_return_t proc_remove_by_pid(pid_t pid)
+kern_return_t proc_remove_by_pid__nolock(pid_t pid)
 {
     /*
      * removing process from radix tree, which is also
      * where its first reference lives at.
      */
-    proc_table_wrlock();
     ksurface_proc_t *proc = radix_remove(&(ksurface->proc_info.tree), pid);
     
     /*
@@ -38,8 +38,7 @@ kern_return_t proc_remove_by_pid(pid_t pid)
      */
     if(proc == NULL)
     {
-        proc_table_unlock();
-        return KERN_NO_ACCESS;
+        return KERN_NOT_FOUND;
     }
     
     /*
@@ -47,7 +46,6 @@ kern_return_t proc_remove_by_pid(pid_t pid)
      * correctly counted.
      */
     ksurface->proc_info.proc_count--;
-    proc_table_unlock();
     
     /*
      * invalidating object and removing its
@@ -58,4 +56,12 @@ kern_return_t proc_remove_by_pid(pid_t pid)
     kvo_release(proc);
 
     return KERN_SUCCESS;
+}
+
+kern_return_t proc_remove_by_pid(pid_t pid)
+{
+    proc_table_wrlock();
+    kern_return_t kr = proc_remove_by_pid__nolock(pid);
+    proc_table_unlock();
+    return kr;
 }

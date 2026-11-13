@@ -49,13 +49,6 @@
 			<string>MicroGamepad</string>
 		</dict>
 	</array>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>sidestore</string>
-		<string>livecontainer</string>
-		<string>livecontainer2</string>
-		<string>livecontainer3</string>
-	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -71,10 +64,6 @@
 	<true/>
 	<key>SBAppUsesLocalNotifications</key>
 	<integer>1</integer>
-	<key>TSRootBinaries</key>
-	<array>
-		<string>tshelper</string>
-	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -93,7 +82,7 @@
 		</dict>
 	</dict>
 	<key>UIFileSharingEnabled</key>
-	<true/>
+	<false/>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
@@ -142,5 +131,7 @@
 			</dict>
 		</dict>
 	</array>
+	<key>_EXIgnoreHostAppStateChanges</key>
+	<true/>
 </dict>
 </plist>

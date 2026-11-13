@@ -7,48 +7,47 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		791C96052F8726B0006AF674 /* Runestone in Frameworks */ = {isa = PBXBuildFile; productRef = 791C96042F8726B0006AF674 /* Runestone */; };
-		793A4E3B2F84FE1D003B609A /* Runestone in Frameworks */ = {isa = PBXBuildFile; productRef = 793A4E3A2F84FE1D003B609A /* Runestone */; };
-		793A7E502EB5996A0044418E /* SwiftTerm in Frameworks */ = {isa = PBXBuildFile; productRef = 793A7E4F2EB5996A0044418E /* SwiftTerm */; };
 		793FCD242E6730740011B3F5 /* libarchive.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 79BF9A8E2E62BA7D00C60D4C /* libarchive.tbd */; };
-		79AA11C72F7FFF46002FEAF2 /* libarchive.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 79AA11C32F7FFEE4002FEAF2 /* libarchive.tbd */; };
-		79B708BC2F73157F000F38E7 /* TreeSitterCPP in Frameworks */ = {isa = PBXBuildFile; productRef = 79B708BB2F73157F000F38E7 /* TreeSitterCPP */; };
-		79B70C1C2F73223A000F38E7 /* Runestone in Frameworks */ = {isa = PBXBuildFile; productRef = 79B70C1B2F73223A000F38E7 /* Runestone */; };
-		79B70C1F2F732364000F38E7 /* Runestone in Frameworks */ = {isa = PBXBuildFile; productRef = 79B70C1E2F732364000F38E7 /* Runestone */; };
-		79BF9A8F2E62BA8700C60D4C /* libarchive.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 79BF9A8E2E62BA7D00C60D4C /* libarchive.tbd */; };
-		79D1DA672F92A6CE0020518A /* TreeSitterSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 79D1DA662F92A6CE0020518A /* TreeSitterSwift */; };
-		860D917D2FAE1F95000D321B /* MobileDevelopmentKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 860D91752FAE1F95000D321B /* MobileDevelopmentKit.framework */; };
-		860D917E2FAE1F95000D321B /* MobileDevelopmentKit.framework in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 860D91752FAE1F95000D321B /* MobileDevelopmentKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		860D91832FAE1F9C000D321B /* CoreCompiler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86DCC25A2FA5209600973169 /* CoreCompiler.framework */; platformFilter = ios; };
-		860D91E02FAE2E4C000D321B /* CoreCompiler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86DCC25A2FA5209600973169 /* CoreCompiler.framework */; };
-		860D91E12FAE2E4C000D321B /* CoreCompiler.framework in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 86DCC25A2FA5209600973169 /* CoreCompiler.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		86DCC30A2FA521A600973169 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 86DCC3082FA5219900973169 /* libz.tbd */; };
-		86E4D4F72FB8CF63008BFE4D /* TreeSitterSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 86E4D4F62FB8CF63008BFE4D /* TreeSitterSwift */; };
-		8F4D96E62FFBF8FB006CAF3C /* Runestone in Frameworks */ = {isa = PBXBuildFile; productRef = 8F4D96E52FFBF8FB006CAF3C /* Runestone */; };
-		8F60051D3033DD2F0028EDFD /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 8F60051C3033DD2F0028EDFD /* UIOnboarding */; };
-		8F6005203033EB920028EDFD /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 8F60051F3033EB920028EDFD /* UIOnboarding */; };
+		8F1B780F3069AA2D00484260 /* libBroadpatch.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FDD845C305C4E9200949118 /* libBroadpatch.dylib */; };
+		8F25252C3096E06C0058F953 /* libpatchfind.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8F25251D3096DFCB0058F953 /* libpatchfind.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8F2525473096F2CD0058F953 /* librecoveryksurface.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8F2525373096F2100058F953 /* librecoveryksurface.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8F2525713096F42F0058F953 /* librecoveryrtpatch.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8F2525703096F3F40058F953 /* librecoveryrtpatch.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8F253101309A17DD0058F953 /* libBroadpatch.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FDD845C305C4E9200949118 /* libBroadpatch.dylib */; };
+		8F253105309A188A0058F953 /* libHWHook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FF32DED3036F59E00C46FE4 /* libHWHook.a */; };
+		8F253129309A1BAC0058F953 /* libarchive.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 79BF9A8E2E62BA7D00C60D4C /* libarchive.tbd */; };
+		8F25313E309A1F950058F953 /* LiveProcessLegacy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F2530D3309A15BE0058F953 /* LiveProcessLegacy.framework */; };
+		8F253143309A1FDB0058F953 /* LiveProcessLegacy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F2530D3309A15BE0058F953 /* LiveProcessLegacy.framework */; };
+		8F253148309A21B70058F953 /* LiveProcessLegacy.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8F2530D3309A15BE0058F953 /* LiveProcessLegacy.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8F253172309A30430058F953 /* libBroadpatch.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FDD845C305C4E9200949118 /* libBroadpatch.dylib */; };
+		8F253175309A304A0058F953 /* libBroadpatch.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FDD845C305C4E9200949118 /* libBroadpatch.dylib */; };
+		8F253178309A343D0058F953 /* LiveProcessLegacy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F2530D3309A15BE0058F953 /* LiveProcessLegacy.framework */; };
+		8F25317D309A36D10058F953 /* libHWHook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FF32DED3036F59E00C46FE4 /* libHWHook.a */; };
 		8F6008783033F9200028EDFD /* LiveProcess.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 79BF97F72E6291EE00C60D4C /* LiveProcess.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		8F60FE5A3032DB610028EDFD /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 8F60FE593032DB610028EDFD /* UIOnboarding */; };
-		8F60FE5D3032DC260028EDFD /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 8F60FE5C3032DC260028EDFD /* UIOnboarding */; };
-		8FB3BB043030089000DB3ABC /* LiveShim.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FB3BADB302FFBAA00DB3ABC /* LiveShim.framework */; };
-		8FB3BB053030089000DB3ABC /* LiveShim.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8FB3BADB302FFBAA00DB3ABC /* LiveShim.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		8FECB2472FFD34D500049BB0 /* Runestone in Frameworks */ = {isa = PBXBuildFile; productRef = 8FECB2462FFD34D500049BB0 /* Runestone */; };
-		8FECB24D2FFD367A00049BB0 /* Runestone in Frameworks */ = {isa = PBXBuildFile; productRef = 8FECB24C2FFD367A00049BB0 /* Runestone */; };
-		8FF32E2D3036F8DC00C46FE4 /* libHWHook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FF32DED3036F59E00C46FE4 /* libHWHook.a */; };
-		AF9919582DC9175A00DDF895 /* TreeSitterObjc in Frameworks */ = {isa = PBXBuildFile; productRef = AF9919572DC9175A00DDF895 /* TreeSitterObjc */; };
-		AF99195B2DC9176900DDF895 /* TreeSitterC in Frameworks */ = {isa = PBXBuildFile; productRef = AF99195A2DC9176900DDF895 /* TreeSitterC */; };
+		8F75DDC23063448D004D9A49 /* libarchive.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 79BF9A8E2E62BA7D00C60D4C /* libarchive.tbd */; };
+		8F75DDC8306344C3004D9A49 /* Runestone in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75DDC7306344C3004D9A49 /* Runestone */; };
+		8F75DDCC306344DC004D9A49 /* TreeSitterObjc in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75DDCB306344DC004D9A49 /* TreeSitterObjc */; };
+		8F75DDCE306344DC004D9A49 /* TreeSitterC in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75DDCD306344DC004D9A49 /* TreeSitterC */; };
+		8F75DDD0306344DC004D9A49 /* TreeSitterXML in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75DDCF306344DC004D9A49 /* TreeSitterXML */; };
+		8F75DDD2306344DC004D9A49 /* TreeSitterCPP in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75DDD1306344DC004D9A49 /* TreeSitterCPP */; };
+		8F75DDD4306344DC004D9A49 /* TreeSitterSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75DDD3306344DC004D9A49 /* TreeSitterSwift */; };
+		8F75DDD6306344EB004D9A49 /* UIOnboarding in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75DDD5306344EB004D9A49 /* UIOnboarding */; };
+		8F75DE9D30634E66004D9A49 /* TreeSitter in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75DE9C30634E66004D9A49 /* TreeSitter */; };
+		8F75E838306351E6004D9A49 /* SwiftTerm in Frameworks */ = {isa = PBXBuildFile; productRef = 8F75E837306351E6004D9A49 /* SwiftTerm */; };
+		8F75F22130635AF8004D9A49 /* MobileDevelopmentKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 860D91752FAE1F95000D321B /* MobileDevelopmentKit.framework */; };
+		8F75F71830635D9A004D9A49 /* SuperSlot.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8F75DDAE306343D6004D9A49 /* SuperSlot.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8F75F72E30636046004D9A49 /* MobileDevelopmentKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 860D91752FAE1F95000D321B /* MobileDevelopmentKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8F75F72F3063609D004D9A49 /* CoreCompiler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86DCC25A2FA5209600973169 /* CoreCompiler.framework */; platformFilter = ios; };
+		8F75F7303063609D004D9A49 /* CoreCompiler.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 86DCC25A2FA5209600973169 /* CoreCompiler.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8FDD846D305C4EE900949118 /* libBroadpatch.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8FDD845C305C4E9200949118 /* libBroadpatch.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8FDD846E305C4EF200949118 /* libBroadpatch.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8FDD845C305C4E9200949118 /* libBroadpatch.dylib */; };
+		8FF647CB3054E68400E1E610 /* bootstrapd.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8FF647C63054E61900E1E610 /* bootstrapd.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8FF64813305678ED00E1E610 /* MobileDevelopmentService.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8FF6480E3056786A00E1E610 /* MobileDevelopmentService.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8FF648243056934700E1E610 /* MobileDevelopmentKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 860D91752FAE1F95000D321B /* MobileDevelopmentKit.framework */; };
 		AFF4D5D92DC9390B00B1B5F9 /* Shared in Resources */ = {isa = PBXBuildFile; fileRef = AF99171F2DC8EA3C00DDF895 /* Shared */; };
-		AFF4E3492DCCCE0F00B1B5F9 /* TreeSitterXML in Frameworks */ = {isa = PBXBuildFile; productRef = AFF4E3482DCCCE0F00B1B5F9 /* TreeSitterXML */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		860D917B2FAE1F95000D321B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 860D91742FAE1F95000D321B;
-			remoteInfo = MobileDevelopmentKit;
-		};
 		860D91852FAE1F9C000D321B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
@@ -56,40 +55,103 @@
 			remoteGlobalIDString = 86DCC2592FA5209600973169;
 			remoteInfo = CoreCompiler;
 		};
-		860D91E22FAE2E4C000D321B /* PBXContainerItemProxy */ = {
+		8F1B78103069AA2D00484260 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 86DCC2592FA5209600973169;
-			remoteInfo = CoreCompiler;
+			remoteGlobalIDString = 8FDD845B305C4E9200949118;
+			remoteInfo = Broadpatch;
 		};
-		8F6008793033F9200028EDFD /* PBXContainerItemProxy */ = {
+		8F253102309A17DD0058F953 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 79BF97F62E6291EE00C60D4C;
-			remoteInfo = LiveProcess;
+			remoteGlobalIDString = 8FDD845B305C4E9200949118;
+			remoteInfo = Broadpatch;
 		};
-		8FB3BB063030089000DB3ABC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8FB3BADA302FFBAA00DB3ABC;
-			remoteInfo = LiveShim;
-		};
-		8FB3BE8B303131D800DB3ABC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 79BF97F62E6291EE00C60D4C;
-			remoteInfo = LiveProcess;
-		};
-		8FF32E2E3036F8DC00C46FE4 /* PBXContainerItemProxy */ = {
+		8F253106309A188A0058F953 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8FF32DEC3036F59E00C46FE4;
 			remoteInfo = HWHook;
+		};
+		8F253140309A1F950058F953 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8F2530D2309A15BE0058F953;
+			remoteInfo = LiveProcessLegacy;
+		};
+		8F253145309A1FDB0058F953 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8F2530D2309A15BE0058F953;
+			remoteInfo = LiveProcessLegacy;
+		};
+		8F253173309A30430058F953 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8FDD845B305C4E9200949118;
+			remoteInfo = Broadpatch;
+		};
+		8F253176309A304A0058F953 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8FDD845B305C4E9200949118;
+			remoteInfo = Broadpatch;
+		};
+		8F25317A309A343D0058F953 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8F2530D2309A15BE0058F953;
+			remoteInfo = LiveProcessLegacy;
+		};
+		8F25317E309A36D10058F953 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8FF32DEC3036F59E00C46FE4;
+			remoteInfo = HWHook;
+		};
+		8F75DDC5306344B5004D9A49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 860D91742FAE1F95000D321B;
+			remoteInfo = MobileDevelopmentKit;
+		};
+		8F75F71A30635DBB004D9A49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8F75DDA4306343D6004D9A49;
+			remoteInfo = SuperSlot;
+		};
+		8FB3BE8B303131D800DB3ABC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B131FA82D732FCD187DD75FB;
+			remoteInfo = LiveProcess;
+		};
+		8FDD846F305C4EF200949118 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8FDD845B305C4E9200949118;
+			remoteInfo = Broadpatch;
+		};
+		8FF648263056934700E1E610 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AF9916D12DC8C42200DDF895 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 860D91742FAE1F95000D321B;
+			remoteInfo = MobileDevelopmentKit;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -113,6 +175,42 @@
 			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8F2525193096DFCB0058F953 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F2525333096F2100058F953 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F25256C3096F3F40058F953 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F252B09309839FC0058F953 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Frameworks;
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8F60087B3033F9200028EDFD /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,15 +222,65 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8F75DDAA306343D6004D9A49 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F75F21530635AEF004D9A49 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F75F24030635D23004D9A49 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8F75F72E30636046004D9A49 /* MobileDevelopmentKit.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F75F7313063609D004D9A49 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8F75F7303063609D004D9A49 /* CoreCompiler.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8FB3BB083030089000DB3ABC /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8FB3BB053030089000DB3ABC /* LiveShim.framework in Embed Frameworks */,
+				8F253148309A21B70058F953 /* LiveProcessLegacy.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FDD845A305C4E9200949118 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		8FF32DEB3036F59E00C46FE4 /* CopyFiles */ = {
@@ -144,16 +292,38 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AFF4DB332DCA57EC00B1B5F9 /* Embed Libraries */ = {
+		8FF647BA3054D5EE00E1E610 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstPath = Frameworks;
+			dstSubfolderSpec = 7;
 			files = (
-				860D917E2FAE1F95000D321B /* MobileDevelopmentKit.framework in Embed Libraries */,
-				860D91E12FAE2E4C000D321B /* CoreCompiler.framework in Embed Libraries */,
+				8F25252C3096E06C0058F953 /* libpatchfind.dylib in CopyFiles */,
+				8F2525473096F2CD0058F953 /* librecoveryksurface.dylib in CopyFiles */,
+				8F2525713096F42F0058F953 /* librecoveryrtpatch.dylib in CopyFiles */,
+				8F75F71830635D9A004D9A49 /* SuperSlot.dylib in CopyFiles */,
+				8FDD846D305C4EE900949118 /* libBroadpatch.dylib in CopyFiles */,
+				8FF647CB3054E68400E1E610 /* bootstrapd.dylib in CopyFiles */,
+				8FF64813305678ED00E1E610 /* MobileDevelopmentService.dylib in CopyFiles */,
 			);
-			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FF647C23054E61900E1E610 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FF6480A3056786A00E1E610 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -165,7 +335,6 @@
 		7944B5652DEC74EA00834134 /* Nyxian.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nyxian.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7944B5672DEC74FC00834134 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		79AA11BC2F7FFE24002FEAF2 /* nxtool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = nxtool; sourceTree = BUILT_PRODUCTS_DIR; };
-		79AA11C32F7FFEE4002FEAF2 /* libarchive.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/usr/lib/libarchive.tbd; sourceTree = DEVELOPER_DIR; };
 		79AA11C42F7FFEFF002FEAF2 /* libarchive.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/libarchive.tbd; sourceTree = DEVELOPER_DIR; };
 		79BF97F72E6291EE00C60D4C /* LiveProcess.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiveProcess.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		79BF9A8E2E62BA7D00C60D4C /* libarchive.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libarchive.tbd; path = usr/lib/libarchive.tbd; sourceTree = SDKROOT; };
@@ -173,10 +342,19 @@
 		86DCC25A2FA5209600973169 /* CoreCompiler.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CoreCompiler.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86DCC3082FA5219900973169 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		86DCC3092FA521A100973169 /* libz.1.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.tbd; path = usr/lib/libz.1.tbd; sourceTree = SDKROOT; };
-		8FB3BADB302FFBAA00DB3ABC /* LiveShim.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LiveShim.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F25251D3096DFCB0058F953 /* libpatchfind.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpatchfind.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F2525373096F2100058F953 /* librecoveryksurface.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = librecoveryksurface.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F2525703096F3F40058F953 /* librecoveryrtpatch.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = librecoveryrtpatch.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F2530D3309A15BE0058F953 /* LiveProcessLegacy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LiveProcessLegacy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F75DDAE306343D6004D9A49 /* SuperSlot.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = SuperSlot.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FB3C1EA3031450500DB3ABC /* ksurface_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ksurface_config.h; sourceTree = "<group>"; };
+		8FDD845C305C4E9200949118 /* libBroadpatch.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBroadpatch.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FF32DED3036F59E00C46FE4 /* libHWHook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libHWHook.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FF346DD3039AA7000C46FE4 /* ksurface_abi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ksurface_abi.h; sourceTree = "<group>"; };
+		8FF647C63054E61900E1E610 /* bootstrapd.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = bootstrapd.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FF6480E3056786A00E1E610 /* MobileDevelopmentService.dylib */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = MobileDevelopmentService.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FFF7C113064D8B9002612E7 /* superslotfix.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = superslotfix.sh; sourceTree = "<group>"; };
+		93C2C4FAE3F192B466194056 /* fetchtruststore.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = fetchtruststore.sh; sourceTree = "<group>"; };
 		AF99171F2DC8EA3C00DDF895 /* Shared */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Shared; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -184,88 +362,578 @@
 		798BBD332F1D265200CBB23F /* Exceptions for "Nyxian" folder in "Nyxian" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				LindChain/Downloader/fdownload.m,
+				LindChain/IDEBuilder/LDEFilesFinder.m,
+				LindChain/IDEBuilder/NXBuilder.swift,
+				"LindChain/IDEBuilder/NXBuilder+MDKDriver.swift",
+				"LindChain/IDEBuilder/NXBuilder+MDKPhaseRunner.swift",
+				LindChain/IDEBuilder/NXPhaseEngine.m,
+				LindChain/IDEBuilder/NXPhaseRunner.m,
+				LindChain/IDEConsole/NXConsoleView.m,
+				LindChain/IDEFoundation/NXAlertDiagnosticPresenter.m,
+				LindChain/IDEFoundation/NXBootstrap.m,
+				LindChain/IDEFoundation/NXCodeTemplate.m,
+				LindChain/IDEFoundation/NXDocument.m,
+				LindChain/IDEFoundation/NXDocumentManager.m,
+				LindChain/IDEFoundation/NXPlist.m,
+				LindChain/IDEFoundation/NXProject.m,
+				LindChain/IDEFoundation/NXRemoteCompiler.m,
+				LindChain/IDEFoundation/NXType.m,
+				LindChain/IDEFoundation/NXUser.m,
+				LindChain/IDEFoundation/NXUtils.m,
+				"LindChain/IDEFoundation/Project+Debug.swift",
+				LindChain/IDELanguageServer/NXLanguageServer.m,
+				LindChain/Private/Frameworks/AssertionServices.framework,
+				LindChain/Private/Frameworks/BackBoardServices.framework,
+				LindChain/Private/Frameworks/BaseBoard.framework,
+				LindChain/Private/Frameworks/BoardServices.framework,
+				LindChain/Private/Frameworks/FrontBoard.framework,
+				LindChain/Private/Frameworks/FrontBoardServices.framework,
+				LindChain/Private/Frameworks/RunningBoardServices.framework,
+				LindChain/Private/mach/fileport.m,
+				LindChain/Private/UIKitPrivate.m,
+				LindChain/ProcEnvironment/KextLoader/PEDependency.m,
+				LindChain/ProcEnvironment/KextLoader/PEKext.m,
+				LindChain/ProcEnvironment/KextLoader/PEKextLoader.m,
 				LindChain/ProcEnvironment/LiveContainer/LCBootstrap.m,
 				LindChain/ProcEnvironment/LiveContainer/Tweaks/Dead10ccFix.m,
 				LindChain/ProcEnvironment/LiveContainer/Tweaks/Dyld.m,
+				LindChain/ProcEnvironment/LiveContainer/Tweaks/DyldHook.m,
 				"LindChain/ProcEnvironment/LiveContainer/Tweaks/NSFileManager+GuestHooks.m",
 				LindChain/ProcEnvironment/LiveContainer/Tweaks/NSUserDefaults.m,
-				LindChain/ProcEnvironment/LiveContainer/Tweaks/SecItem.m,
 				"LindChain/ProcEnvironment/LiveContainer/Tweaks/UIKit+GuestHooksInit.m",
+				LindChain/ProcEnvironment/LiveContainer/utils.m,
+				LindChain/ProcEnvironment/PEArchiveHandle.m,
+				LindChain/ProcEnvironment/PEBootstrapRegistry.m,
+				LindChain/ProcEnvironment/PEExtension.m,
+				LindChain/ProcEnvironment/PEFileHandle.m,
+				LindChain/ProcEnvironment/PEFileTable.m,
+				LindChain/ProcEnvironment/PELaunchService.m,
+				LindChain/ProcEnvironment/PELaunchServiceInstance.m,
+				LindChain/ProcEnvironment/PELaunchServiceManager.m,
+				LindChain/ProcEnvironment/PEMachPort.m,
+				LindChain/ProcEnvironment/PEProcess.m,
+				LindChain/ProcEnvironment/PEProcessManager.m,
+				LindChain/ProcEnvironment/PEUserspaceManager.m,
+				LindChain/ProcEnvironment/Server/Server.m,
+				LindChain/ProcEnvironment/Server/ServerSession.m,
 				LindChain/ProcEnvironment/Shims/application.m,
-				LindChain/ProcEnvironment/Shims/libproc.m,
+				LindChain/ProcEnvironment/Shims/attrstrnilfix.m,
+				LindChain/ProcEnvironment/Shims/environment_abi.m,
+				LindChain/ProcEnvironment/Shims/environment.m,
+				LindChain/ProcEnvironment/Shims/LSApplicationWorkspace.m,
 				LindChain/ProcEnvironment/Shims/posix_spawn.m,
 				LindChain/ProcEnvironment/Shims/proxy.m,
-				LindChain/ProcEnvironment/Shims/README.txt,
-				LindChain/ProcEnvironment/Shims/vfork.c,
+				LindChain/ProcEnvironment/Shims/vfork.m,
+				LindChain/ProcEnvironment/Surface/cache/patchcache.m,
+				LindChain/ProcEnvironment/Surface/cache/shimcache.m,
+				LindChain/ProcEnvironment/Surface/fs/fs.m,
+				LindChain/ProcEnvironment/Surface/fs/mount.c,
+				LindChain/ProcEnvironment/Surface/fs/preserver.c,
+				LindChain/ProcEnvironment/Surface/fs/sandbox.m,
+				LindChain/ProcEnvironment/Surface/libkern/klog.m,
+				LindChain/ProcEnvironment/Surface/libkern/kpanic.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/export.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/fixup.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/image.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/init.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/kmod.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/kxopen.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/mapper.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/objc.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/pseudo.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/reseal.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/resolve.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/validation.c,
+				LindChain/ProcEnvironment/Surface/libkern/obj/alloc.c,
+				LindChain/ProcEnvironment/Surface/libkern/obj/event.c,
+				LindChain/ProcEnvironment/Surface/libkern/obj/reference.c,
+				LindChain/ProcEnvironment/Surface/libkern/sys/core.c,
+				LindChain/ProcEnvironment/Surface/libkern/sys/systm.c,
+				LindChain/ProcEnvironment/Surface/libkern/sys/worker.c,
+				LindChain/ProcEnvironment/Surface/libkern/task_handoff.c,
+				LindChain/ProcEnvironment/Surface/proc/insert.c,
+				LindChain/ProcEnvironment/Surface/proc/list.c,
+				LindChain/ProcEnvironment/Surface/proc/lookup.c,
+				LindChain/ProcEnvironment/Surface/proc/permit.c,
+				LindChain/ProcEnvironment/Surface/proc/proc.c,
+				LindChain/ProcEnvironment/Surface/proc/proctil.c,
+				LindChain/ProcEnvironment/Surface/proc/remove.c,
+				LindChain/ProcEnvironment/Surface/proc/spawn.m,
+				LindChain/ProcEnvironment/Surface/surface.m,
+				LindChain/ProcEnvironment/Surface/sys/compat/handoffep.c,
+				LindChain/ProcEnvironment/Surface/sys/compat/pectl.m,
+				LindChain/ProcEnvironment/Surface/sys/compat/sign.m,
+				LindChain/ProcEnvironment/Surface/sys/compat/task_for_pid.c,
+				LindChain/ProcEnvironment/Surface/sys/compat/vroot.c,
+				LindChain/ProcEnvironment/Surface/sys/compat/waittask.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/getgid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/getppid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/getsid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/getuid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/groupctl.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/loginctl.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/setgid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/setsid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/setuid.c,
+				LindChain/ProcEnvironment/Surface/sys/host/ioctl.c,
+				LindChain/ProcEnvironment/Surface/sys/host/openpty.c,
+				LindChain/ProcEnvironment/Surface/sys/host/sysctl.m,
+				LindChain/ProcEnvironment/Surface/sys/proc/kill.c,
+				LindChain/ProcEnvironment/Surface/sys/proc/proc_info.c,
+				LindChain/ProcEnvironment/Surface/sys/proc/wait4.c,
+				LindChain/ProcEnvironment/Surface/trust/apple.c,
+				LindChain/ProcEnvironment/Surface/trust/keychain.m,
+				LindChain/ProcEnvironment/Surface/trust/presets.m,
+				LindChain/ProcEnvironment/Surface/trust/summary.m,
+				LindChain/ProcEnvironment/Surface/trust/trust.m,
+				LindChain/ProcEnvironment/Surface/tty/attach.c,
+				LindChain/ProcEnvironment/Surface/tty/lookup.c,
+				LindChain/ProcEnvironment/Surface/tty/tty.c,
+				LindChain/ProcEnvironment/Utils/fd.c,
+				LindChain/ProcEnvironment/Utils/PEMachOUtils.m,
+				LindChain/Utils/CFTools.c,
+				LindChain/Utils/DynaMod.m,
+				LindChain/Utils/IconUtils.m,
+				LindChain/Utils/LDEDebouncer.m,
+				LindChain/Utils/Swizzle.c,
+				LindChain/WindowServer/NXAppTile.m,
+				LindChain/WindowServer/NXWindowServer.m,
+				LindChain/WindowServer/Session/NXWindowSessionApplication.m,
+				LindChain/WindowServer/Session/NXWindowSessionTerminal.m,
+				LindChain/WindowServer/Window/NXHitSurfaceButton.m,
+				LindChain/WindowServer/Window/NXResizeHandle.m,
+				LindChain/WindowServer/Window/NXWindow.m,
+				LindChain/WindowServer/Window/NXWindowBar.m,
+				LindChain/WindowServer/Window/NXWindowSession.m,
+				UI/CodeEditor/CodeEditor.swift,
+				"UI/CodeEditor/CodeEditor+Button.swift",
+				"UI/CodeEditor/CodeEditor+Theme.swift",
+				UI/CodeEditor/CodeEditorCoordinator.swift,
+				"UI/CodeEditor/CodeEditorCoordinator+Autoindent.swift",
+				UI/CodeSigCheck.swift,
+				UI/ContentView.swift,
+				UI/FileList/FileInfoViewController.swift,
+				UI/FileList/FileList.swift,
+				"UI/FileList/FileList+iPad.swift",
+				UI/FileList/FileListEntry.swift,
+				UI/FileList/FileTabBar.swift,
+				UI/FileList/iOSVersionPickerView.swift,
+				UI/FileList/PasteBoardServices.swift,
+				UI/FileList/ProjectConfigViewController.swift,
+				UI/ProjectCreationSheetView.swift,
+				UI/ProjectTemplatePicker.swift,
+				UI/ProjectTemplateSelectionView.swift,
+				UI/Settings/ApplicationManagement.swift,
+				"UI/Settings/Bundle+IconUtils.swift",
+				UI/Settings/CreditsViewController.swift,
+				UI/Settings/CustomizationViewController.swift,
+				UI/Settings/KEXTManagement.swift,
+				UI/Settings/ManagementViewController.swift,
+				UI/Settings/NXSettingsTableViewController.m,
+				UI/Settings/ToolChainViewController.swift,
+				UI/SlotEntry.swift,
+				UI/TableCells/ComplexImportTableCell.swift,
+				UI/TableCells/CreditCell.swift,
+				UI/TableCells/FileListCell.swift,
+				UI/TableCells/ImportCell.swift,
+				UI/TableCells/PickerCell.swift,
+				UI/TableCells/ProjectTableCell.swift,
+				UI/TableCells/StepperCell.swift,
+				UI/TableCells/TextFieldCell.swift,
+				UI/TableCells/ThemePickerPreviewCell.swift,
+				UI/TableCells/ToggleCell.swift,
+				UI/UIInit/NXUISwitch.m,
+				UI/UIInit/NXUITabBarController.m,
+				UI/UIInit/NXUITableViewController.m,
+				UI/UIInit/NXUIViewController.m,
+				UI/UIInit/Terminal.swift,
+				UI/UIInit/UIInit.swift,
+				UI/UIInit/UIThemed.swift,
+				UI/XCodeButton.m,
 			);
 			target = AF9916D82DC8C42200DDF895 /* Nyxian */;
 		};
 		79AA11C62F7FFF12002FEAF2 /* Exceptions for "Nyxian" folder in "nxtool" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				LindChain/OpenSSL.xcframework,
+				LindChain/ProcEnvironment/LiveContainer/LCMachOUtils.m,
+				LindChain/ProcEnvironment/Surface/trust/apple.c,
+				LindChain/ProcEnvironment/Surface/trust/cdhash.c,
 				LindChain/ProcEnvironment/Surface/trust/signing.c,
 				LindChain/Utils/Zip.m,
 			);
 			target = 79AA11BB2F7FFE24002FEAF2 /* nxtool */;
 		};
-		79BF983D2E62930600C60D4C /* Exceptions for "LiveProcess" folder in "LiveProcess" target */ = {
+		8F2525293096E0250058F953 /* Exceptions for "Nyxian" folder in "libpatchfind" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				LindChain/ServiceKit/Service.m,
-				LindChain/Services/applicationmgmtd/LDEApplicationObject.m,
-				LindChain/Services/applicationmgmtd/LDEApplicationWorkspace.m,
-				LindChain/Services/applicationmgmtd/LDEApplicationWorkspaceInternal.m,
-				main.m,
-				ResecureDecoder.m,
+				LindChain/ProcEnvironment/litehook/litehook.c,
 			);
-			target = 79BF97F62E6291EE00C60D4C /* LiveProcess */;
+			target = 8F2525133096DFCB0058F953 /* libpatchfind */;
 		};
-		79BF98402E62931E00C60D4C /* Exceptions for "LiveProcess" folder in "Nyxian" target */ = {
+		8F25252B3096E02D0058F953 /* Exceptions for "Frameworks" folder in "libpatchfind" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				LindChain/Services/applicationmgmtd/LDEApplicationObject.m,
-				LindChain/Services/applicationmgmtd/LDEApplicationWorkspace.m,
+				libpatchfind/libpatchfind.m,
 			);
-			target = AF9916D82DC8C42200DDF895 /* Nyxian */;
+			target = 8F2525133096DFCB0058F953 /* libpatchfind */;
 		};
-		79BF9A972E62BB6900C60D4C /* Exceptions for "Nyxian" folder in "LiveProcess" target */ = {
+		8F2525413096F2430058F953 /* Exceptions for "Frameworks" folder in "librecoveryksurface" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				LindChain/IDEConsole/Utils.c,
-				LindChain/Private/mach/fileport.m,
+				librecoveryksurface/rks_handoff.c,
+				librecoveryksurface/rks_proc.c,
+				librecoveryksurface/rks_sign.c,
+				librecoveryksurface/rks_spawn.m,
+				librecoveryksurface/rks_syscall.c,
+				librecoveryksurface/rks_tty.c,
+			);
+			target = 8F25252E3096F2100058F953 /* librecoveryksurface */;
+		};
+		8F2525493096F3210058F953 /* Exceptions for "Nyxian" folder in "librecoveryksurface" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LindChain/ProcEnvironment/PEFileHandle.m,
+				LindChain/ProcEnvironment/PEFileTable.m,
+				LindChain/ProcEnvironment/PEMachPort.m,
+				LindChain/ProcEnvironment/Surface/libkern/radix/radix.c,
+				LindChain/ProcEnvironment/Utils/fd.c,
+				LindChain/ProcEnvironment/Utils/vnode.c,
+			);
+			target = 8F25252E3096F2100058F953 /* librecoveryksurface */;
+		};
+		8F252B003096F5200058F953 /* Exceptions for "Frameworks" folder in "librecoveryrtpatch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				librecoveryrtpatch/posix_spawn.m,
+				librecoveryrtpatch/rtpatch.c,
+				librecoveryrtpatch/spawn_bootstrap.m,
+				librecoveryrtpatch/vfork.m,
+			);
+			target = 8F2525673096F3F40058F953 /* librecoveryrtpatch */;
+		};
+		8F2530E2309A15C80058F953 /* Exceptions for "Frameworks" folder in "LiveProcessLegacy" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationObject.m,
+				LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspace.m,
+				LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspaceInternal.m,
+				LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspaceService.m,
+				LiveProcessLegacy/LiveProcessLegacy.h,
+				LiveProcessLegacy/LowShim/LPLLSDyld.c,
+				LiveProcessLegacy/LowShim/LPLLSDyld.h,
+				LiveProcessLegacy/LowShim/LPLLSIO.c,
+				LiveProcessLegacy/LowShim/LPLLSIoctl.c,
+				LiveProcessLegacy/LowShim/LPLLSLibProc.c,
+				LiveProcessLegacy/LowShim/LPLLSMount.c,
+				LiveProcessLegacy/LowShim/LPLLSPatchcache.c,
+				LiveProcessLegacy/LowShim/LPLLSPatchcache.h,
+				LiveProcessLegacy/LowShim/LPLLSPTY.c,
+				LiveProcessLegacy/LowShim/LPLLSSecItem.m,
+				LiveProcessLegacy/LowShim/LPLLSSysctl.c,
+				LiveProcessLegacy/LowShim/LPLLSTask.c,
+				LiveProcessLegacy/LowShim/LPLLSUcred.c,
+				LiveProcessLegacy/LowShim/patchfind_loader.h,
+				LiveProcessLegacy/LPLFileport.c,
+				LiveProcessLegacy/LPLFileport.h,
+				LiveProcessLegacy/LPLMain.m,
+				LiveProcessLegacy/LPLShim.h,
+				LiveProcessLegacy/LPLSyscall.c,
+				LiveProcessLegacy/LPLSyscall.h,
+				LiveProcessLegacy/LPLUtils.c,
+				LiveProcessLegacy/LPLUtils.h,
+				LiveProcessLegacy/LPLVRoot.c,
+				LiveProcessLegacy/LPLVRoot.h,
+				LiveProcessLegacy/Private/LPLCdhash.h,
+				LiveProcessLegacy/Private/LPLDyldNodeRemap.c,
+				LiveProcessLegacy/Private/LPLDyldNodeRemap.h,
+				LiveProcessLegacy/ServiceKit/LPLService.h,
+				LiveProcessLegacy/ServiceKit/LPLService.m,
+				LiveProcessLegacy/ServiceKit/LPLServiceProtocol.h,
+			);
+			privateHeaders = (
+				LiveProcessLegacy/LowShim/patchfind_loader.h,
+				LiveProcessLegacy/LPLShim.h,
+				LiveProcessLegacy/Private/LPLCdhash.h,
+				LiveProcessLegacy/Private/LPLDyldNodeRemap.h,
+			);
+			publicHeaders = (
+				LiveProcessLegacy/LiveProcessLegacy.h,
+				LiveProcessLegacy/LowShim/LPLLSDyld.h,
+				LiveProcessLegacy/LowShim/LPLLSPatchcache.h,
+				LiveProcessLegacy/LPLFileport.h,
+				LiveProcessLegacy/LPLSyscall.h,
+				LiveProcessLegacy/LPLUtils.h,
+				LiveProcessLegacy/LPLVRoot.h,
+				LiveProcessLegacy/ServiceKit/LPLService.h,
+				LiveProcessLegacy/ServiceKit/LPLServiceProtocol.h,
+			);
+			target = 8F2530D2309A15BE0058F953 /* LiveProcessLegacy */;
+		};
+		8F2530EE309A17020058F953 /* Exceptions for "Nyxian" folder in "LiveProcessLegacy" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
 				LindChain/ProcEnvironment/litehook/litehook.c,
 				LindChain/ProcEnvironment/LiveContainer/LCBootstrap.m,
 				LindChain/ProcEnvironment/LiveContainer/LCMachOUtils.m,
 				LindChain/ProcEnvironment/LiveContainer/Tweaks/Dead10ccFix.m,
 				LindChain/ProcEnvironment/LiveContainer/Tweaks/Dyld.m,
+				LindChain/ProcEnvironment/LiveContainer/Tweaks/DyldHook.m,
 				"LindChain/ProcEnvironment/LiveContainer/Tweaks/NSFileManager+GuestHooks.m",
 				LindChain/ProcEnvironment/LiveContainer/Tweaks/NSUserDefaults.m,
-				LindChain/ProcEnvironment/LiveContainer/Tweaks/SecItem.m,
 				"LindChain/ProcEnvironment/LiveContainer/Tweaks/UIKit+GuestHooksInit.m",
 				LindChain/ProcEnvironment/LiveContainer/utils.m,
-				LindChain/ProcEnvironment/LiveContainer/ZSign/Utils.mm,
 				LindChain/ProcEnvironment/PEArchiveHandle.m,
 				LindChain/ProcEnvironment/PEFileHandle.m,
 				LindChain/ProcEnvironment/PEFileTable.m,
 				LindChain/ProcEnvironment/PEMachPort.m,
 				LindChain/ProcEnvironment/Shims/application.m,
 				LindChain/ProcEnvironment/Shims/attrstrnilfix.m,
+				LindChain/ProcEnvironment/Shims/environment_abi.m,
 				LindChain/ProcEnvironment/Shims/environment.m,
-				LindChain/ProcEnvironment/Shims/libproc.m,
 				LindChain/ProcEnvironment/Shims/LSApplicationWorkspace.m,
 				LindChain/ProcEnvironment/Shims/posix_spawn.m,
 				LindChain/ProcEnvironment/Shims/proxy.m,
-				LindChain/ProcEnvironment/Shims/README.txt,
-				LindChain/ProcEnvironment/Shims/vfork.c,
-				LindChain/ProcEnvironment/Surface/extra/relax.c,
+				LindChain/ProcEnvironment/Shims/vfork.m,
+				LindChain/ProcEnvironment/Surface/libkern/radix/radix.c,
+				LindChain/ProcEnvironment/Surface/libkern/task_handoff.c,
+				LindChain/ProcEnvironment/Surface/trust/cdhash.c,
+				LindChain/ProcEnvironment/Surface/trust/signing.c,
 				LindChain/ProcEnvironment/Utils/fd.c,
-				LindChain/ProcEnvironment/Utils/ktfp.c,
+				LindChain/ProcEnvironment/Utils/PEMachOUtils.m,
 				LindChain/ProcEnvironment/Utils/vnode.c,
 				LindChain/Utils/CFTools.c,
+				LindChain/Utils/IconUtils.m,
 				LindChain/Utils/Swizzle.c,
 				LindChain/Utils/Zip.m,
 			);
-			target = 79BF97F62E6291EE00C60D4C /* LiveProcess */;
+			target = 8F2530D2309A15BE0058F953 /* LiveProcessLegacy */;
+		};
+		8F25316F309A29000058F953 /* Exceptions for "LiveProcess" folder in "LiveProcess" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				main.c,
+				NXLiveProcessDispatch.c,
+			);
+			target = B131FA82D732FCD187DD75FB /* LiveProcess */;
+		};
+		8F253171309A29E10058F953 /* Exceptions for "Frameworks" folder in "SuperSlot" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationObject.m,
+				LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspace.m,
+			);
+			target = 8F75DDA4306343D6004D9A49 /* SuperSlot */;
+		};
+		8F75DDB33063446F004D9A49 /* Exceptions for "Nyxian" folder in "SuperSlot" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LindChain/Downloader/fdownload.m,
+				LindChain/IDEBuilder/LDEFilesFinder.m,
+				LindChain/IDEBuilder/NXBuilder.swift,
+				"LindChain/IDEBuilder/NXBuilder+MDKDriver.swift",
+				"LindChain/IDEBuilder/NXBuilder+MDKPhaseRunner.swift",
+				LindChain/IDEBuilder/NXPhaseEngine.m,
+				LindChain/IDEBuilder/NXPhaseRunner.m,
+				LindChain/IDEConsole/NXConsoleView.m,
+				LindChain/IDEFoundation/NXAlertDiagnosticPresenter.m,
+				LindChain/IDEFoundation/NXBootstrap.m,
+				LindChain/IDEFoundation/NXCodeTemplate.m,
+				LindChain/IDEFoundation/NXDocument.m,
+				LindChain/IDEFoundation/NXDocumentManager.m,
+				LindChain/IDEFoundation/NXPlist.m,
+				LindChain/IDEFoundation/NXProject.m,
+				LindChain/IDEFoundation/NXRemoteCompiler.m,
+				LindChain/IDEFoundation/NXType.m,
+				LindChain/IDEFoundation/NXUser.m,
+				LindChain/IDEFoundation/NXUtils.m,
+				"LindChain/IDEFoundation/Project+Debug.swift",
+				LindChain/IDELanguageServer/NXLanguageServer.m,
+				LindChain/OpenSSL.xcframework,
+				LindChain/Private/Frameworks/AssertionServices.framework,
+				LindChain/Private/Frameworks/BackBoardServices.framework,
+				LindChain/Private/Frameworks/BaseBoard.framework,
+				LindChain/Private/Frameworks/BoardServices.framework,
+				LindChain/Private/Frameworks/FrontBoard.framework,
+				LindChain/Private/Frameworks/FrontBoardServices.framework,
+				LindChain/Private/Frameworks/RunningBoardServices.framework,
+				LindChain/Private/mach/fileport.m,
+				LindChain/Private/UIKitPrivate.m,
+				LindChain/ProcEnvironment/KextLoader/PEDependency.m,
+				LindChain/ProcEnvironment/KextLoader/PEKext.m,
+				LindChain/ProcEnvironment/KextLoader/PEKextLoader.m,
+				LindChain/ProcEnvironment/litehook/litehook.c,
+				LindChain/ProcEnvironment/LiveContainer/LCMachOUtils.m,
+				LindChain/ProcEnvironment/LiveContainer/LCUtils.m,
+				LindChain/ProcEnvironment/LiveContainer/utils.m,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/archo.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/bundle.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/common/base64.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/common/fs.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/common/json.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/common/log.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/common/sha.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/common/timer.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/common/util.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/macho.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/openssl.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/signing.cpp,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/Utils.mm,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/zsign.mm,
+				LindChain/ProcEnvironment/LiveContainer/ZSign/zsigner.m,
+				LindChain/ProcEnvironment/PEArchiveHandle.m,
+				LindChain/ProcEnvironment/PEBootstrapRegistry.m,
+				LindChain/ProcEnvironment/PEExtension.m,
+				LindChain/ProcEnvironment/PEFileHandle.m,
+				LindChain/ProcEnvironment/PEFileTable.m,
+				LindChain/ProcEnvironment/PELaunchService.m,
+				LindChain/ProcEnvironment/PELaunchServiceInstance.m,
+				LindChain/ProcEnvironment/PELaunchServiceManager.m,
+				LindChain/ProcEnvironment/PEMachPort.m,
+				LindChain/ProcEnvironment/PEProcess.m,
+				LindChain/ProcEnvironment/PEProcessManager.m,
+				LindChain/ProcEnvironment/PEUserspaceManager.m,
+				LindChain/ProcEnvironment/Server/Server.m,
+				LindChain/ProcEnvironment/Server/ServerSession.m,
+				LindChain/ProcEnvironment/Surface/cache/patchcache.m,
+				LindChain/ProcEnvironment/Surface/cache/shimcache.m,
+				LindChain/ProcEnvironment/Surface/fs/fs.m,
+				LindChain/ProcEnvironment/Surface/fs/mount.c,
+				LindChain/ProcEnvironment/Surface/fs/preserver.c,
+				LindChain/ProcEnvironment/Surface/fs/sandbox.m,
+				LindChain/ProcEnvironment/Surface/key.c,
+				LindChain/ProcEnvironment/Surface/libkern/klog.m,
+				LindChain/ProcEnvironment/Surface/libkern/kpanic.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/export.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/fixup.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/image.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/init.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/kmod.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/kxopen.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/mapper.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/objc.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/pseudo.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/reseal.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/resolve.c,
+				LindChain/ProcEnvironment/Surface/libkern/kxld/validation.c,
+				LindChain/ProcEnvironment/Surface/libkern/obj/alloc.c,
+				LindChain/ProcEnvironment/Surface/libkern/obj/event.c,
+				LindChain/ProcEnvironment/Surface/libkern/obj/reference.c,
+				LindChain/ProcEnvironment/Surface/libkern/radix/radix.c,
+				LindChain/ProcEnvironment/Surface/libkern/sys/core.c,
+				LindChain/ProcEnvironment/Surface/libkern/sys/systm.c,
+				LindChain/ProcEnvironment/Surface/libkern/sys/worker.c,
+				LindChain/ProcEnvironment/Surface/libkern/task_handoff.c,
+				LindChain/ProcEnvironment/Surface/libkern/version.c,
+				LindChain/ProcEnvironment/Surface/proc/insert.c,
+				LindChain/ProcEnvironment/Surface/proc/list.c,
+				LindChain/ProcEnvironment/Surface/proc/lookup.c,
+				LindChain/ProcEnvironment/Surface/proc/permit.c,
+				LindChain/ProcEnvironment/Surface/proc/proc.c,
+				LindChain/ProcEnvironment/Surface/proc/proctil.c,
+				LindChain/ProcEnvironment/Surface/proc/remove.c,
+				LindChain/ProcEnvironment/Surface/proc/spawn.m,
+				LindChain/ProcEnvironment/Surface/surface.m,
+				LindChain/ProcEnvironment/Surface/sys/compat/handoffep.c,
+				LindChain/ProcEnvironment/Surface/sys/compat/pectl.m,
+				LindChain/ProcEnvironment/Surface/sys/compat/sign.m,
+				LindChain/ProcEnvironment/Surface/sys/compat/task_for_pid.c,
+				LindChain/ProcEnvironment/Surface/sys/compat/vroot.c,
+				LindChain/ProcEnvironment/Surface/sys/compat/waittask.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/getgid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/getppid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/getsid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/getuid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/groupctl.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/loginctl.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/setgid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/setsid.c,
+				LindChain/ProcEnvironment/Surface/sys/cred/setuid.c,
+				LindChain/ProcEnvironment/Surface/sys/host/ioctl.c,
+				LindChain/ProcEnvironment/Surface/sys/host/openpty.c,
+				LindChain/ProcEnvironment/Surface/sys/host/sysctl.m,
+				LindChain/ProcEnvironment/Surface/sys/proc/kill.c,
+				LindChain/ProcEnvironment/Surface/sys/proc/proc_info.c,
+				LindChain/ProcEnvironment/Surface/sys/proc/wait4.c,
+				LindChain/ProcEnvironment/Surface/trust/apple.c,
+				LindChain/ProcEnvironment/Surface/trust/cdhash.c,
+				LindChain/ProcEnvironment/Surface/trust/entitlement.c,
+				LindChain/ProcEnvironment/Surface/trust/keychain.m,
+				LindChain/ProcEnvironment/Surface/trust/presets.m,
+				LindChain/ProcEnvironment/Surface/trust/signing.c,
+				LindChain/ProcEnvironment/Surface/trust/summary.m,
+				LindChain/ProcEnvironment/Surface/trust/trust.m,
+				LindChain/ProcEnvironment/Surface/tty/attach.c,
+				LindChain/ProcEnvironment/Surface/tty/lookup.c,
+				LindChain/ProcEnvironment/Surface/tty/tty.c,
+				LindChain/ProcEnvironment/Utils/fd.c,
+				LindChain/ProcEnvironment/Utils/misc.m,
+				LindChain/ProcEnvironment/Utils/PEMachOUtils.m,
+				LindChain/ProcEnvironment/Utils/vnode.c,
+				LindChain/Utils/CFTools.c,
+				LindChain/Utils/DynaMod.m,
+				LindChain/Utils/IconUtils.m,
+				LindChain/Utils/LDEDebouncer.m,
+				LindChain/Utils/Swizzle.c,
+				LindChain/Utils/Zip.m,
+				LindChain/WindowServer/NXAppTile.m,
+				LindChain/WindowServer/NXWindowServer.m,
+				LindChain/WindowServer/Session/NXWindowSessionApplication.m,
+				LindChain/WindowServer/Session/NXWindowSessionTerminal.m,
+				LindChain/WindowServer/Window/NXHitSurfaceButton.m,
+				LindChain/WindowServer/Window/NXResizeHandle.m,
+				LindChain/WindowServer/Window/NXWindow.m,
+				LindChain/WindowServer/Window/NXWindowBar.m,
+				LindChain/WindowServer/Window/NXWindowSession.m,
+				UI/CodeEditor/CodeEditor.swift,
+				"UI/CodeEditor/CodeEditor+Button.swift",
+				"UI/CodeEditor/CodeEditor+Theme.swift",
+				UI/CodeEditor/CodeEditorCoordinator.swift,
+				"UI/CodeEditor/CodeEditorCoordinator+Autoindent.swift",
+				UI/CodeSigCheck.swift,
+				UI/ContentView.swift,
+				UI/FileList/FileInfoViewController.swift,
+				UI/FileList/FileList.swift,
+				"UI/FileList/FileList+iPad.swift",
+				UI/FileList/FileListEntry.swift,
+				UI/FileList/FileTabBar.swift,
+				UI/FileList/iOSVersionPickerView.swift,
+				UI/FileList/PasteBoardServices.swift,
+				UI/FileList/ProjectConfigViewController.swift,
+				UI/ProjectCreationSheetView.swift,
+				UI/ProjectTemplatePicker.swift,
+				UI/ProjectTemplateSelectionView.swift,
+				UI/Settings/ApplicationManagement.swift,
+				"UI/Settings/Bundle+IconUtils.swift",
+				UI/Settings/CreditsViewController.swift,
+				UI/Settings/CustomizationViewController.swift,
+				UI/Settings/KEXTManagement.swift,
+				UI/Settings/ManagementViewController.swift,
+				UI/Settings/NXSettingsTableViewController.m,
+				UI/Settings/ToolChainViewController.swift,
+				UI/SlotEntry.swift,
+				UI/TableCells/ComplexImportTableCell.swift,
+				UI/TableCells/CreditCell.swift,
+				UI/TableCells/FileListCell.swift,
+				UI/TableCells/ImportCell.swift,
+				UI/TableCells/PickerCell.swift,
+				UI/TableCells/ProjectTableCell.swift,
+				UI/TableCells/StepperCell.swift,
+				UI/TableCells/TextFieldCell.swift,
+				UI/TableCells/ThemePickerPreviewCell.swift,
+				UI/TableCells/ToggleCell.swift,
+				UI/UIInit/NXUISwitch.m,
+				UI/UIInit/NXUITabBarController.m,
+				UI/UIInit/NXUITableViewController.m,
+				UI/UIInit/NXUIViewController.m,
+				UI/UIInit/Terminal.swift,
+				UI/UIInit/UIInit.swift,
+				UI/UIInit/UIThemed.swift,
+				UI/XCodeButton.m,
+			);
+			target = 8F75DDA4306343D6004D9A49 /* SuperSlot */;
 		};
 		8FB3C25E303145F100DB3ABC /* Exceptions for "Frameworks" folder in "CoreCompiler" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -291,6 +959,7 @@
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxBuilder.dylib,
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxMacroExpansion.dylib,
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxMacros.dylib,
+				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftWarningControl.dylib,
 				CoreCompiler/CoreCompilerSupportLibs/LLVM.xcframework,
 				CoreCompiler/Support/CCDiagnostic.c,
 				CoreCompiler/Support/CCDiagnostic.h,
@@ -304,10 +973,14 @@
 				CoreCompiler/Support/CCSourceLocation.h,
 				CoreCompiler/Tools/CCASTUnit.cpp,
 				CoreCompiler/Tools/CCASTUnit.h,
+				CoreCompiler/Tools/CCDependency.c,
+				CoreCompiler/Tools/CCDependency.h,
 				CoreCompiler/Tools/CCDependencyScanner.cpp,
 				CoreCompiler/Tools/CCDependencyScanner.h,
 				CoreCompiler/Tools/CCDriver.cpp,
 				CoreCompiler/Tools/CCDriver.h,
+				CoreCompiler/Tools/CCMachO.cpp,
+				CoreCompiler/Tools/CCMachO.h,
 				CoreCompiler/Tools/CCSDK.cpp,
 				CoreCompiler/Tools/CCSDK.h,
 				CoreCompiler/Tools/Compiler/CCCompiler.cpp,
@@ -331,8 +1004,10 @@
 				CoreCompiler/Support/CCJob.h,
 				CoreCompiler/Support/CCSourceLocation.h,
 				CoreCompiler/Tools/CCASTUnit.h,
+				CoreCompiler/Tools/CCDependency.h,
 				CoreCompiler/Tools/CCDependencyScanner.h,
 				CoreCompiler/Tools/CCDriver.h,
+				CoreCompiler/Tools/CCMachO.h,
 				CoreCompiler/Tools/CCSDK.h,
 				CoreCompiler/Tools/Compiler/CCCompiler.h,
 				CoreCompiler/Tools/Compiler/CCSwiftCompiler.h,
@@ -340,44 +1015,10 @@
 			);
 			target = 86DCC2592FA5209600973169 /* CoreCompiler */;
 		};
-		8FB3C27B3031460B00DB3ABC /* Exceptions for "Frameworks" folder in "LiveShim" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				LiveShim/LiveShim.docc,
-				LiveShim/LiveShim.h,
-				LiveShim/LiveShimSyscall.c,
-				LiveShim/LiveShimSyscall.h,
-				LiveShim/mach/fileport.h,
-				LiveShim/mach/fileport.m,
-				LiveShim/private/cdhash.h,
-				LiveShim/private/cdhash.m,
-				LiveShim/private/dyld_node_remap.c,
-				LiveShim/private/dyld_node_remap.h,
-				LiveShim/shims/dyld.c,
-				LiveShim/shims/dyld.h,
-				LiveShim/shims/io.c,
-				LiveShim/shims/ioctl.c,
-				LiveShim/shims/shim.h,
-				LiveShim/shims/sysctl.c,
-				LiveShim/shims/task.c,
-				LiveShim/shims/ucred.c,
-			);
-			privateHeaders = (
-				LiveShim/mach/fileport.h,
-				LiveShim/private/cdhash.h,
-				LiveShim/private/dyld_node_remap.h,
-				LiveShim/shims/shim.h,
-			);
-			publicHeaders = (
-				LiveShim/LiveShim.h,
-				LiveShim/LiveShimSyscall.h,
-				LiveShim/shims/dyld.h,
-			);
-			target = 8FB3BADA302FFBAA00DB3ABC /* LiveShim */;
-		};
 		8FB3C2D23031460C00DB3ABC /* Exceptions for "Frameworks" folder in "MobileDevelopmentKit" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				MobileDevelopmentKit/MDKBaseSwift.swift,
 				MobileDevelopmentKit/MobileDevelopmentKit.docc,
 				MobileDevelopmentKit/MobileDevelopmentKit.h,
 				MobileDevelopmentKit/PhaseEngine/MDKPhase.h,
@@ -399,6 +1040,8 @@
 				MobileDevelopmentKit/Support/MDKOSVersion.h,
 				MobileDevelopmentKit/Support/MDKOSVersion.m,
 				MobileDevelopmentKit/Support/MDKOSVersion.swift,
+				MobileDevelopmentKit/Support/MDKSourceLocation.h,
+				MobileDevelopmentKit/Support/MDKSourceLocation.m,
 				MobileDevelopmentKit/Support/MDKThreadPool.h,
 				MobileDevelopmentKit/Support/MDKThreadPool.m,
 				MobileDevelopmentKit/Support/MDKThreadPoolGroup.h,
@@ -412,10 +1055,14 @@
 				MobileDevelopmentKit/Tools/Linker/MDKLinker.m,
 				MobileDevelopmentKit/Tools/MDKASTUnit.h,
 				MobileDevelopmentKit/Tools/MDKASTUnit.m,
+				MobileDevelopmentKit/Tools/MDKDependency.h,
+				MobileDevelopmentKit/Tools/MDKDependency.m,
 				MobileDevelopmentKit/Tools/MDKDependencyScanner.h,
 				MobileDevelopmentKit/Tools/MDKDependencyScanner.m,
 				MobileDevelopmentKit/Tools/MDKDriver.h,
 				MobileDevelopmentKit/Tools/MDKDriver.m,
+				MobileDevelopmentKit/Tools/MDKMachO.h,
+				MobileDevelopmentKit/Tools/MDKMachO.m,
 				MobileDevelopmentKit/Tools/MDKSDK.h,
 				MobileDevelopmentKit/Tools/MDKSDK.m,
 			);
@@ -433,17 +1080,27 @@
 				MobileDevelopmentKit/Support/MDKFileSourceLocation.h,
 				MobileDevelopmentKit/Support/MDKJob.h,
 				MobileDevelopmentKit/Support/MDKOSVersion.h,
+				MobileDevelopmentKit/Support/MDKSourceLocation.h,
 				MobileDevelopmentKit/Support/MDKThreadPool.h,
 				MobileDevelopmentKit/Support/MDKThreadPoolGroup.h,
 				MobileDevelopmentKit/Tools/Compiler/MDKCompiler.h,
 				MobileDevelopmentKit/Tools/Compiler/MDKSwiftCompiler.h,
 				MobileDevelopmentKit/Tools/Linker/MDKLinker.h,
 				MobileDevelopmentKit/Tools/MDKASTUnit.h,
+				MobileDevelopmentKit/Tools/MDKDependency.h,
 				MobileDevelopmentKit/Tools/MDKDependencyScanner.h,
 				MobileDevelopmentKit/Tools/MDKDriver.h,
+				MobileDevelopmentKit/Tools/MDKMachO.h,
 				MobileDevelopmentKit/Tools/MDKSDK.h,
 			);
 			target = 860D91742FAE1F95000D321B /* MobileDevelopmentKit */;
+		};
+		8FDD846B305C4EA000949118 /* Exceptions for "Frameworks" folder in "Broadpatch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Broadpatch/Broadpatch.m,
+			);
+			target = 8FDD845B305C4E9200949118 /* Broadpatch */;
 		};
 		8FF32E1A3036F5F500C46FE4 /* Exceptions for "Frameworks" folder in "HWHook" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -453,9 +1110,33 @@
 			);
 			target = 8FF32DEC3036F59E00C46FE4 /* HWHook */;
 		};
+		8FF647CA3054E67000E1E610 /* Exceptions for "Daemons" folder in "bootstrapd" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				bootstrapd/main.m,
+			);
+			target = 8FF647BF3054E61900E1E610 /* bootstrapd */;
+		};
+		8FF64812305678DA00E1E610 /* Exceptions for "Daemons" folder in "MobileDevelopmentService" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				MobileDevelopmentService/main.m,
+			);
+			target = 8FF648073056786A00E1E610 /* MobileDevelopmentService */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		8F75F24130635D24004D9A49 /* Exceptions for "Nyxian" folder in "Embed Frameworks" phase from "Nyxian" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			attributesByRelativePath = {
+				LindChain/OpenSSL.xcframework = (CodeSignOnCopy, RemoveHeadersOnCopy, );
+			};
+			buildPhase = 8F75F24030635D23004D9A49 /* Embed Frameworks */;
+			membershipExceptions = (
+				LindChain/OpenSSL.xcframework,
+			);
+		};
 		8FB3C25F303145F100DB3ABC /* Exceptions for "Frameworks" folder in "Embed Libraries" phase from "CoreCompiler" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
 			attributesByRelativePath = {
@@ -472,6 +1153,7 @@
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxBuilder.dylib = (CodeSignOnCopy, );
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxMacroExpansion.dylib = (CodeSignOnCopy, );
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxMacros.dylib = (CodeSignOnCopy, );
+				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftWarningControl.dylib = (CodeSignOnCopy, );
 			};
 			buildPhase = 86DCC2922FA520EE00973169 /* Embed Libraries */;
 			membershipExceptions = (
@@ -488,16 +1170,14 @@
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxBuilder.dylib,
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxMacroExpansion.dylib,
 				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftSyntaxMacros.dylib,
+				CoreCompiler/CoreCompilerSupportLibs/lib_CompilerSwiftWarningControl.dylib,
 			);
 		};
-		AFF4DBDB2DCA5DEA00B1B5F9 /* Exceptions for "Nyxian" folder in "Embed Libraries" phase from "Nyxian" target */ = {
+		8FDD846C305C4EA000949118 /* Exceptions for "Frameworks" folder in "Copy Files" phase from "Broadpatch" target */ = {
 			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			attributesByRelativePath = {
-				LindChain/OpenSSL.xcframework = (CodeSignOnCopy, RemoveHeadersOnCopy, );
-			};
-			buildPhase = AFF4DB332DCA57EC00B1B5F9 /* Embed Libraries */;
+			buildPhase = 8FDD845A305C4E9200949118 /* CopyFiles */;
 			membershipExceptions = (
-				LindChain/OpenSSL.xcframework,
+				Broadpatch/Broadpatch.h,
 			);
 		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
@@ -506,8 +1186,7 @@
 		798692F02E627A3B00390D7E /* LiveProcess */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				79BF98402E62931E00C60D4C /* Exceptions for "LiveProcess" folder in "Nyxian" target */,
-				79BF983D2E62930600C60D4C /* Exceptions for "LiveProcess" folder in "LiveProcess" target */,
+				8F25316F309A29000058F953 /* Exceptions for "LiveProcess" folder in "LiveProcess" target */,
 			);
 			path = LiveProcess;
 			sourceTree = "<group>";
@@ -520,21 +1199,39 @@
 		8FB3C1EC303145D600DB3ABC /* Frameworks */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				8FB3C2D23031460C00DB3ABC /* Exceptions for "Frameworks" folder in "MobileDevelopmentKit" target */,
+				8FDD846B305C4EA000949118 /* Exceptions for "Frameworks" folder in "Broadpatch" target */,
+				8FDD846C305C4EA000949118 /* Exceptions for "Frameworks" folder in "Copy Files" phase from "Broadpatch" target */,
+				8FF32E1A3036F5F500C46FE4 /* Exceptions for "Frameworks" folder in "HWHook" target */,
+				8F2530E2309A15C80058F953 /* Exceptions for "Frameworks" folder in "LiveProcessLegacy" target */,
 				8FB3C25E303145F100DB3ABC /* Exceptions for "Frameworks" folder in "CoreCompiler" target */,
 				8FB3C25F303145F100DB3ABC /* Exceptions for "Frameworks" folder in "Embed Libraries" phase from "CoreCompiler" target */,
-				8FB3C27B3031460B00DB3ABC /* Exceptions for "Frameworks" folder in "LiveShim" target */,
-				8FF32E1A3036F5F500C46FE4 /* Exceptions for "Frameworks" folder in "HWHook" target */,
+				8FB3C2D23031460C00DB3ABC /* Exceptions for "Frameworks" folder in "MobileDevelopmentKit" target */,
+				8F25252B3096E02D0058F953 /* Exceptions for "Frameworks" folder in "libpatchfind" target */,
+				8F253171309A29E10058F953 /* Exceptions for "Frameworks" folder in "SuperSlot" target */,
+				8F2525413096F2430058F953 /* Exceptions for "Frameworks" folder in "librecoveryksurface" target */,
+				8F252B003096F5200058F953 /* Exceptions for "Frameworks" folder in "librecoveryrtpatch" target */,
 			);
 			path = Frameworks;
+			sourceTree = "<group>";
+		};
+		8FF647B13054D56000E1E610 /* Daemons */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8FF647CA3054E67000E1E610 /* Exceptions for "Daemons" folder in "bootstrapd" target */,
+				8FF64812305678DA00E1E610 /* Exceptions for "Daemons" folder in "MobileDevelopmentService" target */,
+			);
+			path = Daemons;
 			sourceTree = "<group>";
 		};
 		AF9916DB2DC8C42200DDF895 /* Nyxian */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				798BBD332F1D265200CBB23F /* Exceptions for "Nyxian" folder in "Nyxian" target */,
-				AFF4DBDB2DCA5DEA00B1B5F9 /* Exceptions for "Nyxian" folder in "Embed Libraries" phase from "Nyxian" target */,
-				79BF9A972E62BB6900C60D4C /* Exceptions for "Nyxian" folder in "LiveProcess" target */,
+				8F75F24130635D24004D9A49 /* Exceptions for "Nyxian" folder in "Embed Frameworks" phase from "Nyxian" target */,
+				8F2530EE309A17020058F953 /* Exceptions for "Nyxian" folder in "LiveProcessLegacy" target */,
+				8F2525293096E0250058F953 /* Exceptions for "Nyxian" folder in "libpatchfind" target */,
+				8F75DDB33063446F004D9A49 /* Exceptions for "Nyxian" folder in "SuperSlot" target */,
+				8F2525493096F3210058F953 /* Exceptions for "Nyxian" folder in "librecoveryksurface" target */,
 				79AA11C62F7FFF12002FEAF2 /* Exceptions for "Nyxian" folder in "nxtool" target */,
 			);
 			path = Nyxian;
@@ -543,20 +1240,18 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4BBAC6EEA4BDE8D29BE1F58F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F1B780F3069AA2D00484260 /* libBroadpatch.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		79AA11B92F7FFE24002FEAF2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				79AA11C72F7FFF46002FEAF2 /* libarchive.tbd in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		79BF97F42E6291EE00C60D4C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				79BF9A8F2E62BA8700C60D4C /* libarchive.tbd in Frameworks */,
-				8FB3BB043030089000DB3ABC /* LiveShim.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -564,7 +1259,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				860D91832FAE1F9C000D321B /* CoreCompiler.framework in Frameworks */,
+				8F75F72F3063609D004D9A49 /* CoreCompiler.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,11 +1271,63 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8FB3BAD8302FFBAA00DB3ABC /* Frameworks */ = {
+		8F2525173096DFCB0058F953 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8FF32E2D3036F8DC00C46FE4 /* libHWHook.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F2525323096F2100058F953 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F253175309A304A0058F953 /* libBroadpatch.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F25256B3096F3F40058F953 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F253172309A30430058F953 /* libBroadpatch.dylib in Frameworks */,
+				8F25317D309A36D10058F953 /* libHWHook.a in Frameworks */,
+				8F253178309A343D0058F953 /* LiveProcessLegacy.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F2530D0309A15BE0058F953 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F253129309A1BAC0058F953 /* libarchive.tbd in Frameworks */,
+				8F253101309A17DD0058F953 /* libBroadpatch.dylib in Frameworks */,
+				8F253105309A188A0058F953 /* libHWHook.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F75DDA8306343D6004D9A49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F75DDC23063448D004D9A49 /* libarchive.tbd in Frameworks */,
+				8F75DDCC306344DC004D9A49 /* TreeSitterObjc in Frameworks */,
+				8F75DDD4306344DC004D9A49 /* TreeSitterSwift in Frameworks */,
+				8F75DDCE306344DC004D9A49 /* TreeSitterC in Frameworks */,
+				8F75F22130635AF8004D9A49 /* MobileDevelopmentKit.framework in Frameworks */,
+				8F75DE9D30634E66004D9A49 /* TreeSitter in Frameworks */,
+				8F75DDD0306344DC004D9A49 /* TreeSitterXML in Frameworks */,
+				8F75E838306351E6004D9A49 /* SwiftTerm in Frameworks */,
+				8F75DDC8306344C3004D9A49 /* Runestone in Frameworks */,
+				8F75DDD2306344DC004D9A49 /* TreeSitterCPP in Frameworks */,
+				8F75DDD6306344EB004D9A49 /* UIOnboarding in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FDD8459305C4E9200949118 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,31 +1338,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8FF647C13054E61900E1E610 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F25313E309A1F950058F953 /* LiveProcessLegacy.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FF648093056786A00E1E610 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8FF648243056934700E1E610 /* MobileDevelopmentKit.framework in Frameworks */,
+				8F253143309A1FDB0058F953 /* LiveProcessLegacy.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AF9916D62DC8C42200DDF895 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86E4D4F72FB8CF63008BFE4D /* TreeSitterSwift in Frameworks */,
-				860D917D2FAE1F95000D321B /* MobileDevelopmentKit.framework in Frameworks */,
-				79B708BC2F73157F000F38E7 /* TreeSitterCPP in Frameworks */,
-				79B70C1C2F73223A000F38E7 /* Runestone in Frameworks */,
-				79B70C1F2F732364000F38E7 /* Runestone in Frameworks */,
-				8F4D96E62FFBF8FB006CAF3C /* Runestone in Frameworks */,
-				8FECB2472FFD34D500049BB0 /* Runestone in Frameworks */,
-				8F60FE5A3032DB610028EDFD /* UIOnboarding in Frameworks */,
-				AF9919582DC9175A00DDF895 /* TreeSitterObjc in Frameworks */,
-				793A4E3B2F84FE1D003B609A /* Runestone in Frameworks */,
-				791C96052F8726B0006AF674 /* Runestone in Frameworks */,
+				8FDD846E305C4EF200949118 /* libBroadpatch.dylib in Frameworks */,
 				793FCD242E6730740011B3F5 /* libarchive.tbd in Frameworks */,
-				860D91E02FAE2E4C000D321B /* CoreCompiler.framework in Frameworks */,
-				79D1DA672F92A6CE0020518A /* TreeSitterSwift in Frameworks */,
-				8F60FE5D3032DC260028EDFD /* UIOnboarding in Frameworks */,
-				8F6005203033EB920028EDFD /* UIOnboarding in Frameworks */,
-				8FECB24D2FFD367A00049BB0 /* Runestone in Frameworks */,
-				AF99195B2DC9176900DDF895 /* TreeSitterC in Frameworks */,
-				8F60051D3033DD2F0028EDFD /* UIOnboarding in Frameworks */,
-				AFF4E3492DCCCE0F00B1B5F9 /* TreeSitterXML in Frameworks */,
-				793A7E502EB5996A0044418E /* SwiftTerm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -628,7 +1373,6 @@
 				86DCC3092FA521A100973169 /* libz.1.tbd */,
 				86DCC3082FA5219900973169 /* libz.tbd */,
 				79BF9A8E2E62BA7D00C60D4C /* libarchive.tbd */,
-				79AA11C32F7FFEE4002FEAF2 /* libarchive.tbd */,
 				79AA11C42F7FFEFF002FEAF2 /* libarchive.tbd */,
 				7944B5672DEC74FC00834134 /* MobileCoreServices.framework */,
 				79281CBF2E3A44CA00E983C9 /* UniformTypeIdentifiers.framework */,
@@ -642,20 +1386,30 @@
 				8FF346DD3039AA7000C46FE4 /* ksurface_abi.h */,
 				8FB3C1EA3031450500DB3ABC /* ksurface_config.h */,
 				79277DC62EE8761000F18B30 /* version.sh */,
+				93C2C4FAE3F192B466194056 /* fetchtruststore.sh */,
+				8FFF7C113064D8B9002612E7 /* superslotfix.sh */,
 				79277DC02EE8752800F18B30 /* Config.xcconfig */,
 				AF99171F2DC8EA3C00DDF895 /* Shared */,
 				AF9916DB2DC8C42200DDF895 /* Nyxian */,
 				798692F02E627A3B00390D7E /* LiveProcess */,
-				79AA11BD2F7FFE24002FEAF2 /* nxtool */,
+				8FF647B13054D56000E1E610 /* Daemons */,
 				8FB3C1EC303145D600DB3ABC /* Frameworks */,
+				79AA11BD2F7FFE24002FEAF2 /* nxtool */,
 				7944B5662DEC74FC00834134 /* Frameworks */,
 				79BF97F72E6291EE00C60D4C /* LiveProcess.appex */,
 				7944B5652DEC74EA00834134 /* Nyxian.app */,
 				79AA11BC2F7FFE24002FEAF2 /* nxtool */,
 				86DCC25A2FA5209600973169 /* CoreCompiler.framework */,
 				860D91752FAE1F95000D321B /* MobileDevelopmentKit.framework */,
-				8FB3BADB302FFBAA00DB3ABC /* LiveShim.framework */,
 				8FF32DED3036F59E00C46FE4 /* libHWHook.a */,
+				8FF647C63054E61900E1E610 /* bootstrapd.dylib */,
+				8FF6480E3056786A00E1E610 /* MobileDevelopmentService.dylib */,
+				8FDD845C305C4E9200949118 /* libBroadpatch.dylib */,
+				8F75DDAE306343D6004D9A49 /* SuperSlot.dylib */,
+				8F25251D3096DFCB0058F953 /* libpatchfind.dylib */,
+				8F2525373096F2100058F953 /* librecoveryksurface.dylib */,
+				8F2525703096F3F40058F953 /* librecoveryrtpatch.dylib */,
+				8F2530D3309A15BE0058F953 /* LiveProcessLegacy.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -676,7 +1430,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8FB3BAD6302FFBAA00DB3ABC /* Headers */ = {
+		8F2530CE309A15BE0058F953 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -708,27 +1462,6 @@
 			productReference = 79AA11BC2F7FFE24002FEAF2 /* nxtool */;
 			productType = "com.apple.product-type.tool";
 		};
-		79BF97F62E6291EE00C60D4C /* LiveProcess */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 79BF98062E6291EE00C60D4C /* Build configuration list for PBXNativeTarget "LiveProcess" */;
-			buildPhases = (
-				79BF97F32E6291EE00C60D4C /* Sources */,
-				79BF97F42E6291EE00C60D4C /* Frameworks */,
-				79BF97F52E6291EE00C60D4C /* Resources */,
-				8FB3BB083030089000DB3ABC /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				8FB3BB073030089000DB3ABC /* PBXTargetDependency */,
-			);
-			name = LiveProcess;
-			packageProductDependencies = (
-			);
-			productName = LiveProcess;
-			productReference = 79BF97F72E6291EE00C60D4C /* LiveProcess.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		860D91742FAE1F95000D321B /* MobileDevelopmentKit */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 860D917F2FAE1F95000D321B /* Build configuration list for PBXNativeTarget "MobileDevelopmentKit" */;
@@ -737,6 +1470,7 @@
 				860D91712FAE1F95000D321B /* Sources */,
 				860D91722FAE1F95000D321B /* Frameworks */,
 				860D91732FAE1F95000D321B /* Resources */,
+				8F75F7313063609D004D9A49 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -771,26 +1505,137 @@
 			productReference = 86DCC25A2FA5209600973169 /* CoreCompiler.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		8FB3BADA302FFBAA00DB3ABC /* LiveShim */ = {
+		8F2525133096DFCB0058F953 /* libpatchfind */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8FB3BAE5302FFBAA00DB3ABC /* Build configuration list for PBXNativeTarget "LiveShim" */;
+			buildConfigurationList = 8F25251A3096DFCB0058F953 /* Build configuration list for PBXNativeTarget "libpatchfind" */;
 			buildPhases = (
-				8FB3BAD6302FFBAA00DB3ABC /* Headers */,
-				8FB3BAD7302FFBAA00DB3ABC /* Sources */,
-				8FB3BAD8302FFBAA00DB3ABC /* Frameworks */,
-				8FB3BAD9302FFBAA00DB3ABC /* Resources */,
+				8F2525163096DFCB0058F953 /* Sources */,
+				8F2525173096DFCB0058F953 /* Frameworks */,
+				8F2525193096DFCB0058F953 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				8FF32E2F3036F8DC00C46FE4 /* PBXTargetDependency */,
 			);
-			name = LiveShim;
+			name = libpatchfind;
 			packageProductDependencies = (
 			);
-			productName = LiveShim;
-			productReference = 8FB3BADB302FFBAA00DB3ABC /* LiveShim.framework */;
+			productName = execd;
+			productReference = 8F25251D3096DFCB0058F953 /* libpatchfind.dylib */;
+			productType = "com.apple.product-type.library.static";
+		};
+		8F25252E3096F2100058F953 /* librecoveryksurface */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F2525343096F2100058F953 /* Build configuration list for PBXNativeTarget "librecoveryksurface" */;
+			buildPhases = (
+				8F2525313096F2100058F953 /* Sources */,
+				8F2525323096F2100058F953 /* Frameworks */,
+				8F2525333096F2100058F953 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8F253177309A304A0058F953 /* PBXTargetDependency */,
+			);
+			name = librecoveryksurface;
+			packageProductDependencies = (
+			);
+			productName = execd;
+			productReference = 8F2525373096F2100058F953 /* librecoveryksurface.dylib */;
+			productType = "com.apple.product-type.library.static";
+		};
+		8F2525673096F3F40058F953 /* librecoveryrtpatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F25256D3096F3F40058F953 /* Build configuration list for PBXNativeTarget "librecoveryrtpatch" */;
+			buildPhases = (
+				8F25256A3096F3F40058F953 /* Sources */,
+				8F25256B3096F3F40058F953 /* Frameworks */,
+				8F25256C3096F3F40058F953 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8F253174309A30430058F953 /* PBXTargetDependency */,
+				8F25317B309A343D0058F953 /* PBXTargetDependency */,
+				8F25317F309A36D10058F953 /* PBXTargetDependency */,
+			);
+			name = librecoveryrtpatch;
+			packageProductDependencies = (
+			);
+			productName = execd;
+			productReference = 8F2525703096F3F40058F953 /* librecoveryrtpatch.dylib */;
+			productType = "com.apple.product-type.library.static";
+		};
+		8F2530D2309A15BE0058F953 /* LiveProcessLegacy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F2530DB309A15BE0058F953 /* Build configuration list for PBXNativeTarget "LiveProcessLegacy" */;
+			buildPhases = (
+				8F2530CE309A15BE0058F953 /* Headers */,
+				8F2530CF309A15BE0058F953 /* Sources */,
+				8F2530D0309A15BE0058F953 /* Frameworks */,
+				8F2530D1309A15BE0058F953 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8F253103309A17DD0058F953 /* PBXTargetDependency */,
+				8F253107309A188A0058F953 /* PBXTargetDependency */,
+			);
+			name = LiveProcessLegacy;
+			packageProductDependencies = (
+			);
+			productName = LiveProcessLegacy;
+			productReference = 8F2530D3309A15BE0058F953 /* LiveProcessLegacy.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		8F75DDA4306343D6004D9A49 /* SuperSlot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F75DDAB306343D6004D9A49 /* Build configuration list for PBXNativeTarget "SuperSlot" */;
+			buildPhases = (
+				8F75DDA7306343D6004D9A49 /* Sources */,
+				8F75DDA8306343D6004D9A49 /* Frameworks */,
+				8F75DDAA306343D6004D9A49 /* CopyFiles */,
+				8F75F21530635AEF004D9A49 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8F75DDC6306344B5004D9A49 /* PBXTargetDependency */,
+			);
+			name = SuperSlot;
+			packageProductDependencies = (
+				8F75DDC7306344C3004D9A49 /* Runestone */,
+				8F75DDCB306344DC004D9A49 /* TreeSitterObjc */,
+				8F75DDCD306344DC004D9A49 /* TreeSitterC */,
+				8F75DDCF306344DC004D9A49 /* TreeSitterXML */,
+				8F75DDD1306344DC004D9A49 /* TreeSitterCPP */,
+				8F75DDD3306344DC004D9A49 /* TreeSitterSwift */,
+				8F75DDD5306344EB004D9A49 /* UIOnboarding */,
+				8F75DE9C30634E66004D9A49 /* TreeSitter */,
+				8F75E837306351E6004D9A49 /* SwiftTerm */,
+			);
+			productName = execd;
+			productReference = 8F75DDAE306343D6004D9A49 /* SuperSlot.dylib */;
+			productType = "com.apple.product-type.library.static";
+		};
+		8FDD845B305C4E9200949118 /* Broadpatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8FDD8463305C4E9200949118 /* Build configuration list for PBXNativeTarget "Broadpatch" */;
+			buildPhases = (
+				8FDD8458305C4E9200949118 /* Sources */,
+				8FDD8459305C4E9200949118 /* Frameworks */,
+				8FDD845A305C4E9200949118 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Broadpatch;
+			packageProductDependencies = (
+			);
+			productName = Broadpatch;
+			productReference = 8FDD845C305C4E9200949118 /* libBroadpatch.dylib */;
+			productType = "com.apple.product-type.library.static";
 		};
 		8FF32DEC3036F59E00C46FE4 /* HWHook */ = {
 			isa = PBXNativeTarget;
@@ -811,6 +1656,47 @@
 			productReference = 8FF32DED3036F59E00C46FE4 /* libHWHook.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		8FF647BF3054E61900E1E610 /* bootstrapd */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8FF647C33054E61900E1E610 /* Build configuration list for PBXNativeTarget "bootstrapd" */;
+			buildPhases = (
+				8FF647C03054E61900E1E610 /* Sources */,
+				8FF647C13054E61900E1E610 /* Frameworks */,
+				8FF647C23054E61900E1E610 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8F253141309A1F950058F953 /* PBXTargetDependency */,
+			);
+			name = bootstrapd;
+			packageProductDependencies = (
+			);
+			productName = execd;
+			productReference = 8FF647C63054E61900E1E610 /* bootstrapd.dylib */;
+			productType = "com.apple.product-type.library.static";
+		};
+		8FF648073056786A00E1E610 /* MobileDevelopmentService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8FF6480B3056786A00E1E610 /* Build configuration list for PBXNativeTarget "MobileDevelopmentService" */;
+			buildPhases = (
+				8FF648083056786A00E1E610 /* Sources */,
+				8FF648093056786A00E1E610 /* Frameworks */,
+				8FF6480A3056786A00E1E610 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8FF648273056934700E1E610 /* PBXTargetDependency */,
+				8F253146309A1FDB0058F953 /* PBXTargetDependency */,
+			);
+			name = MobileDevelopmentService;
+			packageProductDependencies = (
+			);
+			productName = execd;
+			productReference = 8FF6480E3056786A00E1E610 /* MobileDevelopmentService.dylib */;
+			productType = "com.apple.product-type.library.static";
+		};
 		AF9916D82DC8C42200DDF895 /* Nyxian */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AF9916E72DC8C42400DDF895 /* Build configuration list for PBXNativeTarget "Nyxian" */;
@@ -818,44 +1704,49 @@
 				AF9916D52DC8C42200DDF895 /* Sources */,
 				AF9916D62DC8C42200DDF895 /* Frameworks */,
 				AF9916D72DC8C42200DDF895 /* Resources */,
-				AFF4DB332DCA57EC00B1B5F9 /* Embed Libraries */,
+				FC2B32649EF25F219B0BC1C5 /* Bundle the Latest TrustStore */,
 				8F60087B3033F9200028EDFD /* Embed Foundation Extensions */,
+				8FF647BA3054D5EE00E1E610 /* CopyFiles */,
+				8F75F24030635D23004D9A49 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				860D917C2FAE1F95000D321B /* PBXTargetDependency */,
-				860D91E32FAE2E4C000D321B /* PBXTargetDependency */,
 				8FB3BE8C303131D800DB3ABC /* PBXTargetDependency */,
-				8F60087A3033F9200028EDFD /* PBXTargetDependency */,
+				8FDD8470305C4EF200949118 /* PBXTargetDependency */,
+				8F75F71B30635DBB004D9A49 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				AF9916DB2DC8C42200DDF895 /* Nyxian */,
 			);
 			name = Nyxian;
 			packageProductDependencies = (
-				AF9919572DC9175A00DDF895 /* TreeSitterObjc */,
-				AF99195A2DC9176900DDF895 /* TreeSitterC */,
-				AFF4E3482DCCCE0F00B1B5F9 /* TreeSitterXML */,
-				793A7E4F2EB5996A0044418E /* SwiftTerm */,
-				79B708BB2F73157F000F38E7 /* TreeSitterCPP */,
-				79B70C1B2F73223A000F38E7 /* Runestone */,
-				79B70C1E2F732364000F38E7 /* Runestone */,
-				793A4E3A2F84FE1D003B609A /* Runestone */,
-				791C96042F8726B0006AF674 /* Runestone */,
-				79D1DA662F92A6CE0020518A /* TreeSitterSwift */,
-				86E4D4F62FB8CF63008BFE4D /* TreeSitterSwift */,
-				8F4D96E52FFBF8FB006CAF3C /* Runestone */,
-				8FECB2462FFD34D500049BB0 /* Runestone */,
-				8FECB24C2FFD367A00049BB0 /* Runestone */,
-				8F60FE593032DB610028EDFD /* UIOnboarding */,
-				8F60FE5C3032DC260028EDFD /* UIOnboarding */,
-				8F60051C3033DD2F0028EDFD /* UIOnboarding */,
-				8F60051F3033EB920028EDFD /* UIOnboarding */,
 			);
 			productName = LindDE;
 			productReference = 7944B5652DEC74EA00834134 /* Nyxian.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B131FA82D732FCD187DD75FB /* LiveProcess */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 782ECDCCEC79DB3EE851B143 /* Build configuration list for PBXNativeTarget "LiveProcess" */;
+			buildPhases = (
+				ED2F9485E0454964F2A9A837 /* Sources */,
+				4BBAC6EEA4BDE8D29BE1F58F /* Frameworks */,
+				29A01B6996EE55510418B8CB /* Resources */,
+				8FB3BB083030089000DB3ABC /* Embed Frameworks */,
+				8F252B09309839FC0058F953 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8F1B78113069AA2D00484260 /* PBXTargetDependency */,
+			);
+			name = LiveProcess;
+			packageProductDependencies = (
+			);
+			productName = LiveProcess;
+			productReference = 79BF97F72E6291EE00C60D4C /* LiveProcess.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -870,9 +1761,6 @@
 					79AA11BB2F7FFE24002FEAF2 = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
-					79BF97F62E6291EE00C60D4C = {
-						CreatedOnToolsVersion = 16.4;
-					};
 					860D91742FAE1F95000D321B = {
 						CreatedOnToolsVersion = 26.4.1;
 						LastSwiftMigration = 2650;
@@ -881,7 +1769,10 @@
 						CreatedOnToolsVersion = 26.4.1;
 						LastSwiftMigration = 2640;
 					};
-					8FB3BADA302FFBAA00DB3ABC = {
+					8F2530D2309A15BE0058F953 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					8FDD845B305C4E9200949118 = {
 						CreatedOnToolsVersion = 27.0;
 					};
 					8FF32DEC3036F59E00C46FE4 = {
@@ -910,6 +1801,7 @@
 				86E4D4F52FB8CF63008BFE4D /* XCRemoteSwiftPackageReference "tree-sitter-swift" */,
 				8FECB24B2FFD367A00049BB0 /* XCRemoteSwiftPackageReference "Runestone" */,
 				8F60051E3033EB920028EDFD /* XCRemoteSwiftPackageReference "UIOnboarding" */,
+				8F75DE9B30634E66004D9A49 /* XCRemoteSwiftPackageReference "tree-sitter" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AF9916D02DC8C42200DDF895;
@@ -917,18 +1809,25 @@
 			projectRoot = "";
 			targets = (
 				AF9916D82DC8C42200DDF895 /* Nyxian */,
-				79BF97F62E6291EE00C60D4C /* LiveProcess */,
-				860D91742FAE1F95000D321B /* MobileDevelopmentKit */,
-				86DCC2592FA5209600973169 /* CoreCompiler */,
-				79AA11BB2F7FFE24002FEAF2 /* nxtool */,
-				8FB3BADA302FFBAA00DB3ABC /* LiveShim */,
+				B131FA82D732FCD187DD75FB /* LiveProcess */,
+				8FDD845B305C4E9200949118 /* Broadpatch */,
 				8FF32DEC3036F59E00C46FE4 /* HWHook */,
+				8F2530D2309A15BE0058F953 /* LiveProcessLegacy */,
+				86DCC2592FA5209600973169 /* CoreCompiler */,
+				860D91742FAE1F95000D321B /* MobileDevelopmentKit */,
+				8F2525133096DFCB0058F953 /* libpatchfind */,
+				8F75DDA4306343D6004D9A49 /* SuperSlot */,
+				8F25252E3096F2100058F953 /* librecoveryksurface */,
+				8F2525673096F3F40058F953 /* librecoveryrtpatch */,
+				8FF647BF3054E61900E1E610 /* bootstrapd */,
+				8FF648073056786A00E1E610 /* MobileDevelopmentService */,
+				79AA11BB2F7FFE24002FEAF2 /* nxtool */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		79BF97F52E6291EE00C60D4C /* Resources */ = {
+		29A01B6996EE55510418B8CB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -949,7 +1848,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8FB3BAD9302FFBAA00DB3ABC /* Resources */ = {
+		8F2530D1309A15BE0058F953 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -966,15 +1865,30 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXSourcesBuildPhase section */
-		79AA11B82F7FFE24002FEAF2 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
+/* Begin PBXShellScriptBuildPhase section */
+		FC2B32649EF25F219B0BC1C5 /* Bundle the Latest TrustStore */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle the Latest TrustStore";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh \"$SRCROOT/fetchtruststore.sh\"\n";
 		};
-		79BF97F32E6291EE00C60D4C /* Sources */ = {
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		79AA11B82F7FFE24002FEAF2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -995,7 +1909,42 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8FB3BAD7302FFBAA00DB3ABC /* Sources */ = {
+		8F2525163096DFCB0058F953 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F2525313096F2100058F953 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F25256A3096F3F40058F953 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F2530CF309A15BE0058F953 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F75DDA7306343D6004D9A49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FDD8458305C4E9200949118 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1009,7 +1958,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8FF647C03054E61900E1E610 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FF648083056786A00E1E610 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AF9916D52DC8C42200DDF895 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ED2F9485E0454964F2A9A837 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1019,57 +1989,176 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		860D917C2FAE1F95000D321B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 860D91742FAE1F95000D321B /* MobileDevelopmentKit */;
-			targetProxy = 860D917B2FAE1F95000D321B /* PBXContainerItemProxy */;
-		};
 		860D91862FAE1F9C000D321B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			platformFilter = ios;
 			target = 86DCC2592FA5209600973169 /* CoreCompiler */;
 			targetProxy = 860D91852FAE1F9C000D321B /* PBXContainerItemProxy */;
 		};
-		860D91E32FAE2E4C000D321B /* PBXTargetDependency */ = {
+		8F1B78113069AA2D00484260 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 86DCC2592FA5209600973169 /* CoreCompiler */;
-			targetProxy = 860D91E22FAE2E4C000D321B /* PBXContainerItemProxy */;
+			target = 8FDD845B305C4E9200949118 /* Broadpatch */;
+			targetProxy = 8F1B78103069AA2D00484260 /* PBXContainerItemProxy */;
 		};
-		8F60087A3033F9200028EDFD /* PBXTargetDependency */ = {
+		8F253103309A17DD0058F953 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 79BF97F62E6291EE00C60D4C /* LiveProcess */;
-			targetProxy = 8F6008793033F9200028EDFD /* PBXContainerItemProxy */;
+			target = 8FDD845B305C4E9200949118 /* Broadpatch */;
+			targetProxy = 8F253102309A17DD0058F953 /* PBXContainerItemProxy */;
 		};
-		8FB3BB073030089000DB3ABC /* PBXTargetDependency */ = {
+		8F253107309A188A0058F953 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8FB3BADA302FFBAA00DB3ABC /* LiveShim */;
-			targetProxy = 8FB3BB063030089000DB3ABC /* PBXContainerItemProxy */;
+			target = 8FF32DEC3036F59E00C46FE4 /* HWHook */;
+			targetProxy = 8F253106309A188A0058F953 /* PBXContainerItemProxy */;
+		};
+		8F253141309A1F950058F953 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8F2530D2309A15BE0058F953 /* LiveProcessLegacy */;
+			targetProxy = 8F253140309A1F950058F953 /* PBXContainerItemProxy */;
+		};
+		8F253146309A1FDB0058F953 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8F2530D2309A15BE0058F953 /* LiveProcessLegacy */;
+			targetProxy = 8F253145309A1FDB0058F953 /* PBXContainerItemProxy */;
+		};
+		8F253174309A30430058F953 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8FDD845B305C4E9200949118 /* Broadpatch */;
+			targetProxy = 8F253173309A30430058F953 /* PBXContainerItemProxy */;
+		};
+		8F253177309A304A0058F953 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8FDD845B305C4E9200949118 /* Broadpatch */;
+			targetProxy = 8F253176309A304A0058F953 /* PBXContainerItemProxy */;
+		};
+		8F25317B309A343D0058F953 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8F2530D2309A15BE0058F953 /* LiveProcessLegacy */;
+			targetProxy = 8F25317A309A343D0058F953 /* PBXContainerItemProxy */;
+		};
+		8F25317F309A36D10058F953 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8FF32DEC3036F59E00C46FE4 /* HWHook */;
+			targetProxy = 8F25317E309A36D10058F953 /* PBXContainerItemProxy */;
+		};
+		8F75DDC6306344B5004D9A49 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 860D91742FAE1F95000D321B /* MobileDevelopmentKit */;
+			targetProxy = 8F75DDC5306344B5004D9A49 /* PBXContainerItemProxy */;
+		};
+		8F75F71B30635DBB004D9A49 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8F75DDA4306343D6004D9A49 /* SuperSlot */;
+			targetProxy = 8F75F71A30635DBB004D9A49 /* PBXContainerItemProxy */;
 		};
 		8FB3BE8C303131D800DB3ABC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 79BF97F62E6291EE00C60D4C /* LiveProcess */;
+			target = B131FA82D732FCD187DD75FB /* LiveProcess */;
 			targetProxy = 8FB3BE8B303131D800DB3ABC /* PBXContainerItemProxy */;
 		};
-		8FF32E2F3036F8DC00C46FE4 /* PBXTargetDependency */ = {
+		8FDD8470305C4EF200949118 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8FF32DEC3036F59E00C46FE4 /* HWHook */;
-			targetProxy = 8FF32E2E3036F8DC00C46FE4 /* PBXContainerItemProxy */;
+			target = 8FDD845B305C4E9200949118 /* Broadpatch */;
+			targetProxy = 8FDD846F305C4EF200949118 /* PBXContainerItemProxy */;
+		};
+		8FF648273056934700E1E610 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 860D91742FAE1F95000D321B /* MobileDevelopmentKit */;
+			targetProxy = 8FF648263056934700E1E610 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		1049131335A4E0B3AED6A8E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 79277DC02EE8752800F18B30 /* Config.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = NO;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
+				CODE_SIGN_ENTITLEMENTS = "$(NYXIAN_LIVEPROCESS_CODE_SIGN_ENTITLEMENTS)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(BUILD_NUMBER)";
+				DEAD_CODE_STRIPPING = NO;
+				ENABLE_DEBUG_DYLIB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/LiveProcessABI";
+				INFOPLIST_FILE = LiveProcess/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LiveProcess;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_ENTRY_POINT = _NSExtensionMain;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(VERSION)";
+				OTHER_CFLAGS = "-DOS_OBJECT_USE_OBJC=0";
+				OTHER_LDFLAGS = "-Wl,-e,_NSExtensionMain";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(NYXIAN_LIVEPROCESS_PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = LiveProcess;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		7189B435A49D898BECCB8232 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 79277DC02EE8752800F18B30 /* Config.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = NO;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
+				CODE_SIGN_ENTITLEMENTS = "$(NYXIAN_LIVEPROCESS_CODE_SIGN_ENTITLEMENTS)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(BUILD_NUMBER)";
+				DEAD_CODE_STRIPPING = NO;
+				ENABLE_DEBUG_DYLIB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/LiveProcessABI";
+				INFOPLIST_FILE = LiveProcess/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LiveProcess;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_ENTRY_POINT = _NSExtensionMain;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = "$(VERSION)";
+				OTHER_CFLAGS = "-DOS_OBJECT_USE_OBJC=0";
+				OTHER_LDFLAGS = "-Wl,-e,_NSExtensionMain";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(NYXIAN_LIVEPROCESS_PRODUCT_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = LiveProcess;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		79AA11C12F7FFE24002FEAF2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
+				ENABLE_DEBUG_DYLIB = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
 					Nyxian/,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				OTHER_CFLAGS = "-D__NXTOOL";
+				OTHER_LDFLAGS = "-larchive";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -1078,107 +2167,22 @@
 		79AA11C22F7FFE24002FEAF2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
+				ENABLE_DEBUG_DYLIB = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
 					Nyxian/,
 				);
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				OTHER_CFLAGS = "-D__NXTOOL";
+				OTHER_LDFLAGS = "-larchive";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-			};
-			name = Release;
-		};
-		79BF98072E6291EE00C60D4C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79277DC02EE8752800F18B30 /* Config.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "$(NYXIAN_LIVEPROCESS_CODE_SIGN_ENTITLEMENTS)";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = "$(BUILD_NUMBER)";
-				DEAD_CODE_STRIPPING = YES;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)",
-					Nyxian/,
-					LiveProcess/,
-				);
-				INFOPLIST_FILE = LiveProcess/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = LiveProcess;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIMainStoryboardFile = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = "$(VERSION)";
-				OTHER_CFLAGS = "-DCLIENT_ENV";
-				OTHER_LDFLAGS = (
-					"-Wl,-U,_OBJC_CLASS_$_FBSSceneParameters",
-					"-Wl,-U,_OBJC_CLASS_$_LSApplicationWorkspace",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "$(NYXIAN_LIVEPROCESS_PRODUCT_BUNDLE_IDENTIFIER)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		79BF98082E6291EE00C60D4C /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 79277DC02EE8752800F18B30 /* Config.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "$(NYXIAN_LIVEPROCESS_CODE_SIGN_ENTITLEMENTS)";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = "$(BUILD_NUMBER)";
-				DEAD_CODE_STRIPPING = YES;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)",
-					Nyxian/,
-					LiveProcess/,
-				);
-				INFOPLIST_FILE = LiveProcess/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = LiveProcess;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIMainStoryboardFile = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = "$(VERSION)";
-				OTHER_CFLAGS = "-DCLIENT_ENV";
-				OTHER_LDFLAGS = (
-					"-Wl,-U,_OBJC_CLASS_$_FBSSceneParameters",
-					"-Wl,-U,_OBJC_CLASS_$_LSApplicationWorkspace",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "$(NYXIAN_LIVEPROCESS_PRODUCT_BUNDLE_IDENTIFIER)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1195,6 +2199,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = YES;
+				GCC_VERSION = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1237,6 +2242,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = YES;
+				GCC_VERSION = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1268,7 +2274,6 @@
 		86DCC2652FA5209600973169 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1278,6 +2283,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = YES;
+				GCC_VERSION = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1289,12 +2295,16 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/CoreCompiler/CoreCompilerSupportLibs",
 					"$(PROJECT_DIR)/Frameworks/CoreCompiler/CoreCompilerSupportLibs",
 				);
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_CFLAGS = "-std=gnu17";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-std=gnu++17",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.cr4zy.CoreCompiler;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -1321,7 +2331,6 @@
 		86DCC2662FA5209600973169 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1331,6 +2340,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = YES;
+				GCC_VERSION = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1342,12 +2352,16 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/CoreCompiler/CoreCompilerSupportLibs",
 					"$(PROJECT_DIR)/Frameworks/CoreCompiler/CoreCompilerSupportLibs",
 				);
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_CFLAGS = "-std=gnu17";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-std=gnu++17",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.cr4zy.CoreCompiler;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -1370,7 +2384,165 @@
 			};
 			name = Release;
 		};
-		8FB3BAE6302FFBAA00DB3ABC /* Debug */ = {
+		8F25251B3096DFCB0058F953 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = libpatchfind.dylib;
+				GCC_VERSION = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../PlugIns/LiveProcess.appex/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8F25251C3096DFCB0058F953 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = libpatchfind.dylib;
+				GCC_VERSION = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../PlugIns/LiveProcess.appex/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8F2525353096F2100058F953 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = librecoveryksurface.dylib;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SRCROOT)/Nyxian",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../PlugIns/LiveProcess.appex/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8F2525363096F2100058F953 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = librecoveryksurface.dylib;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SRCROOT)/Nyxian",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../PlugIns/LiveProcess.appex/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8F25256E3096F3F40058F953 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = librecoveryrtpatch.dylib;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../PlugIns/LiveProcess.appex/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-Wl,-undefined,dynamic_lookup",
+					"-framework",
+					Foundation,
+					"-framework",
+					CoreFoundation,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		8F25256F3096F3F40058F953 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = librecoveryrtpatch.dylib;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../PlugIns/LiveProcess.appex/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-Wl,-undefined,dynamic_lookup",
+					"-framework",
+					Foundation,
+					"-framework",
+					CoreFoundation,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
+		8F2530DC309A15BE0058F953 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1382,10 +2554,14 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SRCROOT)/Nyxian",
+					"$(SRCROOT)/LiveProcess",
+				);
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1394,10 +2570,19 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = org.emexlabs.LiveShim;
+				OTHER_CFLAGS = "-DCLIENT_ENV";
+				OTHER_LDFLAGS = (
+					"-Wl,-U,_OBJC_CLASS_$_FBSSceneParameters",
+					"-Wl,-U,_OBJC_CLASS_$_LSApplicationWorkspace",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.emexlabs.LiveProcessLegacy;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1405,7 +2590,7 @@
 			};
 			name = Debug;
 		};
-		8FB3BAE7302FFBAA00DB3ABC /* Release */ = {
+		8F2530DD309A15BE0058F953 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1417,10 +2602,14 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_MODULE_VERIFIER = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					"$(SRCROOT)/Nyxian",
+					"$(SRCROOT)/LiveProcess",
+				);
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1429,14 +2618,214 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = org.emexlabs.LiveShim;
+				OTHER_CFLAGS = "-DCLIENT_ENV";
+				OTHER_LDFLAGS = (
+					"-Wl,-U,_OBJC_CLASS_$_FBSSceneParameters",
+					"-Wl,-U,_OBJC_CLASS_$_LSApplicationWorkspace",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.emexlabs.LiveProcessLegacy;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		8F75DDAC306343D6004D9A49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_ENABLE_MODULE_DEBUGGING = YES;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
+				ENABLE_SECURITY_COMPILER_WARNINGS = YES;
+				EXECUTABLE_NAME = SuperSlot.dylib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Nyxian/LindChain",
+					"$(PROJECT_DIR)/Nyxian/LindChain/Private/Frameworks",
+				);
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					Nyxian/,
+					LiveProcess/,
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@executable_path/Frameworks/MobileDevelopmentKit.framework/Frameworks",
+					"@loader_path",
+				);
+				MACH_O_TYPE = mh_dylib;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DHOST_ENV",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/SwiftTerm.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/Runestone.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/UIOnboarding.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitter.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterC.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterCPP.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterObjc.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterSwift.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterXML.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterDTD.modulemap",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				OTHER_SWIFT_FLAGS = "$(inherited) -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitter.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterC.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterCPP.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterObjc.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterSwift.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterXML.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterDTD.modulemap";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = None;
+				STRIP_SWIFT_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_ENABLE_EXPLICIT_MODULES = "$(SWIFT_USE_INTEGRATED_DRIVER)";
+				SWIFT_OBJC_BRIDGING_HEADER = Nyxian/NXBridge.h;
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "Nyxian-Swift.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8F75DDAD306343D6004D9A49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_ENABLE_MODULE_DEBUGGING = YES;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = NO;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
+				ENABLE_SECURITY_COMPILER_WARNINGS = YES;
+				EXECUTABLE_NAME = SuperSlot.dylib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Nyxian/LindChain",
+					"$(PROJECT_DIR)/Nyxian/LindChain/Private/Frameworks",
+				);
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)",
+					Nyxian/,
+					LiveProcess/,
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@executable_path/Frameworks/MobileDevelopmentKit.framework/Frameworks",
+					"@loader_path",
+				);
+				MACH_O_TYPE = mh_dylib;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DHOST_ENV",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/SwiftTerm.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/Runestone.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/UIOnboarding.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitter.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterC.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterCPP.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterObjc.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterSwift.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterXML.modulemap",
+					"-fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterDTD.modulemap",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				OTHER_SWIFT_FLAGS = "$(inherited) -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitter.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterC.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterCPP.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterObjc.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterSwift.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterXML.modulemap -Xcc -fmodule-map-file=$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)/TreeSitterDTD.modulemap";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = None;
+				STRIP_SWIFT_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_ENABLE_EXPLICIT_MODULES = "$(SWIFT_USE_INTEGRATED_DRIVER)";
+				SWIFT_OBJC_BRIDGING_HEADER = Nyxian/NXBridge.h;
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "Nyxian-Swift.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8FDD8464305C4E9200949118 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				DYLIB_INSTALL_NAME_BASE = "@rpath/libBroadpatch.dylib";
+				EXECUTABLE_EXTENSION = dylib;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_DYLIB_INSTALL_NAME = "@rpath/libBroadpatch.dylib";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-framework",
+					Security,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8FDD8465305C4E9200949118 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				DYLIB_INSTALL_NAME_BASE = "@rpath/libBroadpatch.dylib";
+				EXECUTABLE_EXTENSION = dylib;
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_DYLIB_INSTALL_NAME = "@rpath/libBroadpatch.dylib";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-framework",
+					Security,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1445,10 +2834,15 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				GCC_VERSION = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1458,10 +2852,108 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				GCC_OPTIMIZATION_LEVEL = fast;
+				GCC_VERSION = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8FF647C43054E61900E1E610 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = bootstrapd.dylib;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../bootloader/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8FF647C53054E61900E1E610 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = bootstrapd.dylib;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../bootloader/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		8FF6480C3056786A00E1E610 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = MobileDevelopmentService.dylib;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../bootloader/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8FF6480D3056786A00E1E610 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = L4A6CKH3TV;
+				EXECUTABLE_NAME = MobileDevelopmentService.dylib;
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../bootloader/Frameworks";
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -1603,21 +3095,30 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_MODULES_AUTOLINK = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(NYXIAN_CODE_SIGN_ENTITLEMENTS)";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(BUILD_NUMBER)";
-				DEAD_CODE_STRIPPING = YES;
+				DEAD_CODE_STRIPPING = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_ENHANCED_SECURITY = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_SECURITY_COMPILER_WARNINGS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Nyxian/LindChain",
 					"$(PROJECT_DIR)/Nyxian/LindChain/Private/Frameworks",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"NX_ROM_BOOTLOADER=1",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
@@ -1683,29 +3184,40 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportsDocumentBrowser = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Nyxian",
-					"$(PROJECT_DIR)/Nyxian/LindChain/Synpush",
-					"$(PROJECT_DIR)/Nyxian/LindChain",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = "$(VERSION)";
-				OTHER_CFLAGS = "-DHOST_ENV";
-				OTHER_LDFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DHOST_ENV",
+					"-DBOOT",
+				);
+				OTHER_LDFLAGS = (
+					"-Wl,-segprot,__BOOTONLY,rx,rx",
+					"-Wl,-U,_IOHIDEventGetIntegerValue",
+					"-Wl,-U,_IOHIDEventGetType",
+					"-Wl,-U,_IOHIDEventSystemClientCreate",
+					"-Wl,-U,_IOHIDEventSystemClientRegisterEventCallback",
+					"-Wl,-U,_IOHIDEventSystemClientScheduleWithDispatchQueue",
+					"-Wl,-U,_IOHIDEventSystemClientSetMatching",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(NYXIAN_PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = None;
+				STRIP_SWIFT_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = Nyxian/NXBridge.h;
+				SWIFT_OBJC_BRIDGING_HEADER = Nyxian/BootBridge.h;
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1719,22 +3231,30 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_MODULES_AUTOLINK = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(NYXIAN_CODE_SIGN_ENTITLEMENTS)";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(BUILD_NUMBER)";
-				DEAD_CODE_STRIPPING = YES;
+				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_DEBUG_DYLIB = NO;
 				ENABLE_ENHANCED_SECURITY = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_SECURITY_COMPILER_WARNINGS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Nyxian/LindChain",
 					"$(PROJECT_DIR)/Nyxian/LindChain/Private/Frameworks",
 				);
 				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"NX_ROM_BOOTLOADER=1",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)",
@@ -1800,30 +3320,41 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportsDocumentBrowser = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Nyxian",
-					"$(PROJECT_DIR)/Nyxian/LindChain/Synpush",
-					"$(PROJECT_DIR)/Nyxian/LindChain",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = "$(VERSION)";
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "-DHOST_ENV";
-				OTHER_LDFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DHOST_ENV",
+					"-DBOOT",
+				);
+				OTHER_LDFLAGS = (
+					"-Wl,-segprot,__BOOTONLY,rx,rx",
+					"-Wl,-U,_IOHIDEventGetIntegerValue",
+					"-Wl,-U,_IOHIDEventGetType",
+					"-Wl,-U,_IOHIDEventSystemClientCreate",
+					"-Wl,-U,_IOHIDEventSystemClientRegisterEventCallback",
+					"-Wl,-U,_IOHIDEventSystemClientScheduleWithDispatchQueue",
+					"-Wl,-U,_IOHIDEventSystemClientSetMatching",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(NYXIAN_PRODUCT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = None;
+				STRIP_SWIFT_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = Nyxian/NXBridge.h;
+				SWIFT_OBJC_BRIDGING_HEADER = Nyxian/BootBridge.h;
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = NO;
@@ -1833,20 +3364,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		782ECDCCEC79DB3EE851B143 /* Build configuration list for PBXNativeTarget "LiveProcess" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7189B435A49D898BECCB8232 /* Debug */,
+				1049131335A4E0B3AED6A8E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		79AA11C02F7FFE24002FEAF2 /* Build configuration list for PBXNativeTarget "nxtool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				79AA11C12F7FFE24002FEAF2 /* Debug */,
 				79AA11C22F7FFE24002FEAF2 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		79BF98062E6291EE00C60D4C /* Build configuration list for PBXNativeTarget "LiveProcess" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				79BF98072E6291EE00C60D4C /* Debug */,
-				79BF98082E6291EE00C60D4C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1869,11 +3400,56 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8FB3BAE5302FFBAA00DB3ABC /* Build configuration list for PBXNativeTarget "LiveShim" */ = {
+		8F25251A3096DFCB0058F953 /* Build configuration list for PBXNativeTarget "libpatchfind" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8FB3BAE6302FFBAA00DB3ABC /* Debug */,
-				8FB3BAE7302FFBAA00DB3ABC /* Release */,
+				8F25251B3096DFCB0058F953 /* Debug */,
+				8F25251C3096DFCB0058F953 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8F2525343096F2100058F953 /* Build configuration list for PBXNativeTarget "librecoveryksurface" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F2525353096F2100058F953 /* Debug */,
+				8F2525363096F2100058F953 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8F25256D3096F3F40058F953 /* Build configuration list for PBXNativeTarget "librecoveryrtpatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F25256E3096F3F40058F953 /* Debug */,
+				8F25256F3096F3F40058F953 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8F2530DB309A15BE0058F953 /* Build configuration list for PBXNativeTarget "LiveProcessLegacy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F2530DC309A15BE0058F953 /* Debug */,
+				8F2530DD309A15BE0058F953 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8F75DDAB306343D6004D9A49 /* Build configuration list for PBXNativeTarget "SuperSlot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F75DDAC306343D6004D9A49 /* Debug */,
+				8F75DDAD306343D6004D9A49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8FDD8463305C4E9200949118 /* Build configuration list for PBXNativeTarget "Broadpatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8FDD8464305C4E9200949118 /* Debug */,
+				8FDD8465305C4E9200949118 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1883,6 +3459,24 @@
 			buildConfigurations = (
 				8FF32DF53036F59E00C46FE4 /* Debug */,
 				8FF32DF63036F59E00C46FE4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8FF647C33054E61900E1E610 /* Build configuration list for PBXNativeTarget "bootstrapd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8FF647C43054E61900E1E610 /* Debug */,
+				8FF647C53054E61900E1E610 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8FF6480B3056786A00E1E610 /* Build configuration list for PBXNativeTarget "MobileDevelopmentService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8FF6480C3056786A00E1E610 /* Debug */,
+				8FF6480D3056786A00E1E610 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1940,6 +3534,14 @@
 				kind = branch;
 			};
 		};
+		8F75DE9B30634E66004D9A49 /* XCRemoteSwiftPackageReference "tree-sitter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tree-sitter/tree-sitter";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.18.0;
+			};
+		};
 		8FECB24B2FFD367A00049BB0 /* XCRemoteSwiftPackageReference "Runestone" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/emexlab/Runestone";
@@ -1975,85 +3577,50 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		791C96042F8726B0006AF674 /* Runestone */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Runestone;
-		};
-		793A4E3A2F84FE1D003B609A /* Runestone */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Runestone;
-		};
-		793A7E4F2EB5996A0044418E /* SwiftTerm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 793A7E4E2EB599690044418E /* XCRemoteSwiftPackageReference "SwiftTerm" */;
-			productName = SwiftTerm;
-		};
-		79B708BB2F73157F000F38E7 /* TreeSitterCPP */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 79B708BA2F73157F000F38E7 /* XCRemoteSwiftPackageReference "tree-sitter-cpp" */;
-			productName = TreeSitterCPP;
-		};
-		79B70C1B2F73223A000F38E7 /* Runestone */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Runestone;
-		};
-		79B70C1E2F732364000F38E7 /* Runestone */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Runestone;
-		};
-		79D1DA662F92A6CE0020518A /* TreeSitterSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TreeSitterSwift;
-		};
-		86E4D4F62FB8CF63008BFE4D /* TreeSitterSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 86E4D4F52FB8CF63008BFE4D /* XCRemoteSwiftPackageReference "tree-sitter-swift" */;
-			productName = TreeSitterSwift;
-		};
-		8F4D96E52FFBF8FB006CAF3C /* Runestone */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Runestone;
-		};
-		8F60051C3033DD2F0028EDFD /* UIOnboarding */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UIOnboarding;
-		};
-		8F60051F3033EB920028EDFD /* UIOnboarding */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8F60051E3033EB920028EDFD /* XCRemoteSwiftPackageReference "UIOnboarding" */;
-			productName = UIOnboarding;
-		};
-		8F60FE593032DB610028EDFD /* UIOnboarding */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UIOnboarding;
-		};
-		8F60FE5C3032DC260028EDFD /* UIOnboarding */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = UIOnboarding;
-		};
-		8FECB2462FFD34D500049BB0 /* Runestone */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Runestone;
-		};
-		8FECB24C2FFD367A00049BB0 /* Runestone */ = {
+		8F75DDC7306344C3004D9A49 /* Runestone */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8FECB24B2FFD367A00049BB0 /* XCRemoteSwiftPackageReference "Runestone" */;
 			productName = Runestone;
 		};
-		AF9919572DC9175A00DDF895 /* TreeSitterObjc */ = {
+		8F75DDCB306344DC004D9A49 /* TreeSitterObjc */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AF9919562DC9175A00DDF895 /* XCRemoteSwiftPackageReference "tree-sitter-objc" */;
 			productName = TreeSitterObjc;
 		};
-		AF99195A2DC9176900DDF895 /* TreeSitterC */ = {
+		8F75DDCD306344DC004D9A49 /* TreeSitterC */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AF9919592DC9176900DDF895 /* XCRemoteSwiftPackageReference "tree-sitter-c" */;
 			productName = TreeSitterC;
 		};
-		AFF4E3482DCCCE0F00B1B5F9 /* TreeSitterXML */ = {
+		8F75DDCF306344DC004D9A49 /* TreeSitterXML */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AFF4E3472DCCCE0F00B1B5F9 /* XCRemoteSwiftPackageReference "tree-sitter-xml" */;
 			productName = TreeSitterXML;
+		};
+		8F75DDD1306344DC004D9A49 /* TreeSitterCPP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 79B708BA2F73157F000F38E7 /* XCRemoteSwiftPackageReference "tree-sitter-cpp" */;
+			productName = TreeSitterCPP;
+		};
+		8F75DDD3306344DC004D9A49 /* TreeSitterSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 86E4D4F52FB8CF63008BFE4D /* XCRemoteSwiftPackageReference "tree-sitter-swift" */;
+			productName = TreeSitterSwift;
+		};
+		8F75DDD5306344EB004D9A49 /* UIOnboarding */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8F60051E3033EB920028EDFD /* XCRemoteSwiftPackageReference "UIOnboarding" */;
+			productName = UIOnboarding;
+		};
+		8F75DE9C30634E66004D9A49 /* TreeSitter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8F75DE9B30634E66004D9A49 /* XCRemoteSwiftPackageReference "tree-sitter" */;
+			productName = TreeSitter;
+		};
+		8F75E837306351E6004D9A49 /* SwiftTerm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 793A7E4E2EB599690044418E /* XCRemoteSwiftPackageReference "SwiftTerm" */;
+			productName = SwiftTerm;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

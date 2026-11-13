@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <LindChain/WindowServer/Session/NXWindowSessionApplication.h>
@@ -24,12 +25,14 @@
 #import <LindChain/WindowServer/NXWindowServer.h>
 #import <LindChain/ProcEnvironment/PEExtension.h>
 #import <LindChain/Utils/Swizzle.h>
-
-#import <LindChain/Services/applicationmgmtd/LDEApplicationWorkspace.h>
-#import <LindChain/ProcEnvironment/Utils/klog.h>
+#import <Frameworks/LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspace.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/klog.h>
 #import <objc/runtime.h>
 #import <os/lock.h>
 #import <objc/message.h>
+
+static NSMutableDictionary<NSString*,NSValue*> *g_window_rects;
+static os_unfair_lock g_window_rects_lock = OS_UNFAIR_LOCK_INIT;
 
 @implementation NXWindowSessionApplication {
     UIView *_contentView;
@@ -254,17 +257,51 @@
         return NO;
     }
     
-    if(self.process.applicationObject != nil && self.process.applicationObject.isFullscreenRequired)
+    os_unfair_lock_lock(&g_window_rects_lock);
+    if(self.process && self.process.applicationObject && self.process.applicationObject.bundleIdentifier &&
+       ![self.process.applicationObject.bundleIdentifier isEqual:@""] &&
+       g_window_rects)
+    {
+        NSValue *rect = [g_window_rects objectForKey:self.process.applicationObject.bundleIdentifier];
+        if(rect)
+        {
+            self.startWindowRect = [rect CGRectValue];
+        }
+    }
+    os_unfair_lock_unlock(&g_window_rects_lock);
+    
+    if(UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad &&
+       self.process.applicationObject != nil && self.process.applicationObject.isFullscreenRequired)
     {
         CGRect screenRect = UIScreen.mainScreen.bounds;
+        UIInterfaceOrientationMask mask = self.process.applicationObject.supportedInterfaceOrientations;
         
-        if(NXWindowServer.shared.rootViewController.interfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
-           NXWindowServer.shared.rootViewController.interfaceOrientation == UIInterfaceOrientationLandscapeRight)
+        BOOL supportsPortrait = (mask & (UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown)) != 0;
+        BOOL supportsLandscape = (mask & UIInterfaceOrientationMaskLandscape) != 0;
+        BOOL isLandscapeOnly = supportsLandscape && !supportsPortrait;
+        BOOL isCurrentlyLandscape = (NXWindowServer.shared.rootViewController.interfaceOrientation == UIInterfaceOrientationLandscapeLeft || NXWindowServer.shared.rootViewController.interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+        BOOL needsFlip = NO;
+        
+        if(isLandscapeOnly)
         {
-            /* they have to be flipped */
-            CGFloat heigth = screenRect.size.height;
+            if(!isCurrentlyLandscape)
+            {
+                needsFlip = YES;
+            }
+        }
+        else
+        {
+            if(isCurrentlyLandscape)
+            {
+                needsFlip = YES;
+            }
+        }
+        
+        if(needsFlip)
+        {
+            CGFloat height = screenRect.size.height;
             screenRect.size.height = screenRect.size.width;
-            screenRect.size.width = heigth;
+            screenRect.size.width = height;
         }
         
         screenRect.size.width = screenRect.size.width / 2;
@@ -286,7 +323,7 @@
         /* bye bye presenter */
         [_scenePresenter invalidate];
     }
-    [_process terminate];
+    [_process forceTerminate];
     
     return YES;
 }
@@ -354,7 +391,7 @@
     return windowName ?: self.process.displayName;
 }
 
-- (void)beginInteractiveResize
+- (void)windowBeganResizing
 {
     assert([NSThread isMainThread]);
     if(_isInteractivelyResizing || _contentView == nil)
@@ -412,7 +449,7 @@
     }
 }
 
-- (void)commitInteractiveResize
+- (void)windowEndedResizing
 {
     assert([NSThread isMainThread]);
     if(!_isInteractivelyResizing)
@@ -463,6 +500,35 @@
     }];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 250 * NSEC_PER_MSEC), dispatch_get_main_queue(), unstretch);
+    
+    os_unfair_lock_lock(&g_window_rects_lock);
+    if(self.process && self.process.applicationObject && self.process.applicationObject.bundleIdentifier &&
+       ![self.process.applicationObject.bundleIdentifier isEqual:@""])
+    {
+        if(!g_window_rects)
+        {
+            g_window_rects = [NSMutableDictionary dictionary];
+        }
+        
+        [g_window_rects setObject:[NSValue valueWithCGRect:self.window.view.frame] forKey:self.process.applicationObject.bundleIdentifier];
+    }
+    os_unfair_lock_unlock(&g_window_rects_lock);
+}
+
+- (void)windowDidMove
+{
+    os_unfair_lock_lock(&g_window_rects_lock);
+    if(self.process && self.process.applicationObject && self.process.applicationObject.bundleIdentifier &&
+       ![self.process.applicationObject.bundleIdentifier isEqual:@""])
+    {
+        if(!g_window_rects)
+        {
+            g_window_rects = [NSMutableDictionary dictionary];
+        }
+        
+        [g_window_rects setObject:[NSValue valueWithCGRect:self.window.view.frame] forKey:self.process.applicationObject.bundleIdentifier];
+    }
+    os_unfair_lock_unlock(&g_window_rects_lock);
 }
 
 - (void)process:(PEProcess *)process didExitWithWait4Code:(int)code
@@ -472,13 +538,12 @@
     });
 }
 
-#if DEBUG
-
 - (void)dealloc
 {
+    [self.process removeObserver:self];
+#if DEBUG
     NSLog(@"deallocated %@", self);
-}
-
 #endif /* DEBUG */
+}
 
 @end

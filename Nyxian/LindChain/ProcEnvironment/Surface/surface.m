@@ -1,62 +1,48 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
+#import <LindChain/ProcEnvironment/Surface/libkern/kpanic.h>
 #import <LindChain/ProcEnvironment/Shims/environment.h>
-#import <LindChain/ProcEnvironment/Shims/panic.h>
 #import <LindChain/ProcEnvironment/Surface/surface.h>
 #import <LindChain/ProcEnvironment/Surface/proc/proc.h>
-#import <LindChain/ProcEnvironment/Utils/klog.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/klog.h>
 #import <LindChain/ProcEnvironment/Surface/sys/syscall.h>
 #import <LindChain/ProcEnvironment/LiveContainer/utils.h>
 #import <LindChain/ProcEnvironment/Surface/sys/host/sysctl.h>
+#import <LindChain/ProcEnvironment/Surface/fs/fs.h>
+#import <LindChain/ProcEnvironment/Surface/trust/keychain.h>
 #import <ksurface_config.h>
 #import <ksurface_abi.h>
 
 syscall_list_item_t sys_list[] = {
-    /* necessary for basic function */
     { .name = "SYS_handoffep",      .sysnum = SYS_handoffep,    .hndl = GET_SYSCALL_HANDLER(handoffep)      },
     { .name = "SYS_pectl",          .sysnum = SYS_pectl,        .hndl = GET_SYSCALL_HANDLER(pectl)          },
     { .name = "sys_getppid",        .sysnum = SYS_getppid,      .hndl = GET_SYSCALL_HANDLER(getppid)        },
-    
-#if KSURFACE_SYS_IO_ENABLED
-    { .name = "SYS_open",           .sysnum = SYS_open,         .hndl = GET_SYSCALL_HANDLER(open)           },
-    { .name = "SYS_faccessat",      .sysnum = SYS_faccessat,    .hndl = GET_SYSCALL_HANDLER(faccessat)      },
-    { .name = "SYS_getattrlist",    .sysnum = SYS_getattrlist,  .hndl = GET_SYSCALL_HANDLER(getattrlist)    },
-#endif /* KSURFACE_SYS_IO_ENABLED */
-    
-#if KSURFACE_SYS_IOCTL_ENABLED
+    { .name = "SYS_openpty",        .sysnum = SYS_openpty,      .hndl = GET_SYSCALL_HANDLER(openpty)        },
+    { .name = "SYS_vroot",          .sysnum = SYS_vroot,        .hndl = GET_SYSCALL_HANDLER(vroot)          },
     { .name = "SYS_ioctl",          .sysnum = SYS_ioctl,        .hndl = GET_SYSCALL_HANDLER(ioctl)          },
-#endif /* KSURFACE_SYS_IOCTL_ENABLED */
-    
-#if KSURFACE_SYS_SYSCTL_ENABLED
     { .name = "SYS_sysctl",         .sysnum = SYS_sysctl,       .hndl = GET_SYSCALL_HANDLER(sysctl)         },
     { .name = "SYS_sysctlbyname",   .sysnum = SYS_sysctlbyname, .hndl = GET_SYSCALL_HANDLER(sysctlbyname)   },
-    { .name = "SYS_procpath",       .sysnum = SYS_procpath,     .hndl = GET_SYSCALL_HANDLER(procpath)       },
-#endif /* KSURFACE_SYS_SYSCTL_ENABLED */
-    
-#if KSURFACE_SYS_TASK_ENABLED
-    { .name = "SYS_gettask",        .sysnum = SYS_gettask,      .hndl = GET_SYSCALL_HANDLER(gettask)        },
-#endif /* KSURFACE_SYS_UCRED_ENABLED */
-    
-#if KSURFACE_SYS_UCRED_ENABLED
+    { .name = "SYS_task_for_pid",   .sysnum = SYS_task_for_pid, .hndl = GET_SYSCALL_HANDLER(task_for_pid)   },
     { .name = "SYS_setuid",         .sysnum = SYS_setuid,       .hndl = GET_SYSCALL_HANDLER(setuid)         },
     { .name = "SYS_seteuid",        .sysnum = SYS_seteuid,      .hndl = GET_SYSCALL_HANDLER(seteuid)        },
     { .name = "SYS_setgid",         .sysnum = SYS_setgid,       .hndl = GET_SYSCALL_HANDLER(setgid)         },
@@ -67,18 +53,19 @@ syscall_list_item_t sys_list[] = {
     { .name = "SYS_geteuid",        .sysnum = SYS_geteuid,      .hndl = GET_SYSCALL_HANDLER(geteuid)        },
     { .name = "SYS_getgid",         .sysnum = SYS_getgid,       .hndl = GET_SYSCALL_HANDLER(getgid)         },
     { .name = "SYS_getegid",        .sysnum = SYS_getegid,      .hndl = GET_SYSCALL_HANDLER(getegid)        },
+    { .name = "SYS_getpgrp",        .sysnum = SYS_getpgrp,      .hndl = GET_SYSCALL_HANDLER(getpgrp)        },
+    { .name = "SYS_setpgid",        .sysnum = SYS_setpgid,      .hndl = GET_SYSCALL_HANDLER(setpgid)        },
     { .name = "SYS_getsid",         .sysnum = SYS_getsid,       .hndl = GET_SYSCALL_HANDLER(getsid)         },
     { .name = "SYS_setsid",         .sysnum = SYS_setsid,       .hndl = GET_SYSCALL_HANDLER(setsid)         },
-#endif /* KSURFACE_SYS_UCRED_ENABLED */
-    
-#if KSURFACE_SYS_PROC_ENABLED
+    { .name = "SYS_getpgid",        .sysnum = SYS_getpgid,      .hndl = GET_SYSCALL_HANDLER(getpgid)        },
+    { .name = "SYS_loginctl",       .sysnum = SYS_loginctl,     .hndl = GET_SYSCALL_HANDLER(loginctl)       },
+    { .name = "SYS_groupctl",       .sysnum = SYS_groupctl,     .hndl = GET_SYSCALL_HANDLER(groupctl)       },
     { .name = "SYS_kill",           .sysnum = SYS_kill,         .hndl = GET_SYSCALL_HANDLER(kill)           },
     { .name = "SYS_wait4",          .sysnum = SYS_wait4,        .hndl = GET_SYSCALL_HANDLER(wait4)          },
     { .name = "SYS_waittask",       .sysnum = SYS_waittask,     .hndl = GET_SYSCALL_HANDLER(waittask)       },
     { .name = "SYS_sign",           .sysnum = SYS_sign,         .hndl = GET_SYSCALL_HANDLER(sign)           },
-#endif /* KSURFACE_SYS_PROC_ENABLED */
+    { .name = "SYS_proc_info",      .sysnum = SYS_proc_info,    .hndl = GET_SYSCALL_HANDLER(proc_info)      },
 };
-
 
 ksurface_mapping_t *ksurface = NULL;
 
@@ -110,9 +97,8 @@ int ksurface_sethostname(NSString *hostname)
 
 void ksurface_kinit_get_keys(void)
 {
-    if(ksurface->priv_key != NULL || ksurface->pub_key != NULL)
+    if(ksurface->pub_key != NULL)
     {
-        free(ksurface->priv_key);
         free(ksurface->pub_key);
     }
     
@@ -122,10 +108,10 @@ void ksurface_kinit_get_keys(void)
      * own virtualised entitlements, which are only
      * valid within the environment.
      */
-    if(!get_static_kernel_key(&(ksurface->priv_key), &(ksurface->priv_key_len), &(ksurface->pub_key), &(ksurface->pub_key_len)))
+    if(!get_static_kernel_key(NULL, NULL, &(ksurface->pub_key), &(ksurface->pub_key_len)))
     {
         /* shall never happen */
-        environment_panic("failed to get code signature key pair");
+        kpanic("failed to get code signature key pair");
     }
     klog_log("ksurface:kinit:kalloc", "got code signature key pair");
 }
@@ -138,9 +124,12 @@ static inline void ksurface_kinit_kalloc(void)
     if(ksurface == NULL)
     {
         /* shall never happen */
-        environment_panic("allocating ksurface failed got NULL pointer from malloc");
+        kpanic("allocating ksurface failed got NULL pointer from malloc");
     }
     klog_log("ksurface:kinit:kalloc", "allocated ksurface @ %p", ksurface);
+    
+    /* prepare key fields that are not nullified */
+    ksurface->pub_key = NULL;
     
     /* get code signature key pair */
     ksurface_kinit_get_keys();
@@ -152,13 +141,13 @@ static inline void ksurface_kinit_kalloc(void)
      * one at a time.
      */
     klog_log("ksurface:kinit:kalloc", "initializing global locks");
-    pthread_rwlock_t *wls[3] = { &(ksurface->proc_info.struct_lock),  &(ksurface->host_info.struct_lock), &(ksurface->tty_info.struct_lock) };
-    for(unsigned char i = 0; i < 3; i++)
+    pthread_rwlock_t *wls[] = { &(ksurface->proc_info.struct_lock),  &(ksurface->host_info.struct_lock), &(ksurface->tty_info.struct_lock), &(ksurface->kext_info.struct_lock) };
+    for(unsigned char i = 0; i < sizeof(wls) / sizeof(pthread_rwlock_t*); i++)
     {
         klog_log("ksurface:kinit:kalloc", "initializing global lock @ %p", wls[i]);
         if(pthread_rwlock_init(wls[i], NULL) != 0)
         {
-            environment_panic("failed to initialize global lock @ %p", wls[i]);
+            kpanic("failed to initialize global lock @ %p", wls[i]);
         }
     }
     
@@ -171,6 +160,7 @@ static inline void ksurface_kinit_kalloc(void)
     ksurface->proc_info.tree.root = NULL;
     ksurface->proc_info.proc_count = 0;
     ksurface->tty_info.tty.root = NULL;
+    ksurface->kext_info.kexts.root = NULL;
 }
 
 static inline void ksurface_kinit_kinfo(void)
@@ -198,7 +188,7 @@ static inline void ksurface_kinit_kserver(void)
     if(ksurface->sys_server == NULL)
     {
         /* shall never happen */
-        environment_panic("got NULL syscall server");
+        kpanic("got NULL syscall server");
     }
     klog_log("ksurface:kinit:kserver", "allocated syscall server @ %p", ksurface->sys_server);
     
@@ -234,9 +224,16 @@ static inline void ksurface_kinit_kproc(void)
     if(kproc == NULL)
     {
         /* shall never happen */
-        environment_panic("got NULL kernel process");
+        kpanic("got NULL kernel process");
     }
     klog_log("ksurface:kinit:kproc", "allocated kernel process @ %p", kproc);
+    
+    kproc->nyx.identity = trust_identity_get_kernel();
+    if(kproc->nyx.identity == NULL)
+    {
+        /* shall never happen */
+        kpanic("got NULL kernel trust identity");
+    }
     
     kern_return_t kr;
 #if KSURFACE_EMIT_KERNEL_TASK
@@ -244,16 +241,14 @@ static inline void ksurface_kinit_kproc(void)
     proc_setpid(kproc, 0);
     proc_setppid(kproc, 0);
     proc_setsid(kproc, 0);
+    proc_setpgid(kproc, 0);
     strlcpy(kproc->bsd.kp_proc.p_comm, "kernel_task", MAXCOMLEN);
 #else
     /* setting up properties */
-    pid_t pid = getpid();
-    proc_setpid(kproc, pid);
-    proc_setppid(kproc, 1); /* this is done, because when debugging it has a other ppid than launchd's pid */
-    proc_setsid(kproc, pid);
-    
-    /* getting own identity */
-    kproc->nyx.identity = trust_identity_get_kernel();
+    proc_setpid(kproc, getpid());
+    proc_setppid(kproc, getppid());
+    proc_setsid(kproc, getsid(getpid()));
+    proc_setpgid(kproc, getpgrp());
     const char *name = strrchr(kproc->nyx.identity->path, '/');
     name = name ? name + 1 : kproc->nyx.identity->path;
     strlcpy(kproc->bsd.kp_proc.p_comm, name, MAXCOMLEN);
@@ -264,7 +259,7 @@ static inline void ksurface_kinit_kproc(void)
     if(kr != KERN_SUCCESS)
     {
         /* shall never happen */
-        environment_panic("failed to aquire task name of kernel it self");
+        kpanic("failed to aquire task name of kernel it self");
     }
     kproc->task = task;
 #endif /* KSURFACE_EMIT_KERNEL_TASK */
@@ -277,23 +272,9 @@ static inline void ksurface_kinit_kproc(void)
     if(kr != KERN_SUCCESS)
     {
         /* shall never happen */
-        environment_panic("failed to insert kernel process");
+        kpanic("failed to insert kernel process");
     }
     
-#if KSURFACE_EMIT_LAUNCHD
-    kr = proc_spawn(kproc, &kproc, 1, "/sbin/launchd");
-    if(kr != KERN_SUCCESS)
-    {
-        /* shall never happen */
-        environment_panic("got NULL launchd process");
-    }
-    
-    /* when there is no kernel task we need to set ppid to 0 */
-#if !KSURFACE_EMIT_KERNEL_TASK
-    proc_setppid(kproc, 0);
-#endif /* !KSURFACE_EMIT_KERNEL_TASK */
-    
-#endif /* KSURFACE_EMIT_LAUNCHD */
     ksurface->proc_info.kern_proc = kproc;
     
     /* releaing our reference to kernel proc, because we return now and kproc is now held by the radix tree */
@@ -303,17 +284,12 @@ static inline void ksurface_kinit_kproc(void)
 void ksurface_kinit(void)
 {
     /* starting huh :3 (shall only run once) */
-    klog_log("ksurface:kinit", "hello from kinit");
-    klog_log("ksurface:kinit", "kernel commits magic spells to the iOS kernel :3");
-    klog_log("ksurface:kinit", "extending paws onto XNU");
+    klog_log("ksurface:kinit", "I love XNU >~<");
     klog_log("ksurface:kinit", "");
     klog_log("ksurface:kinit", "   |\\__/,|   (`\\");
     klog_log("ksurface:kinit", " _.|o o  |_   ) )");
     klog_log("ksurface:kinit", "-(((---(((--------");
     klog_log("ksurface:kinit", "");
-    
-    /* sets where the virtual /Developer mount will reference too */
-    setenv("VFSROOT", [[NSString stringWithFormat:@"%@/Documents", NSHomeDirectory()] UTF8String], 1);
     
     /*
      * allocates the surface where everything nyxian kernel
@@ -324,4 +300,27 @@ void ksurface_kinit(void)
     ksurface_kinit_kinfo();
     ksurface_kinit_kserver();
     ksurface_kinit_kproc();
+    
+    /* initialize other subsytems */
+    if(ksurface_fs_init() != KERN_SUCCESS)
+    {
+        kpanic("fs didn't initialize");
+    }
+    
+    if(ksurface_keychain_update() != KERN_SUCCESS)
+    {
+        kpanic("keychain didn't initialize");
+    }
+    
+    /* put log devices where they actually belong to */
+    NSString *kfd_path = [NSString stringWithFormat:@"%@/Documents/mntfs/devfs/kmsg", NSHomeDirectory()];
+    NSString *kfd_path_old = [NSString stringWithFormat:@"%@/Documents/mntfs/devfs/kmsg_old", NSHomeDirectory()];
+    NSString *entry_path = [NSString stringWithFormat:@"%@/Documents/kmsg.txt", NSHomeDirectory()];
+    NSString *entry_old_path = [NSString stringWithFormat:@"%@/Documents/kmsg_old.txt", NSHomeDirectory()];
+    
+    /* now mapping klog to its dev device position */
+    unlink([kfd_path UTF8String]);
+    unlink([kfd_path_old UTF8String]);
+    rename([entry_path UTF8String], [kfd_path UTF8String]);
+    rename([entry_old_path UTF8String], [kfd_path_old UTF8String]);
 }

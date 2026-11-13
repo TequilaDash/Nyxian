@@ -23,10 +23,9 @@
 #ifndef TWEAKS_TWEAKS_H
 #define TWEAKS_TWEAKS_H
 
-bool performHookDyldApi(const char* functionName, uint32_t adrpOffset, void** origFunction, void* hookFunction);
+#include <LindChain/ProcEnvironment/LiveContainer/Tweaks/DyldHook.h>
 
 void NUDGuestHooksInit(void);
-void SecItemGuestHooksInit(void);
 void DyldHooksInit(void);
 void NSFMGuestHooksInit(void);
 
@@ -37,7 +36,6 @@ void NSFMGuestHooksInit(void);
 extern uint32_t appMainImageIndex;
 extern void* appExecutableHandle;
 extern bool tweakLoaderLoaded;
-void* getGuestAppHeader(void);
 void* dlopenBypassingLockWithTrust(const char *path, int mode, const char *cdhash);
 void initDead10ccFix(void);
 void UIKitGuestHooksInit(void);

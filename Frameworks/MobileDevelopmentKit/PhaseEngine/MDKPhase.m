@@ -27,24 +27,17 @@
 @implementation MDKPhase
 
 + (instancetype)phaseWithJobs:(NSArray<MDKJob*>*)jobs
-                  withJobType:(CCJobType)type
+                  withJobType:(MDKJobType)type
     withMultithreadingSupport:(BOOL)isMultithreadingSupported
 {
-    return [[self alloc] initWithJobs:jobs withJobType:type withMultithreadingSupport:isMultithreadingSupported];
-}
-
-- (instancetype)initWithJobs:(NSArray<MDKJob*>*)jobs
-                 withJobType:(CCJobType)type
-   withMultithreadingSupport:(BOOL)isMultithreadingSupported
-{
-    self = [super init];
-    if(self)
+    MDKPhase *phase = super.alloc.init;
+    if(phase)
     {
-        _jobs = jobs;
-        _type = type;
-        _isMultithreadingSupported = isMultithreadingSupported;
+        phase->_jobs = jobs;
+        phase->_type = type;
+        phase->_isMultithreadingSupported = isMultithreadingSupported;
     }
-    return self;
+    return phase;
 }
 
 @end

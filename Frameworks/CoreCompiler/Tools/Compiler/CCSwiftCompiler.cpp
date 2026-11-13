@@ -45,7 +45,6 @@ struct CapturedDiag {
     std::string message;
     std::string file;
     unsigned line = 0, column = 0;
-    /* add ranges / fixits / category / educationalNotes if you need them */
 };
 
 class CapturingConsumer : public swift::DiagnosticConsumer {
@@ -58,8 +57,7 @@ public:
         CapturedDiag d;
         d.id = Info.ID;
         d.kind = Info.Kind;
-
-        /* render FormatString + FormatArgs into a real string. */
+        
         llvm::SmallString<256> buf;
         {
             llvm::raw_svector_ostream os(buf);
@@ -78,7 +76,7 @@ public:
     }
 };
 
-class MyObserver : public swift::FrontendObserver {
+class CCSwiftObserver : public swift::FrontendObserver {
 public:
     std::string primaryFile;
     CapturingConsumer consumer;
@@ -107,8 +105,6 @@ public:
     }
 };
 
-static std::once_flag SwiftModulesInitOnce;
-
 CC_EXPORT Boolean CCSwiftCompilerJobExecute(CCJobRef job,
                                             CFArrayRef *outDiagnostics,
                                             CFStringRef *outMainSource)
@@ -116,7 +112,7 @@ CC_EXPORT Boolean CCSwiftCompilerJobExecute(CCJobRef job,
     assert(job != nullptr);
     assert(CCJobGetType(job) == kCCJobTypeSwiftCompiler);
     
-    CFArrayRef argsArray = CCJobGetArguments(job);
+    CFArrayRef argsArray = CCJobCreateArguments(CFGetAllocator(job), job);
     
     llvm::SmallVector<std::string, 64> argStorage = CCArrayToStringVector(argsArray);
     llvm::SmallVector<const char *, 64> args = StringVectorToCStrings(argStorage);
@@ -127,11 +123,9 @@ CC_EXPORT Boolean CCSwiftCompilerJobExecute(CCJobRef job,
         args.erase(args.begin());
     }
     
-    std::call_once(SwiftModulesInitOnce, [] {
-        initializeSwiftModules();
-    });
+    CCInitializeSwiftModulesOnce();
     
-    MyObserver obs;
+    CCSwiftObserver obs;
     llvm::remove_fatal_error_handler();
     int status = swift::performFrontend(args, "swift-frontend", nullptr, &obs);
     CCInstallLLVMFatalErrorHandler();
@@ -191,6 +185,13 @@ CC_EXPORT Boolean CCSwiftCompilerJobExecute(CCJobRef job,
             continue;
         }
         
+        CFStringRef fileSource = CFStringCreateWithCString(kCFAllocatorDefault, d.file.c_str(), kCFStringEncodingUTF8);
+        if(fileSource == nullptr)
+        {
+            CFRelease(messageStr);
+            continue;
+        }
+        
         CCFileSourceLocationRef fileSourceLocation = nullptr;
         CCFileRef file = CCFileCreateWithCString(kCFAllocatorSystemDefault, d.file.c_str(), kCFStringEncodingUTF8);
         if(file != nullptr)
@@ -200,9 +201,12 @@ CC_EXPORT Boolean CCSwiftCompilerJobExecute(CCJobRef job,
             CFRelease(file);
         }
         
-        CCDiagnosticRef diagnostic = CCDiagnosticCreate(kCFAllocatorSystemDefault, kCCDiagnosticTypeFile, level, mainSource, fileSourceLocation, messageStr);
+        CCDiagnosticRef diagnostic = CCDiagnosticCreate(kCFAllocatorSystemDefault, kCCDiagnosticTypeFile, level, fileSource, fileSourceLocation, messageStr);
         CFRelease(messageStr);
-        CFRelease(fileSourceLocation);
+        if(fileSourceLocation != nullptr)
+        {
+            CFRelease(fileSourceLocation);
+        }
         if(diagnostic == nullptr)
         {
             continue;

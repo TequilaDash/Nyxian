@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 import UIKit
@@ -46,7 +47,7 @@ class CodeEditorViewController: UIViewController, NXDocumentDelegate {
     private(set) var languageServer: NXLanguageServer?
     private(set) var coordinator: CodeEditorCoordinator?
     private(set) var database: DebugDatabase?
-    private(set) var location: CCSourceLocation?
+    private(set) var location: MDKSourceLocation?
     private(set) var floatingToolbar: UIToolbar?
     private(set) var floatingToolbarBottomConstraint: NSLayoutConstraint?
     
@@ -57,13 +58,11 @@ class CodeEditorViewController: UIViewController, NXDocumentDelegate {
     
     let isReadOnly: Bool
     
-    init?(
-        project: NXProject?,
-        url: URL,
-        line: CFIndex? = nil,
-        column: CFIndex? = nil,
-        isReadOnly: Bool = false
-    ) {
+    init?(project: NXProject?,
+          url: URL,
+          line: CFIndex? = nil,
+          column: CFIndex? = nil,
+          isReadOnly: Bool = false) {
         guard let file = MDKFile(url: url) else {
             return nil
         }
@@ -74,24 +73,29 @@ class CodeEditorViewController: UIViewController, NXDocumentDelegate {
         
         if let line = line,
            let column = column {
-            self.location = CCSourceLocationMake(line, column)
+            self.location = MDKSourceLocationMake(line, column)
         }
-        self.isReadOnly = isReadOnly
+        self.isReadOnly = isReadOnly ? isReadOnly : !FileManager.default.isWritableFile(atPath: url.path)
         
         // Only allow C files to typecheck for now
         // Cuz swift is not supported yet by synpush
         // because its still a long journey till
         // swift gets all of those nice little features.
-        if CCFileTypeIsClangFile(self.file.type)
-        {
+        if self.file.isClang || self.file.isSwift {
             self.languageServer = NXLanguageServer(self.file.fileURL.path)
-                
+            
             if let project = project {
                 self.database = DebugDatabase.getDatabase(ofPath: project.cacheURL.appendingPathComponent("debug.json").path)
             }
         }
         
         super.init(nibName: nil, bundle: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changedProjectSettings(_:)), name: Notification.Name("NXProjectSettingsChanged"), object: nil)
+    }
+
+    @objc func changedProjectSettings(_ notification: Notification) {
+        self.languageServer?.releaseMemory()
+        self.coordinator?.textViewDidChange(self.textView)
     }
     
     required init?(coder: NSCoder) {
@@ -146,7 +150,7 @@ class CodeEditorViewController: UIViewController, NXDocumentDelegate {
             self.navigationItem.setLeftBarButton(closeButton, animated: true)
         }
         
-        let theme: LDETheme = currentTheme ?? LDEThemeReader.shared.currentlySelectedTheme()
+        let theme: LDETheme = LDETheme.currentTheme ?? LDEThemeReader.shared.currentlySelectedTheme()
             
         self.view.backgroundColor = .systemBackground
         self.textView.backgroundColor = theme.backgroundColor
@@ -171,7 +175,9 @@ class CodeEditorViewController: UIViewController, NXDocumentDelegate {
         self.textView.lineSelectionDisplayType = .line
         
         self.textView.showsHorizontalScrollIndicator = false;
-        self.textView.bouncesHorizontally = false
+        if #available(iOS 17.4, *) {
+            self.textView.bouncesHorizontally = false
+        }
         
         self.textView.lineHeightMultiplier = 1.3
         self.textView.keyboardType = .asciiCapable
@@ -278,7 +284,7 @@ class CodeEditorViewController: UIViewController, NXDocumentDelegate {
         return self.textView.text
     }
     
-    func goto(location: CCSourceLocation?) {
+    func goto(location: MDKSourceLocation?) {
         let line = location?.line
         let column = location?.column
         
@@ -697,7 +703,7 @@ class CodeEditorViewController: UIViewController, NXDocumentDelegate {
                 let (line, column) = self.offsetToLineColumn(text: text, offset: offset)
                 
                 DispatchQueue.global(qos: .userInitiated).async {
-                    guard let def = server.getDefinitionAt(CCSourceLocationMake(line, column)) else {
+                    guard let def = server.getDefinitionAt(MDKSourceLocationMake(line, column)) else {
                         DispatchQueue.main.async {
                             self.showNoDefinitionFound()
                         }

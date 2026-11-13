@@ -1,27 +1,29 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
+#include <LindChain/ProcEnvironment/Surface/libkern/klog.h>
 #include <LindChain/ProcEnvironment/Surface/proc/proc.h>
-#include <LindChain/ProcEnvironment/Utils/klog.h>
 #include <ksurface_config.h>
+#include <mach/mach_time.h>
 
 DEFINE_KVOBJECT_MAIN_EVENT_HANDLER(proc)
 {
@@ -38,7 +40,7 @@ DEFINE_KVOBJECT_MAIN_EVENT_HANDLER(proc)
     {
         case kvObjEventInit:
         {
-            klog_log("proc:init", "initializing process @ %p", proc);
+            klog_log("ksurface:proc:init", "initializing process @ %p", proc);
             
             /* setting fresh properties */
             proc->bsd.kp_eproc.e_ucred.cr_ngroups = 1;
@@ -46,10 +48,11 @@ DEFINE_KVOBJECT_MAIN_EVENT_HANDLER(proc)
             proc->bsd.kp_proc.p_usrpri = PUSER;
             proc->bsd.kp_eproc.e_tdev = -1;
             proc->bsd.kp_eproc.e_flag = 2;
+            proc->nyx.login_name[0] = '\0';
+            proc->nyx.login_name_len = 0;
+            proc->nyx.supplementary_group_count = 0;
             
-#if !KSURFACE_SYS_UCRED_ENABLED
             proc_setmobilecred(proc);
-#endif /* !KSURFACE_SYS_UCRED_ENABLED */
             
             goto mutual_init;
         }
@@ -57,7 +60,8 @@ DEFINE_KVOBJECT_MAIN_EVENT_HANDLER(proc)
         {
             ksurface_proc_t *src = (ksurface_proc_t*)kvarr[1];
             
-            klog_log("proc:copy", "copying process @ %p from process @ %p", proc, src);
+            klog_log("ksurface:proc:copy", "copying process @ %p from process @ %p", proc, src);
+            klog_log("ksurface:proc:init", "initializing process @ %p", proc);
             
             /* copy the object into the other object */
             memcpy(&(proc->bsd), &(src->bsd), sizeof(kinfo_proc_t));
@@ -72,6 +76,7 @@ DEFINE_KVOBJECT_MAIN_EVENT_HANDLER(proc)
             {
                 return -1;
             }
+            proc->nyx.start_abstime = mach_absolute_time();
             
             if(pthread_mutex_init(&(proc->children.mutex), NULL) != 0)
             {
@@ -93,7 +98,7 @@ DEFINE_KVOBJECT_MAIN_EVENT_HANDLER(proc)
         case kvObjEventDeinit:
             if(proc->header.base_type != kvObjBaseTypeObjectSnapshot)
             {
-                klog_log("proc:deinit", "deinitializing process @ %p", proc);
+                klog_log("ksurface:proc:deinit", "deinitializing process @ %p", proc);
                 pthread_mutex_destroy(&(proc->children.mutex));
                 
                 if(proc->task != MACH_PORT_NULL)

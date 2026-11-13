@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #import <LindChain/IDEBuilder/NXPhaseEngine.h>
@@ -25,8 +26,8 @@
 
 @implementation NXPhaseEngine
 
-- (instancetype)initWithProject:(NXProject *)project
-                          error:(NSError **)error
++ (instancetype)engineWithProject:(NXProject *)project
+                            error:(NSError **)error
 {
     /* finding code files */
     NSArray<NSString*> *swiftFiles = LDEFilesFinder(project.url.path, [NSSet setWithArray:@[@"swift"]], [NSSet setWithArray:@[@"Resources",@"Config"]]);
@@ -70,12 +71,12 @@
         [driverFlags addObjectsFromArray:project.projectConfig.swiftFlags];
         [driverFlags addObject:@"-module-name"];
         [driverFlags addObject:NXMakeContentCodeFriendly(project.projectConfig.displayName)];
-        return [super initWithSwiftFlags:driverFlags withOtherClangFlags:project.projectConfig.compilerFlags withOtherLinkerFlags:project.projectConfig.linkerFlags];
+        return [self engineWithSwiftFlags:driverFlags withOtherClangFlags:project.projectConfig.compilerFlags withOtherLinkerFlags:project.projectConfig.linkerFlags];
     }
     else
     {
         [driverFlags addObjectsFromArray:project.projectConfig.compilerFlags];
-        return [super initWithClangFlags:driverFlags withOtherLinkerFlags:project.projectConfig.linkerFlags];
+        return [self engineWithClangFlags:driverFlags withOtherLinkerFlags:project.projectConfig.linkerFlags];
     }
 }
 

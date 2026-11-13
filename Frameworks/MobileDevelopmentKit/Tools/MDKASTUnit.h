@@ -22,14 +22,18 @@
  * SOFTWARE.
  */
 
-#ifndef MDKASTUNIT_H
-#define MDKASTUNIT_H
+#ifndef MOBILEDEVELOPMENTKIT_MDKASTUNIT_H
+#define MOBILEDEVELOPMENTKIT_MDKASTUNIT_H
 
 #import <MobileDevelopmentKit/MDKCFType.h>
 #import <MobileDevelopmentKit/MDKDiagnostic.h>
 #import <MobileDevelopmentKit/MDKFile.h>
 #import <MobileDevelopmentKit/MDKFileSourceLocation.h>
-#import <CoreCompiler/CCASTUnit.h>
+
+typedef NS_ENUM(UInt8, MDKASTUnitType) {
+    MDKASTUnitTypeClang = 0,
+    MDKASTUnitTypeSwift,
+};
 
 @interface MDKASTUnit : MDKCFType
 
@@ -37,7 +41,7 @@
 @property (nonatomic, readonly) NSArray<MDKDiagnostic*> *diagnostics;
 @property (nonatomic, readonly) BOOL hasErrorOccured;
 
-- (MDKFileSourceLocation*)fileSourceLocationForDefinitionAtLocation:(CCSourceLocation)location;
+- (MDKFileSourceLocation*)fileSourceLocationForDefinitionAtLocation:(MDKSourceLocation)location;
 
 @end
 
@@ -45,11 +49,11 @@
 
 @property (nonatomic, readwrite) MDKFile *file;
 
-+ (instancetype)unit;
++ (instancetype)unitWithType:(MDKASTUnitType)type;
 
 - (BOOL)reparse;
 - (void)setArguments:(NSArray<NSString*>*)arguments;
 
 @end
 
-#endif /* MDKASTUNIT_H */
+#endif /* MOBILEDEVELOPMENTKIT_MDKASTUNIT_H */

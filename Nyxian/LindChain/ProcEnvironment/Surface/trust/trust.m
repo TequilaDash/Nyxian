@@ -1,23 +1,24 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
  Copyright (C) 2026 semvis123
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 /* ----------------------------------------------------------------------
@@ -31,11 +32,18 @@
 /* ----------------------------------------------------------------------
  *  Project Headers
  * -------------------------------------------------------------------- */
-#import <LindChain/Services/applicationmgmtd/LDEApplicationWorkspace.h>
+#import <Frameworks/LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspace.h>
 #import <LindChain/ProcEnvironment/LiveContainer/LCMachOUtils.h>
+#import <LindChain/ProcEnvironment/LiveContainer/LCUtils.h>
 #import <LindChain/ProcEnvironment/Surface/trust/trust.h>
 #import <LindChain/ProcEnvironment/Surface/surface.h>
+#import <LindChain/ProcEnvironment/Surface/fs/sandbox.h>
+#import <LindChain/ProcEnvironment/Utils/vnode.h>
 #import <LindChain/IDEFoundation/NXBootstrap.h>
+#import <LindChain/Utils/CFTools.h>
+#import <LindChain/IDEFoundation/NXBootstrap.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/patch.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/klog.h>
 #import <ksurface_config.h>
 
 /* ----------------------------------------------------------------------
@@ -49,42 +57,59 @@ typedef struct {
 /* ----------------------------------------------------------------------
  *  Functions
  * -------------------------------------------------------------------- */
-static CFDictionaryRef trust_identity_entitlements_from_legacy_entitlements(PEEntitlement entitlement)
+static _Atomic int g_enforcement_mode = -1;
+
+bool trust_enforcement_set_mode(PEEnforcementMode mode)
 {
-    CFMutableDictionaryRef dictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    if(dictionary == NULL)
+    if(mode != kPEEnforcementModePermissive && mode != kPEEnforcementModeDisabled)
     {
-        return NULL;
+        mode = kPEEnforcementModeEnforcing;
     }
     
-    /* foundational */
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementPlatform, entitlement_got_entitlement(entitlement, kPEEntitlementPlatform) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementPlatformRoot, entitlement_got_entitlement(entitlement, kPEEntitlementPlatformRoot) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementGetTaskAllow, entitlement_got_entitlement(entitlement, kPEEntitlementGetTaskAllowed) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementTaskForPid, entitlement_got_entitlement(entitlement, kPEEntitlementTaskForPid) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementSUGID, entitlement_got_entitlement(entitlement, kPEEntitlementProcessElevate) ? kCFBooleanTrue : kCFBooleanFalse);
-    
-    /* dyld */
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementDYLDHideLP, entitlement_got_entitlement(entitlement, kPEEntitlementDyldHideLiveProcess) ? kCFBooleanTrue : kCFBooleanFalse);
-    
-    /* process */
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementProcessEnumeration, entitlement_got_entitlement(entitlement, kPEEntitlementProcessEnumeration) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementProcessKill, entitlement_got_entitlement(entitlement, kPEEntitlementProcessKill) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementProcessSpawn, entitlement_got_entitlement(entitlement, kPEEntitlementProcessSpawn) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementProcessSpawnSignedOnly, entitlement_got_entitlement(entitlement, kPEEntitlementProcessSpawnSignedOnly) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementProcessSpawnInheriteEntitlements, entitlement_got_entitlement(entitlement, kPEEntitlementProcessSpawnInheriteEntitlements) ? kCFBooleanTrue : kCFBooleanFalse);
-    
-    /* management */
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementManagementHost, entitlement_got_entitlement(entitlement, kPEEntitlementHostManager) ? kCFBooleanTrue : kCFBooleanFalse);
-    
-    /* launch services */
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementLaunchServicesStart, entitlement_got_entitlement(entitlement, kPEEntitlementLaunchServicesStart) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementLaunchServicesStop, entitlement_got_entitlement(entitlement, kPEEntitlementLaunchServicesStop) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementLaunchServicesToggle, entitlement_got_entitlement(entitlement, kPEEntitlementLaunchServicesToggle) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementLaunchServicesGetEndpoint, entitlement_got_entitlement(entitlement, kPEEntitlementLaunchServicesGetEndpoint) ? kCFBooleanTrue : kCFBooleanFalse);
-    CFDictionaryAddValue(dictionary, kNXT2EntitlementLaunchServicesSetEndpoint, entitlement_got_entitlement(entitlement, kPEEntitlementLaunchServicesSetEndpoint) ? kCFBooleanTrue : kCFBooleanFalse);
-    
-    return dictionary;
+    int expected = -1;
+    return atomic_compare_exchange_strong(&g_enforcement_mode, &expected, (int)mode);
+}
+
+PEEnforcementMode trust_enforcement_mode(void)
+{
+    int expected = -1;
+    atomic_compare_exchange_strong(&g_enforcement_mode, &expected, (int)kPEEnforcementModeEnforcing);
+    return (PEEnforcementMode)atomic_load(&g_enforcement_mode);
+}
+
+bool trust_enforcement_should_deny(pid_t pid,
+                                   PEEntitlementFlags missing,
+                                   const char *operation)
+{
+    switch(trust_enforcement_mode())
+    {
+        case kPEEnforcementModeDisabled:
+            return false;
+        case kPEEnforcementModePermissive:
+            klog_log("trust", "permissive: pid %d lacks 0x%llx for %s, allowed", pid, (unsigned long long)missing, operation ?: "?");
+            return false;
+        case kPEEnforcementModeEnforcing:
+        default:
+            klog_log("trust", "denied: pid %d lacks 0x%llx for %s", pid, (unsigned long long)missing, operation ?: "?");
+            return true;
+    }
+}
+
+bool trust_enforcement_overrides(pid_t pid,
+                                 PEEntitlementFlags missing,
+                                 const char *operation)
+{
+    switch(trust_enforcement_mode())
+    {
+        case kPEEnforcementModeDisabled:
+            return true;
+        case kPEEnforcementModePermissive:
+            klog_log("trust", "permissive: pid %d lacks 0x%llx for %s, widened", pid, (unsigned long long)missing, operation ?: "?");
+            return true;
+        case kPEEnforcementModeEnforcing:
+        default:
+            return false;
+    }
 }
 
 static bool array_is_all_strings(CFArrayRef arr)
@@ -106,8 +131,8 @@ typedef struct {
     CFTypeID expected_type;
 } entitlement_schema_entry;
 
-static CFDictionaryRef trust_identity_validate_entitlements(CFStringRef executablePath,
-                                                            CFDictionaryRef entitlements)
+LIBKERN_DEFINE_PATCHABLE(CFDictionaryRef, trust_identity_validate_entitlements, (CFStringRef executablePath,
+                                                                                 CFDictionaryRef entitlements))
 {
     if(entitlements == NULL)
     {
@@ -125,9 +150,6 @@ static CFDictionaryRef trust_identity_validate_entitlements(CFStringRef executab
         { kNXT2EntitlementTaskForPid,                   CFBooleanGetTypeID() },
         { kNXT2EntitlementSUGID,                        CFBooleanGetTypeID() },
         { kNXT2EntitlementSystemTaskPorts,              CFBooleanGetTypeID() },
-        
-        /* dyld */
-        { kNXT2EntitlementDYLDHideLP,                   CFBooleanGetTypeID() },
         
         /* process */
         { kNXT2EntitlementProcessEnumeration,           CFBooleanGetTypeID() },
@@ -152,6 +174,10 @@ static CFDictionaryRef trust_identity_validate_entitlements(CFStringRef executab
         { kNXT2EntitlementSandboxFileRead,              CFArrayGetTypeID()   },
         { kNXT2EntitlementSandboxFileReadWrite,         CFArrayGetTypeID()   },
         { kNXT2EntitlementSandboxNoContainer,           CFBooleanGetTypeID() },
+        { kNXT2EntitlementSandboxHost,                  CFBooleanGetTypeID() },
+        
+        /* ksurface */
+        { kNXT2EntitlementKsurfaceKEXTLoading,          CFBooleanGetTypeID() },
     };
     const size_t schema_count = sizeof(schema) / sizeof(schema[0]);
     
@@ -182,7 +208,6 @@ static CFDictionaryRef trust_identity_validate_entitlements(CFStringRef executab
         CFDictionarySetValue(clean, schema[i].key, val);
     }
     
-    /* grant access automatically to executable and blastbox */
     CFMutableArrayRef rwPaths;
     CFArrayRef existing = CFDictionaryGetValue(clean, kNXT2EntitlementSandboxFileReadWrite);
     if(existing)
@@ -275,8 +300,55 @@ static NSString *PECanonicalizePath(NSString *path)
     return [NSString stringWithUTF8String:resolved];
 }
 
-static CFArrayRef trust_identity_give_file_permissions(CFStringRef executableString,
-                                                       CFDictionaryRef entitlements)
+static void trust_identity_append_file_permissions(NSMutableArray<NSData*> *filePermissions,
+                                                   NSString *rawPath,
+                                                   NSDictionary *pathVariables,
+                                                   FSMountPermissionFlags permission,
+                                                   BOOL over_sbfs_layer,
+                                                   CFDictionaryRef entitlements)
+{
+    NSArray<NSString*> *paths = PEResolveEntitlementPaths(rawPath, pathVariables);
+    for(NSString *path in paths)
+    {
+        NSString *actualPath = PECanonicalizePath(path);
+        if(actualPath)
+        {
+            if(over_sbfs_layer)
+            {
+                NSArray<NSData*> *extensions = (__bridge_transfer NSArray<NSData*>*)ksurface_fs_sandbox_copy_sandbox_extensions_for_entitlements(actualPath.UTF8String, permission, entitlements);
+                if(extensions != nil)
+                {
+                    [filePermissions addObjectsFromArray:extensions];
+                }
+            }
+            else
+            {
+                /* that means no mount permission layer! */
+                NSData *extension = (__bridge_transfer NSData*)ksurface_fs_sandbox_copy_sandbox_extension_for_arbitary_path(actualPath.UTF8String, permission);
+                if(extension != nil)
+                {
+                    [filePermissions addObject:extension];
+                }
+            }
+        }
+    }
+}
+
+static void trust_identity_append_file_permissions_for_paths(NSMutableArray<NSData*> *filePermissions,
+                                                             NSArray<NSString*> *rawPaths,
+                                                             NSDictionary *pathVariables,
+                                                             FSMountPermissionFlags permission,
+                                                             BOOL over_sbfs_layer,
+                                                             CFDictionaryRef entitlements)
+{
+    for(NSString *rawPath in rawPaths)
+    {
+        trust_identity_append_file_permissions(filePermissions, rawPath, pathVariables, permission, over_sbfs_layer, entitlements);
+    }
+}
+
+LIBKERN_DEFINE_PATCHABLE(CFArrayRef, trust_identity_give_file_permissions, (CFStringRef executableString,
+                                                                            CFDictionaryRef entitlements))
 {
     @autoreleasepool
     {
@@ -284,9 +356,18 @@ static CFArrayRef trust_identity_give_file_permissions(CFStringRef executableStr
         
         /* prepare variables */
         NSMutableDictionary *vars = [@{
-            @"ROOTFS": NXBootstrap.shared.rootfsURL.path,
+            @"ROOTFS": NXBootstrap.shared.rootfsURL.path,   /* actually deprecated because it will be replaced by NXROOT like the env variable */
+            @"NXROOT": NXBootstrap.shared.rootfsURL.path,
             @"EXECUTABLE": (__bridge NSString*)executableString,
         } mutableCopy];
+        
+        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"nyxian.boot.sandbox.filesystems"])
+        {
+            trust_identity_append_file_permissions_for_paths(filePermissions, @[
+                @"$(NXROOT)",
+            ], vars, kFSMountPermissionReadWrite, true, entitlements);
+            return (__bridge_retained CFArrayRef)filePermissions;
+        }
         
         /* append applicable variables */
         LDEApplicationObject *applicationObject = [[LDEApplicationWorkspace shared] applicationObjectForExecutablePath:(__bridge NSString*)executableString];
@@ -298,47 +379,34 @@ static CFArrayRef trust_identity_give_file_permissions(CFStringRef executableStr
         }
         
         NSDictionary *nsEntitlements = (__bridge NSDictionary*)entitlements;
-        NSArray<NSString*> *readFilePermissions = nsEntitlements[(__bridge NSString*)kNXT2EntitlementSandboxFileRead];
-        NSArray<NSString*> *readWriteFilePermissions = nsEntitlements[(__bridge NSString*)kNXT2EntitlementSandboxFileReadWrite];
-        for(NSString *readWriteFilePermission in readWriteFilePermissions)
+        
+        /* append file permissions from entitlements */
+        trust_identity_append_file_permissions_for_paths(filePermissions, nsEntitlements[(__bridge NSString*)kNXT2EntitlementSandboxFileRead], vars, kFSMountPermissionRead, true, entitlements);
+        trust_identity_append_file_permissions_for_paths(filePermissions, nsEntitlements[(__bridge NSString*)kNXT2EntitlementSandboxFileReadWrite], vars, kFSMountPermissionReadWrite, true, entitlements);
+        
+        /* append extra file permissions that are on by default */
+        trust_identity_append_file_permissions_for_paths(filePermissions, @[
+            @"$(NXROOT)/boot/rtpatch",
+            @"$(NXROOT)/boot/patchfinder.bin"
+        ], vars, kFSMountPermissionRead, true, entitlements);
+        
+        /* handling the most powerful entitlement known to ksurface */
+        if(CFDictionaryGetValue(entitlements, kNXT2EntitlementSandboxHost) == kCFBooleanTrue)
         {
-            NSArray<NSString*> *paths = PEResolveEntitlementPaths(readWriteFilePermission, vars);
-            for(NSString *path in paths)
-            {
-                NSString *actualPath = PECanonicalizePath(path);
-                if(actualPath)
-                {
-                    NSData *sandboxExtension = [NXBootstrap issueSandboxFileExtensionForURL:[NSURL fileURLWithPath:actualPath] readWrite:YES];
-                    if(sandboxExtension != nil)
-                    {
-                        [filePermissions addObject:sandboxExtension];
-                    }
-                }
-            }
-        }
-        for(NSString *readFilePermission in readFilePermissions)
-        {
-            NSArray<NSString*> *paths = PEResolveEntitlementPaths(readFilePermission, vars);
-            for(NSString *path in paths)
-            {
-                NSString *actualPath = PECanonicalizePath(path);
-                if(actualPath)
-                {
-                    NSData *sandboxExtension = [NXBootstrap issueSandboxFileExtensionForURL:[NSURL fileURLWithPath:actualPath] readWrite:NO];
-                    if(sandboxExtension != nil)
-                    {
-                        [filePermissions addObject:sandboxExtension];
-                    }
-                }
-            }
+            trust_identity_append_file_permissions(filePermissions, @"$(NXROOT)/../../*", vars, kFSMountPermissionRead, false, NULL);   /* making host data container sub paths readable */
+            trust_identity_append_file_permissions_for_paths(filePermissions, @[
+                @"$(NXROOT)/../*",          /* full documents path rw in container of host */
+                @"$(NXROOT)/../Library/*",  /* full library path rw in container of host */
+                @"$(NXROOT)/../tmp",        /* full tmp RW */
+            ], vars, kFSMountPermissionReadWrite, false, NULL);
         }
         return (__bridge_retained CFArrayRef)filePermissions;
     }
 }
 
-static PEEntitlement trust_identity_legacy_entitlements_from_entitlements(CFDictionaryRef entitlements)
+PEEntitlementFlags trust_identity_entitlement_flags_from_entitlements(CFDictionaryRef entitlements)
 {
-    PEEntitlement legacyEntitlements = kPEEntitlementNone;
+    PEEntitlementFlags legacyEntitlements = kPEEntitlementFlagNone;
     if(entitlements == NULL)
     {
         return legacyEntitlements;
@@ -350,31 +418,32 @@ static PEEntitlement trust_identity_legacy_entitlements_from_entitlements(CFDict
         && CFBooleanGetValue((CFBooleanRef)_v)); })
     
     /* foundational */
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementPlatform)) legacyEntitlements |= kPEEntitlementPlatform;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementPlatformRoot)) legacyEntitlements |= kPEEntitlementPlatformRoot;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementGetTaskAllow)) legacyEntitlements |= kPEEntitlementGetTaskAllowed;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementTaskForPid)) legacyEntitlements |= kPEEntitlementTaskForPid;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementSUGID)) legacyEntitlements |= kPEEntitlementProcessElevate;
-    
-    /* dyld */
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementDYLDHideLP)) legacyEntitlements |= kPEEntitlementDyldHideLiveProcess;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementPlatform)) legacyEntitlements |= kPEEntitlementFlagPlatform;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementPlatformRoot)) legacyEntitlements |= kPEEntitlementFlagPlatformRoot;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementGetTaskAllow)) legacyEntitlements |= kPEEntitlementFlagGetTaskAllowed;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementTaskForPid)) legacyEntitlements |= kPEEntitlementFlagTaskForPid;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementSystemTaskPorts)) legacyEntitlements |= kPEEntitlementFlagSystemTaskPorts;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementSUGID)) legacyEntitlements |= kPEEntitlementFlagProcessElevate;
     
     /* process */
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessEnumeration)) legacyEntitlements |= kPEEntitlementProcessEnumeration;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessKill)) legacyEntitlements |= kPEEntitlementProcessKill;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessSpawn)) legacyEntitlements |= kPEEntitlementProcessSpawn;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessSpawnSignedOnly)) legacyEntitlements |= kPEEntitlementProcessSpawnSignedOnly;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessSpawnInheriteEntitlements)) legacyEntitlements |= kPEEntitlementProcessSpawnInheriteEntitlements;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessEnumeration)) legacyEntitlements |= kPEEntitlementFlagProcessEnumeration;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessKill)) legacyEntitlements |= kPEEntitlementFlagProcessKill;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessSpawn)) legacyEntitlements |= kPEEntitlementFlagProcessSpawn;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessSpawnSignedOnly)) legacyEntitlements |= kPEEntitlementFlagProcessSpawnSignedOnly;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementProcessSpawnInheriteEntitlements)) legacyEntitlements |= kPEEntitlementFlagProcessSpawnInheriteEntitlements;
     
     /* management */
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementManagementHost)) legacyEntitlements |= kPEEntitlementHostManager;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementManagementHost)) legacyEntitlements |= kPEEntitlementFlagHostManager;
     
     /* launch services */
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesStart)) legacyEntitlements |= kPEEntitlementLaunchServicesStart;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesStop)) legacyEntitlements |= kPEEntitlementLaunchServicesStop;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesToggle)) legacyEntitlements |= kPEEntitlementLaunchServicesToggle;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesGetEndpoint)) legacyEntitlements |= kPEEntitlementLaunchServicesGetEndpoint;
-    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesSetEndpoint)) legacyEntitlements |= kPEEntitlementLaunchServicesSetEndpoint;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesStart)) legacyEntitlements |= kPEEntitlementFlagLaunchServicesStart;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesStop)) legacyEntitlements |= kPEEntitlementFlagLaunchServicesStop;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesToggle)) legacyEntitlements |= kPEEntitlementFlagLaunchServicesToggle;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesGetEndpoint)) legacyEntitlements |= kPEEntitlementFlagLaunchServicesGetEndpoint;
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementLaunchServicesSetEndpoint)) legacyEntitlements |= kPEEntitlementFlagLaunchServicesSetEndpoint;
+    
+    /* ksurface */
+    if(ENT_IS_TRUE(entitlements, kNXT2EntitlementKsurfaceKEXTLoading)) legacyEntitlements |= kPEEntitlementFlagLoadKEXT;
     
     #undef ENT_IS_TRUE
     return legacyEntitlements;
@@ -388,20 +457,74 @@ ksurface_trust_identity_t *trust_identity_get_kernel(void)
         identity = calloc(1, sizeof(ksurface_trust_identity_t));
         identity->trustLevel = kPETrustLevelTrusted;
         identity->entitlements = CFDictionaryCreateCopy(kCFAllocatorDefault, kPEEntitlementsNXT2PresetsKernel);
-        identity->legacyEntitlements = trust_identity_legacy_entitlements_from_entitlements(identity->entitlements);
-        identity->maxLegacyEntitlements = identity->legacyEntitlements;
         
         uint32_t bufsize = PATH_MAX;
         if(_NSGetExecutablePath(identity->path, &bufsize) > 0)
         {
             /* shall never happen */
-            environment_panic("failed to aquire executable path from dyld");
+            kpanic("failed to aquire executable path from dyld");
         }
     });
     return identity;
 }
 
-ksurface_trust_identity_t *trust_identity_create_from_path(const char *path)
+static bool trust_resign_with_fd(int *fd,
+                                 ksurface_nxt2_t *result_nxt2)
+{
+    char path[MAXPATHLEN];
+    if(fcntl(*fd, F_GETPATH, path) != 0)
+    {
+        return false;
+    }
+    
+    if(result_nxt2->isValid &&
+       result_nxt2->isCdHashValid &&
+       result_nxt2->needsResign)
+    {
+        static os_unfair_lock resign_lock = OS_UNFAIR_LOCK_INIT;
+        os_unfair_lock_lock(&resign_lock);
+        
+        if(![LCUtils signMachOAtURL:[NSURL fileURLWithPath:[NSString stringWithCString:path encoding:NSUTF8StringEncoding]]])
+        {
+            os_unfair_lock_unlock(&resign_lock);
+            return false;
+        }
+        
+        if(vnode_inaccessible_reopen(fd) != 0)
+        {
+            os_unfair_lock_unlock(&resign_lock);
+            return false;
+        }
+        
+        if(trust_nxt2_sign_fd(*fd, result_nxt2->entitlements, true, NULL) != KERN_SUCCESS)
+        {
+            os_unfair_lock_unlock(&resign_lock);
+            return false;
+        }
+        
+        ksurface_nxt2_t new_result_nxt2;
+        if(trust_nxt2_read_fd(*fd, &new_result_nxt2) != KERN_SUCCESS)
+        {
+            os_unfair_lock_unlock(&resign_lock);
+            return false;
+        }
+        
+        if(new_result_nxt2.entitlements == NULL)
+        {
+            os_unfair_lock_unlock(&resign_lock);
+            return false;
+        }
+        
+        CFRelease(result_nxt2->entitlements);
+        memcpy(result_nxt2, &new_result_nxt2, sizeof(*result_nxt2));
+        
+        os_unfair_lock_unlock(&resign_lock);
+    }
+    
+    return true;
+}
+
+LIBKERN_DEFINE_PATCHABLE(ksurface_trust_identity_t *, trust_identity_create_from_path, (const char *path))
 {
     if(path == NULL)
     {
@@ -409,24 +532,41 @@ ksurface_trust_identity_t *trust_identity_create_from_path(const char *path)
         return NULL;
     }
     
+    /* daemon trustpath validation */
+    trustDaemonEntry trustDaemonPath[] = {  /* those paths are immutable */
+        {
+            .path = [NXBootstrap.shared.rootfsURL URLByAppendingPathComponent:@"boot/libexec/bootstrapd"].path.UTF8String,
+            .entitlementPreset = kPEEntitlementsNXT2PresetsDaemonBootstrap,
+        },
+        {
+            .path = [NXBootstrap.shared.rootfsURL URLByAppendingPathComponent:@"boot/libexec/MobileDevelopmentService"].path.UTF8String,
+            .entitlementPreset = kPEEntitlementsNXT2PresetsDaemonCompiler,
+        }
+    };
+    
     CFStringRef executableString = CFStringCreateWithCString(kCFAllocatorDefault, path, kCFStringEncodingUTF8);
     if(executableString == NULL)
     {
         return NULL;
     }
     
-    /* daemon trustpath validation */
-    const trustDaemonEntry trustDaemonPath[] = {   /* those paths are immutable */
-        {
-            .path = "/usr/libexec/bootstrapd",
-            .entitlementPreset = kPEEntitlementsNXT2PresetsDaemonBootstrap,
-        }
-    };
-    
     for(int index = 0; index < sizeof(trustDaemonPath) / sizeof(trustDaemonEntry); index++)
     {
         if(strncmp(path, trustDaemonPath[index].path, MAXPATHLEN - 1) == 0)
         {
+            LCMachO *machO = LCMapMachO(path, true);
+            if(machO == NULL)
+            {
+                return NULL;
+            }
+            
+            bool isAppleSigned = LCCheckCodeSignature(machO);
+            LCUnmapMachO(machO);
+            if(!isAppleSigned)
+            {
+                return NULL;
+            }
+            
             ksurface_trust_identity_t *identity = calloc(1, sizeof(ksurface_trust_identity_t));
             if(identity == NULL)
             {
@@ -450,8 +590,6 @@ ksurface_trust_identity_t *trust_identity_create_from_path(const char *path)
                 CFRelease(executableString);
                 return NULL;
             }
-            identity->legacyEntitlements = trust_identity_legacy_entitlements_from_entitlements(kPEEntitlementsNXT2PresetsDaemonBootstrap);
-            identity->legacyEntitlements = identity->legacyEntitlements;
             identity->filePermissions = trust_identity_give_file_permissions(executableString, identity->entitlements);
             return identity;
         }
@@ -460,11 +598,98 @@ ksurface_trust_identity_t *trust_identity_create_from_path(const char *path)
     /* check if path is readable and apple signed (required for trust levels lower than kPETrustLevelTrusted, because paths are attacker controlled) */
     if(access(path, R_OK) != 0)
     {
+        errno = EACCES;
         CFRelease(executableString);
         return NULL;
     }
     
-    LCMachO *machO = LCMapMachO(path, false);
+    /* signature validation */
+#if KSURFACE_CS_ALLOW_NXT2
+    {
+        bool refresh = false;
+        int fd = vnode_inaccessible_open(path, O_RDWR);
+        if(fd < 0)
+        {
+            CFRelease(executableString);
+            return NULL;
+        }
+        
+        ksurface_nxt2_t result_nxt2;
+        if(trust_nxt2_read_fd(fd, &result_nxt2) == KERN_SUCCESS)
+        {
+            if(result_nxt2.entitlements == NULL)
+            {
+                close(fd);
+                CFRelease(executableString);
+                return NULL;
+            }
+            
+            if(result_nxt2.needsResign)
+            {
+                if(!trust_resign_with_fd(&fd, &result_nxt2))
+                {
+                    goto out_failure_release_nxt2;
+                }
+                else
+                {
+                    refresh = true;
+                }
+            }
+            
+            LCMachO *machO = LCMapMachOFromFDRO(dup(fd));
+            if(machO == NULL)
+            {
+                goto out_failure_release_nxt2;
+            }
+            
+            bool isAppleSigned = LCCheckCodeSignature(machO);
+            LCUnmapMachO(machO);
+            if(!isAppleSigned)
+            {
+                goto out_failure_release_nxt2;
+            }
+            
+            /* check if blob was signed */
+            if(!result_nxt2.isSigned || !result_nxt2.isValid || !result_nxt2.isCdHashValid)
+            {
+                goto out_failure_release_nxt2;
+            }
+            
+            ksurface_trust_identity_t *identity = calloc(1, sizeof(ksurface_trust_identity_t));
+            if(identity == NULL)
+            {
+                goto out_failure_release_nxt2;
+            }
+            
+            strlcpy(identity->path, path, MAXPATHLEN);
+            memcpy(identity->cdhash, result_nxt2.cdhash, USER_FSIGNATURES_CDHASH_LEN);
+            
+            identity->trustLevel = kPETrustLevelSignature;
+            identity->entitlements = trust_identity_validate_entitlements(executableString, result_nxt2.entitlements);
+            CFRelease(result_nxt2.entitlements);
+            if(identity->entitlements == NULL)
+            {
+                vnode_inaccessible_close(fd, refresh);
+                CFRelease(executableString);
+                free(identity);
+                return NULL;
+            }
+            identity->filePermissions = trust_identity_give_file_permissions(executableString, identity->entitlements);
+            vnode_inaccessible_close(fd, refresh);
+            return identity;
+            
+        out_failure_release_nxt2:
+            vnode_inaccessible_close(fd, refresh);
+            CFRelease(result_nxt2.entitlements);
+            CFRelease(executableString);
+            return NULL;
+        }
+        vnode_inaccessible_close(fd, refresh);
+    }
+#endif /* KSURFACE_CS_ALLOW_NXT2 */
+    
+    /* fallback */
+    LCMachO *machO = LCMapMachO(path, true);
     if(machO == NULL)
     {
         CFRelease(executableString);
@@ -478,141 +703,40 @@ ksurface_trust_identity_t *trust_identity_create_from_path(const char *path)
         return NULL;
     }
     
-    /* signature validation */
-#if KSURFACE_CS_ALLOW_NXT2
+    CFMutableDictionaryRef entitlements = CFDictionaryCreateMutable(kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    if(entitlements == NULL)
     {
-        ksurface_nxt2_t result_nxt2;
-        if(trust_nxt2_read(path, &result_nxt2) == KERN_SUCCESS)
-        {
-            /* check if blob was signed */
-            if(!result_nxt2.isSigned || !result_nxt2.isValid || !result_nxt2.isCdHashValid)
-            {
-                CFRelease(result_nxt2.entitlements);
-                CFRelease(executableString);
-                return NULL;
-            }
-            
-            ksurface_trust_identity_t *identity = calloc(1, sizeof(ksurface_trust_identity_t));
-            if(identity == NULL)
-            {
-                CFRelease(result_nxt2.entitlements);
-                CFRelease(executableString);
-                return NULL;
-            }
-            
-            strlcpy(identity->path, path, MAXPATHLEN);
-            memcpy(identity->cdhash, result_nxt2.cdhash, USER_FSIGNATURES_CDHASH_LEN);
-            
-            identity->trustLevel = kPETrustLevelSignature;
-            identity->entitlements = trust_identity_validate_entitlements(executableString, result_nxt2.entitlements);
-            CFRelease(result_nxt2.entitlements);
-            if(identity->entitlements == NULL)
-            {
-                free(identity);
-                goto fallback;
-            }
-            identity->legacyEntitlements = trust_identity_legacy_entitlements_from_entitlements(identity->entitlements);
-            identity->maxLegacyEntitlements = identity->legacyEntitlements;
-            identity->filePermissions = trust_identity_give_file_permissions(executableString, identity->entitlements);
-            return identity;
-        }
-    }
-#endif /* KSURFACE_CS_ALLOW_NXT2 */
-    
-#if KSURFACE_CS_ALLOW_NXTR
-    {
-        ksurface_nxtr_result_t result_nxtr;
-        if(trust_nxtr_read(path, &result_nxtr) == KERN_SUCCESS)
-        {
-            /* check if blob was signed */
-            if(entitlement_mach_verify(&result_nxtr, ksurface->pub_key, ksurface->pub_key_len) != KERN_SUCCESS)
-            {
-                CFRelease(executableString);
-                return NULL;
-            }
-            
-            if(!result_nxtr.blob_valid || !result_nxtr.cdhash_valid)
-            {
-                CFRelease(executableString);
-                return NULL;
-            }
-            
-            ksurface_trust_identity_t *identity = calloc(1, sizeof(ksurface_trust_identity_t));
-            if(identity == NULL)
-            {
-                CFRelease(executableString);
-                return NULL;
-            }
-            
-            strlcpy(identity->path, path, MAXPATHLEN);
-            memcpy(identity->cdhash, result_nxtr.blob.cdhash, USER_FSIGNATURES_CDHASH_LEN);
-            
-            identity->trustLevel = kPETrustLevelSignature;
-            
-            CFDictionaryRef convertedEntitlements = trust_identity_entitlements_from_legacy_entitlements(result_nxtr.blob.entitlement);
-            if(convertedEntitlements == NULL)
-            {
-                free(identity);
-                CFRelease(executableString);
-                return NULL;
-            }
-            
-            identity->entitlements = trust_identity_validate_entitlements(executableString, convertedEntitlements);
-            CFRelease(convertedEntitlements);
-            if(identity->entitlements == NULL)
-            {
-                free(identity);
-                CFRelease(executableString);
-                return NULL;
-            }
-            identity->legacyEntitlements = result_nxtr.blob.entitlement;
-            identity->maxLegacyEntitlements = identity->legacyEntitlements;
-            identity->filePermissions = trust_identity_give_file_permissions(executableString, identity->entitlements);
-            return identity;
-        }
-    }
-#endif /* KSURFACE_CS_ALLOW_NXTR */
-    
-    /* fallback */
-fallback:
-    {
-        CFMutableDictionaryRef entitlements = CFDictionaryCreateMutable(kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        if(entitlements == NULL)
-        {
-            CFRelease(executableString);
-            errno = ENOMEM;
-            return NULL;
-        }
-        CFDictionaryRef newEntitlements = trust_identity_validate_entitlements(executableString, entitlements); /* gives container access if applicable */
-        CFRelease(entitlements);
-        if(newEntitlements == NULL)
-        {
-            CFRelease(executableString);
-            errno = ENOMEM;
-            return NULL;
-        }
-        ksurface_trust_identity_t *identity = calloc(1, sizeof(ksurface_trust_identity_t));
-        if(identity == NULL)
-        {
-            CFRelease(executableString);
-            errno = ENOMEM;
-            return NULL;
-        }
-        strlcpy(identity->path, path, MAXPATHLEN);
-        
-        identity->trustLevel = kPETrustLevelFallback;
-        identity->entitlements = newEntitlements;
-        identity->legacyEntitlements = kPEEntitlementNone;
-        identity->maxLegacyEntitlements = kPEEntitlementNone;
-        identity->filePermissions = trust_identity_give_file_permissions(executableString, identity->entitlements);
-        
         CFRelease(executableString);
-        return identity;
+        errno = ENOMEM;
+        return NULL;
     }
+    CFDictionaryRef newEntitlements = trust_identity_validate_entitlements(executableString, entitlements); /* gives container access if applicable */
+    CFRelease(entitlements);
+    if(newEntitlements == NULL)
+    {
+        CFRelease(executableString);
+        errno = ENOMEM;
+        return NULL;
+    }
+    ksurface_trust_identity_t *identity = calloc(1, sizeof(ksurface_trust_identity_t));
+    if(identity == NULL)
+    {
+        CFRelease(executableString);
+        errno = ENOMEM;
+        return NULL;
+    }
+    strlcpy(identity->path, path, MAXPATHLEN);
+    
+    identity->trustLevel = kPETrustLevelFallback;
+    identity->entitlements = newEntitlements;
+    identity->filePermissions = trust_identity_give_file_permissions(executableString, identity->entitlements);
+    
+    CFRelease(executableString);
+    return identity;
 }
 
-ksurface_trust_identity_t *trust_identity_create_from_path_with_parent_identity(const char *path,
-                                                                                ksurface_trust_identity_t *parentIdentity)
+LIBKERN_DEFINE_PATCHABLE(ksurface_trust_identity_t*, trust_identity_create_from_path_with_parent_identity, (const char *path,
+                                                                                                            ksurface_trust_identity_t *parentIdentity))
 {
     /* first we create the child's identity */
     ksurface_trust_identity_t *childIdentity = trust_identity_create_from_path(path);
@@ -652,6 +776,8 @@ ksurface_trust_identity_t *trust_identity_create_from_path_with_parent_identity(
             const void **childKeys = malloc((size_t)childCount * sizeof(*childKeys));
             if(childKeys == NULL)
             {
+                CFRelease(childNewEntitlements);
+                CFRelease(parentMergingEntitlements);
                 return false;
             }
             CFDictionaryGetKeysAndValues(childNewEntitlements, childKeys, NULL);
@@ -688,13 +814,87 @@ ksurface_trust_identity_t *trust_identity_create_from_path_with_parent_identity(
         CFDictionaryRemoveAllValues(parentMergingEntitlements);
     }
     
-    /* TODO: merging remaining parent entitlements */
+    CFIndex remainingParentCount = CFDictionaryGetCount(parentMergingEntitlements);
+    if(remainingParentCount > 0)
+    {
+        const void **parentKeys = malloc((size_t)remainingParentCount * sizeof(*parentKeys));
+        if(parentKeys == NULL)
+        {
+            CFRelease(childNewEntitlements);
+            CFRelease(parentMergingEntitlements);
+            return false;
+        }
+        CFDictionaryGetKeysAndValues(parentMergingEntitlements, parentKeys, NULL);
+        for(CFIndex index = 0; index < remainingParentCount; index++)
+        {
+            CFTypeRef value = CFDictionaryGetValue(parentMergingEntitlements, parentKeys[index]);
+            if(value == NULL)
+            {
+                continue;
+            }
+            
+            if(value == kCFBooleanTrue || value == kCFBooleanFalse)
+            {
+                /* handling booleans */
+                CFDictionaryAddValue(childNewEntitlements, parentKeys[index], value);
+            }
+            else if(CFGetTypeID(value) == CFArrayGetTypeID())
+            {
+                /* handling arrays */
+                CFArrayRef childArray = CFDictionaryGetValue(childNewEntitlements, parentKeys[index]);
+                if(childArray == NULL)
+                {
+                    /* not included */
+                    CFDictionaryAddValue(childNewEntitlements, parentKeys[index], value);
+                    continue;
+                }
+                
+                if(CFGetTypeID(childArray) != CFArrayGetTypeID())
+                {
+                    /* reject */
+                    continue;
+                }
+                
+                /* merge */
+                CFArrayRef parentArray = value;
+                CFIndex childArrayCount = CFArrayGetCount(childArray);
+                CFIndex parentArrayCount = CFArrayGetCount(parentArray);
+                CFMutableArrayRef childNewArray = CFArrayCreateMutableCopy(kCFAllocatorDefault, childArrayCount + parentArrayCount, childArray);
+                if(childNewArray == NULL)
+                {
+                    /* reject */
+                    continue;
+                }
+                
+                for(CFIndex indexParent = 0; indexParent < parentArrayCount; indexParent++)
+                {
+                    CFTypeRef parentValue = CFArrayGetValueAtIndex(parentArray, indexParent);
+                    if(CFGetTypeID(parentValue) != CFStringGetTypeID())
+                    {
+                        /* reject */
+                        continue;
+                    }
+                    
+                    if(CFArrayContainsValue(childArray, CFRangeMake(0, childArrayCount), parentValue))
+                    {
+                        /* exists already */
+                        continue;
+                    }
+                    
+                    CFArrayAppendValue(childNewArray, parentValue);
+                }
+                
+                CFDictionarySetValue(childNewEntitlements, parentKeys[index], childNewArray);
+                /* FIXME: only allow narrower or same file sandbox permissions gathering (so we dont only use the kern_proc to do it) */
+            }
+        }
+        free(parentKeys);
+    }
     
     /* refreshing childIdentity */
+    CFRelease(parentMergingEntitlements);
     CFRelease(childIdentity->entitlements);
     childIdentity->entitlements = childNewEntitlements;
-    childIdentity->maxLegacyEntitlements = trust_identity_legacy_entitlements_from_entitlements(childNewEntitlements);
-    childIdentity->legacyEntitlements = childIdentity->maxLegacyEntitlements;
     
     return childIdentity;
 }

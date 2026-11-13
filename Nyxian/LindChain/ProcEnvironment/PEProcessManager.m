@@ -1,34 +1,35 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
-#import <LindChain/ProcEnvironment/PEProcessManager.h>
-#import <LindChain/Services/applicationmgmtd/LDEApplicationWorkspace.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/klog.h>
+#import <LindChain/ProcEnvironment/Surface/libkern/kpanic.h>
 #import <LindChain/ProcEnvironment/Surface/proc/proc.h>
-#import <LindChain/ProcEnvironment/Shims/panic.h>
-#import <Nyxian-Swift.h>
-#import <LindChain/ProcEnvironment/Utils/klog.h>
-#import <os/lock.h>
-#import <LindChain/WindowServer/Session/NXWindowSessionApplication.h>
+#import <LindChain/ProcEnvironment/PEProcessManager.h>
 #import <LindChain/ProcEnvironment/Server/Server.h>
+#import <LindChain/WindowServer/Session/NXWindowSessionApplication.h>
+#import <Frameworks/LiveProcessLegacy/LindChain/Services/bootstrapd/LDEApplicationWorkspace.h>
 #import <LindChain/IDEFoundation/NXBootstrap.h>
+#import <Nyxian-Swift.h>
+#import <os/lock.h>
 
 @implementation PEProcessManager {
     NSMutableDictionary<NSNumber*,PEProcess*> *_processes;
@@ -111,14 +112,14 @@
         }
         else
         {
-            [existingProcess terminate];
+            [existingProcess forceTerminate];
         }
     }
     
     LDEApplicationObject *applicationObject = [[LDEApplicationWorkspace shared] applicationObjectForBundleID:bundleIdentifier];
-    if(!applicationObject.isLaunchAllowed)
+    if(applicationObject == nil)
     {
-        [NotificationServer NotifyUserWithLevel:NotifLevelError notification:[NSString stringWithFormat:@"\"%@\" Is No Longer Available", applicationObject.localizedName] delay:0.0];
+        errno = EAGAIN;
         return -1;
     }
     
@@ -197,7 +198,7 @@
     PEProcess *process = [self processForBundleIdentifier:bundleIdentifier];
     if(process)
     {
-        [process terminate];
+        [process forceTerminate];
     }
 }
 

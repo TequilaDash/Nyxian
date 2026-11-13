@@ -23,6 +23,7 @@
  */
 
 #import <MobileDevelopmentKit/MDKJob.h>
+#import <CoreCompiler/CCJob.h>
 
 @implementation MDKJob
 
@@ -31,20 +32,67 @@
     _CFRuntimeBridgeClasses(CCJobGetTypeID(), "MDKJob");
 }
 
-+ (instancetype)jobWithType:(CCJobType)type
++ (instancetype)jobWithType:(MDKJobType)type
               withArguments:(NSArray<NSString*>*)arguments
+          withInputFileURLs:(NSArray<NSURL *> *)inputFileURLs
+          withOutputFileURL:(NSURL *)outputFileURL
 {
-    return (__bridge_transfer MDKJob*)CCJobCreate(kCFAllocatorSystemDefault, type, (__bridge CFArrayRef)arguments);
+    CCJobType ccType = kCCJobTypeUnknown;
+    switch(type)
+    {
+        case MDKJobTypeCompiler:
+            ccType = kCCJobTypeCompiler;
+            break;
+        case MDKJobTypeDriver:
+            ccType = kCCJobTypeDriver;
+            break;
+        case MDKJobTypeSwiftCompiler:
+            ccType = kCCJobTypeSwiftCompiler;
+            break;
+        case MDKJobTypeSwiftDriver:
+            ccType = kCCJobTypeSwiftDriver;
+            break;
+        case MDKJobTypeLinker:
+            ccType = kCCJobTypeLinker;
+            break;
+        default:
+            break;
+    }
+    return (__bridge_transfer MDKJob*)CCJobCreate(kCFAllocatorSystemDefault, ccType, (__bridge CFArrayRef)arguments, (__bridge CFArrayRef)inputFileURLs, (__bridge CFURLRef)outputFileURL);
 }
 
-- (CCJobType)type
+- (MDKJobType)type
 {
-    return CCJobGetType((__bridge void*)self);
+    CCJobType type = CCJobGetType((__bridge void*)self);
+    switch(type)
+    {
+        case kCCJobTypeCompiler: return MDKJobTypeCompiler;
+        case kCCJobTypeDriver: return MDKJobTypeDriver;
+        case kCCJobTypeSwiftCompiler: return MDKJobTypeSwiftCompiler;
+        case kCCJobTypeSwiftDriver: return MDKJobTypeSwiftDriver;
+        case kCCJobTypeLinker: return MDKJobTypeLinker;
+        default: return MDKJobTypeUnknown;
+    }
+}
+
+- (NSArray<NSString*>*)baseArguments
+{
+    return (__bridge NSArray<NSString*>*)CCJobGetBaseArguments((__bridge CCJobRef)self);
+}
+
+- (NSArray<NSURL*>*)inputFileURLs
+{
+    return (__bridge NSArray<NSURL*>*)CCJobGetInputFileURLs((__bridge CCJobRef)self);
+}
+
+- (NSURL*)outputFileURL
+{
+    return (__bridge NSURL*)CCJobGetOutputFileURL((__bridge CCJobRef)self);
 }
 
 - (NSArray<NSString*>*)arguments
 {
-    return (__bridge NSArray<NSString*>*)CCJobGetArguments((__bridge void*)self);
+    return (__bridge_transfer NSArray<NSString*>*)CCJobCreateArguments(kCFAllocatorSystemDefault, (__bridge CCJobRef)self);
 }
 
 - (BOOL)executeJobWithOutDiagnostics:(NSArray<MDKDiagnostic*>**)outDiagnostic
@@ -79,6 +127,28 @@
     }
     
     return success;
+}
+
+- (void)encodeWithCoder:(nonnull NSCoder *)coder
+{
+    [coder encodeObject:@(self.type) forKey:@"type"];
+    [coder encodeObject:self.baseArguments forKey:@"baseArguments"];
+    [coder encodeObject:self.inputFileURLs forKey:@"inputFileURLs"];
+    [coder encodeObject:self.outputFileURL forKey:@"outputFileURL"];
+}
+
+- (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder
+{
+    MDKJobType type = ((NSNumber*)[coder decodeObjectOfClass:[NSNumber class] forKey:@"type"]).unsignedCharValue;
+    NSArray<NSString*> *baseArguments = [coder decodeObjectOfClasses:[NSSet setWithArray:@[[NSArray class],[NSString class]]] forKey:@"baseArguments"];
+    NSArray<NSURL*> *inputFileURLs = [coder decodeObjectOfClasses:[NSSet setWithArray:@[[NSArray class],[NSURL class]]] forKey:@"inputFileURLs"];
+    NSURL *outputFileURL = [coder decodeObjectOfClass:[NSURL class] forKey:@"outputFileURL"];
+    return [MDKJob jobWithType:type withArguments:baseArguments withInputFileURLs:inputFileURLs withOutputFileURL:outputFileURL];
+}
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
 }
 
 @end

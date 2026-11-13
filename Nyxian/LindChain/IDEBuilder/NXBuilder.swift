@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 import Foundation
@@ -30,8 +31,10 @@ final class NXBuilder: NSObject {
     
     private(set) var dependencyScanner: MDKDependencyScanner
     private(set) var phaseRunner: NXPhaseRunner
+    private(set) var remoteCompiler: NXRemoteCompiler? = nil
     
-    private let incrementalBuild: Bool = UserDefaults.standard.object(forKey: "LDEIncrementalBuild") as? Bool ?? true
+    private(set) var incrementalBuild: Bool = UserDefaults.standard.object(forKey: "LDEIncrementalBuild") as? Bool ?? true
+    private(set) var useRemoteServiceIfAvailable: Bool = UserDefaults.standard.object(forKey: "LDERemoteCompileService") as? Bool ?? true
     private let argsString: String
     
     static var builds: Bool = false
@@ -47,7 +50,16 @@ final class NXBuilder: NSObject {
         self.database = DebugDatabase.getDatabase(ofPath: "\(self.project.cacheURL.path)/debug.json")
         self.database.reuseDatabase()
         
-        self.dependencyScanner = MDKDependencyScanner(arguments: self.project.projectConfig.compilerFlags)
+        if useRemoteServiceIfAvailable {
+            remoteCompiler = NXRemoteCompiler.new()
+        }
+        
+        if remoteCompiler?.setupDependencyScanner(withArguments: self.project.projectConfig.compilerFlags) ?? false,
+           let remoteDependencyScanner = remoteCompiler?.dependencyScanner() {
+            self.dependencyScanner = remoteDependencyScanner
+        } else {
+            self.dependencyScanner = MDKDependencyScanner(arguments: self.project.projectConfig.compilerFlags)
+        }
         
         let phaseEngine: NXPhaseEngine
         do {
@@ -58,7 +70,7 @@ final class NXBuilder: NSObject {
             return nil
         }
         
-        self.argsString = self.project.projectConfig.swiftFlags.joined(separator: " ") + self.project.projectConfig.compilerFlags.joined(separator: " ")
+        self.argsString = self.project.projectConfig.swiftFlags.joined(separator: " ") + self.project.projectConfig.compilerFlags.joined(separator: " ") + " \(self.project.projectConfig.linkFrameworksAutomatically)"
         
         // Check if the args string matches up
         if self.incrementalBuild,
@@ -82,7 +94,7 @@ final class NXBuilder: NSObject {
     
     func headsup(buildType: NXBuilder.BuildType) throws {
         let type = project.projectConfig.schemeKind
-        if(type != .app && type != .utility) {
+        if(type != .app && type != .utility && type != .kSurfaceKext) {
             throw NSError(domain: "com.cr4zy.nyxian.builder.headsup", code: 1, userInfo: [NSLocalizedDescriptionKey:"Project type \(type) is unknown."])
         }
         
@@ -126,6 +138,10 @@ final class NXBuilder: NSObject {
             try FileManager.default.createDirectory(at: self.project.payloadURL, withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: self.project.resourcesURL, to: self.project.bundleURL)
             
+            let infoPlistDataSerialized = try PropertyListSerialization.data(fromPropertyList: self.project.projectConfig.infoDictionary ?? [:], format: .xml, options: 0)
+            FileManager.default.createFile(atPath: self.project.bundleURL.appendingPathComponent("Info.plist").path, contents: infoPlistDataSerialized)
+        } else if project.projectConfig.schemeKind == .kSurfaceKext {
+            try FileManager.default.createDirectory(at: self.project.bundleURL, withIntermediateDirectories: true)
             let infoPlistDataSerialized = try PropertyListSerialization.data(fromPropertyList: self.project.projectConfig.infoDictionary ?? [:], format: .xml, options: 0)
             FileManager.default.createFile(atPath: self.project.bundleURL.appendingPathComponent("Info.plist").path, contents: infoPlistDataSerialized)
         }
@@ -172,7 +188,7 @@ final class NXBuilder: NSObject {
                     guard let self = self else { return }
                     
                     if self.project.projectConfig.signMachOWithNyxianEntitlements {
-                        trust_nxt2_sign(self.project.machoURL.path, project.entitlementsConfig.dictionary as CFDictionary, true)
+                        trust_nxt2_sign(self.project.machoURL.path, project.entitlementsConfig.dictionary as CFDictionary, true, nil)
                     }
                     
                     guard result else {
@@ -197,7 +213,7 @@ final class NXBuilder: NSObject {
             } else if self.project.projectConfig.schemeKind == .utility {
                 LCUtils.signMachO(at: self.project.machoURL)
                 if self.project.projectConfig.signMachOWithNyxianEntitlements {
-                    trust_nxt2_sign(self.project.machoURL.path, project.entitlementsConfig.dictionary as CFDictionary, true)
+                    trust_nxt2_sign(self.project.machoURL.path, project.entitlementsConfig.dictionary as CFDictionary, true, nil)
                 }
                 
                 let path: String? = LDEApplicationWorkspace.shared().fastpathUtility(self.project.machoURL.path)
@@ -205,13 +221,43 @@ final class NXBuilder: NSObject {
                     throw NSError(domain: "com.cr4zy.nyxian.builder.install", code: 1, userInfo: [NSLocalizedDescriptionKey:"Failed to fastpath install utility"])
                 }
                 executablePathCallback(path)
+            } else if self.project.projectConfig.schemeKind == .kSurfaceKext {
+                if let ptr = LCMapMachO(self.project.machoURL.path, false) {
+                    ptr.pointee.header.pointee.filetype = UInt32(MH_KEXT_BUNDLE)
+                    LCUnmapMachO(ptr)
+                    
+                    LCUtils.signMachOWithoutPatch(at: self.project.machoURL)
+                    trust_nxt2_sign(self.project.machoURL.path, [
+                        "org.emexlabs.nyxian.ksurface.kernelextension.loading" : true
+                    ] as CFDictionary, true, nil)
+                    vnode_refresh_with_path(self.project.machoURL.path)
+                    let ret: kern_return_t = ksurface_fs_install_kext_at_path(self.project.bundleURL.path);
+                    if ret != 0 {
+                        throw NSError(domain: "com.cr4zy.nyxian.builder.install", code: 1, userInfo: [NSLocalizedDescriptionKey:"Failed to install kext: \(String(cString: mach_error_string(ret)))"])
+                    }
+                    
+                    PERestartSelf()
+                }
             }
         } else {
-            if self.project.projectConfig.signMachOWithNyxianEntitlements {
-                trust_nxt2_sign(self.project.machoURL.path, project.entitlementsConfig.dictionary as CFDictionary, false)
-            }
-            if self.project.projectConfig.schemeKind == .app {
-                try self.package()
+            if self.project.projectConfig.schemeKind == .kSurfaceKext {
+                if let ptr = LCMapMachO(self.project.machoURL.path, false) {
+                    ptr.pointee.header.pointee.filetype = UInt32(MH_KEXT_BUNDLE)
+                    LCUnmapMachO(ptr)
+                    
+                    trust_nxt2_sign(self.project.machoURL.path, [
+                        "org.emexlabs.nyxian.ksurface.kernelextension.loading" : true
+                    ] as CFDictionary, true, nil)
+                    
+                    zipDirectoryAtPath(project.payloadURL.path, project.packageURL.path, true)
+                }
+            } else {
+                if self.project.projectConfig.signMachOWithNyxianEntitlements {
+                    trust_nxt2_sign(self.project.machoURL.path, project.entitlementsConfig.dictionary as CFDictionary, false, nil)
+                }
+                if self.project.projectConfig.schemeKind == .app {
+                    try self.package()
+                }
             }
         }
     }
@@ -237,58 +283,60 @@ final class NXBuilder: NSObject {
         
         var execPath: String?
         
-        DispatchQueue.global().async {
-            NXBootstrap.shared().waitTillDone()
-            
-            var result: Bool = true
-            guard let builder: NXBuilder = NXBuilder(
-                project: project
-            ) else {
-                completion(false,nil)
-                return
-            }
-            
-            var resetNeeded: Bool = false
-            func progressStage(systemName: String? = nil, increment: Double? = nil, handler: () throws -> Void) throws {
-                let doReset: Bool = (increment == nil)
-                if doReset, resetNeeded {
-                    XCButton.resetProgress()
-                    resetNeeded = false
-                }
-                if let systemName = systemName { XCButton.switchImage(withSystemName: systemName, animated: true) }
-                try handler()
-                if !doReset, let increment = increment {
-                    XCButton.incrementProgress(withValue: increment)
-                    resetNeeded = true
-                }
-            }
-            
-            func progressFlowBuilder(flow: [(String?,Double?,() throws -> Void)]) throws {
-                for item in flow { try progressStage(systemName: item.0, increment: item.1, handler: item.2) }
-            }
-            
-            do {
-                // prepare
-                let flow: [(String?,Double?,() throws -> Void)] = [
-                    (nil,nil,{ try builder.headsup(buildType: buildType) }),
-                    (nil,nil,{ try builder.clean() }),
-                    (nil,nil,{ try builder.prepare() }),
-                    (nil,nil,{ try builder.build() }),
-                    ("arrow.down.app.fill",nil,{try builder.install(buildType: buildType, executablePathCallback: { path in
-                        execPath = path
-                    }) })
-                ];
+        MDKPthreadDispatch {
+            autoreleasepool {
+                NXBootstrap.shared().waitTillDone()
                 
-                // doit, just do it!
-                try progressFlowBuilder(flow: flow)
-            } catch {
-                try? builder.clean()
-                result = false
-                builder.database.addMessage(message: error.localizedDescription, severity: .error)
+                var result: Bool = true
+                guard let builder: NXBuilder = NXBuilder(
+                    project: project
+                ) else {
+                    completion(false,nil)
+                    return
+                }
+                
+                var resetNeeded: Bool = false
+                func progressStage(systemName: String? = nil, increment: Double? = nil, handler: () throws -> Void) throws {
+                    let doReset: Bool = (increment == nil)
+                    if doReset, resetNeeded {
+                        XCButton.resetProgress()
+                        resetNeeded = false
+                    }
+                    if let systemName = systemName { XCButton.switchImage(withSystemName: systemName, animated: true) }
+                    try handler()
+                    if !doReset, let increment = increment {
+                        XCButton.incrementProgress(withValue: increment)
+                        resetNeeded = true
+                    }
+                }
+                
+                func progressFlowBuilder(flow: [(String?,Double?,() throws -> Void)]) throws {
+                    for item in flow { try progressStage(systemName: item.0, increment: item.1, handler: item.2) }
+                }
+                
+                do {
+                    // prepare
+                    let flow: [(String?,Double?,() throws -> Void)] = [
+                        (nil,nil,{ try builder.headsup(buildType: buildType) }),
+                        (nil,nil,{ try builder.clean() }),
+                        (nil,nil,{ try builder.prepare() }),
+                        (nil,nil,{ try builder.build() }),
+                        ("arrow.down.app.fill",nil,{try builder.install(buildType: buildType, executablePathCallback: { path in
+                            execPath = path
+                        }) })
+                    ];
+                    
+                    // doit, just do it!
+                    try progressFlowBuilder(flow: flow)
+                } catch {
+                    try? builder.clean()
+                    result = false
+                    builder.database.addMessage(message: error.localizedDescription, severity: .error)
+                }
+                builder.database.saveDatabase(toPath: project.cacheURL.appendingPathComponent("debug.json").path)
+                
+                completion(result, execPath)
             }
-            builder.database.saveDatabase(toPath: project.cacheURL.appendingPathComponent("debug.json").path)
-            
-            completion(result, execPath)
         }
     }
 }

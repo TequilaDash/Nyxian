@@ -1,22 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 import Foundation
@@ -24,26 +25,18 @@ import UIKit
 import MobileDevelopmentKit
 
 class DebugItem: Codable {
-    let severity: CCDiagnosticLevel
+    let severity: MDKDiagnosticLevel
     let message: String
+    let originator: String
     
     // TODO: make CCSourceLocation conforming to codable
     private var isValid: Bool = false
     private var line: CFIndex = 0
     private var column: CFIndex = 0
+    var sourceLocation: MDKSourceLocation = .zero
     
-    var sourceLocation: CCSourceLocation {
-        get {
-            return CCSourceLocation(isValid: DarwinBoolean(booleanLiteral: self.isValid), line: self.line, column: self.column)
-        }
-        set {
-            self.isValid = newValue.isValid.boolValue
-            self.line = newValue.line
-            self.column = newValue.column
-        }
-    }
-    
-    init(severity: CCDiagnosticLevel, message: String, sourceLocation: CCSourceLocation = CCSourceLocationZero) {
+    init(originator: String = "self", severity: MDKDiagnosticLevel, message: String, sourceLocation: MDKSourceLocation = .zero) {
+        self.originator = originator
         self.severity = severity
         self.message = message
         self.sourceLocation = sourceLocation
@@ -78,11 +71,27 @@ class DebugDatabase: Codable {
         do {
             let data = try Data(contentsOf: URL(fileURLWithPath: path))
             let decoder = JSONDecoder()
-            let blob = try decoder.decode(DebugDatabase.self, from: data)
-            return blob
+            let db = try decoder.decode(DebugDatabase.self, from: data)
+            let fileManager = FileManager.default
+            let keys = db.debugObjects.keys
+            for key in keys {
+                guard let object = db.debugObjects[key] else { continue }
+                if object.flavour == .File {
+                    if !fileManager.fileExists(atPath: key) {
+                        db.debugObjects.removeValue(forKey: key)
+                    }
+                }
+            }
+            
+            if db.debugObjects["Internal"] == nil {
+                db.debugObjects["Internal"] = DebugObject(title: "Internal", flavour: .Message)
+            }
+            
+            return db
+            
         } catch {
-            print("Failed to decode certblob:", error)
-            let debugDatabase: DebugDatabase = DebugDatabase()
+            print("Failed to decode certblob or missing file:", error)
+            let debugDatabase = DebugDatabase()
             debugDatabase.debugObjects["Internal"] = DebugObject(title: "Internal", flavour: .Message)
             return debugDatabase
         }
@@ -100,7 +109,7 @@ class DebugDatabase: Codable {
         }
     }
     
-    func addMessage(message: String, title: String = "Internal", severity: CCDiagnosticLevel) {
+    func addMessage(message: String, title: String = "Internal", severity: MDKDiagnosticLevel) {
         os_unfair_lock_lock(&self.lock)
         let item = DebugItem(severity: severity, message: message)
         
@@ -123,7 +132,7 @@ class DebugDatabase: Codable {
         if items.count > 0 {
             var debugItems: [DebugItem] = []
             for item in items {
-                debugItems.append(DebugItem(severity: item.level, message: item.message, sourceLocation: item.fileSourceLocation?.location ?? CCSourceLocationZero))
+                debugItems.append(DebugItem(severity: item.level, message: item.message, sourceLocation: item.fileSourceLocation?.location ?? .zero))
             }
             
             guard let internalObject = self.debugObjects[title] else {
@@ -146,26 +155,78 @@ class DebugDatabase: Codable {
         os_unfair_lock_unlock(&self.lock)
     }
     
+    private func standardize(_ path: String) -> String {
+        return URL(fileURLWithPath: path).standardized.path
+    }
+    
     func setFileDebug(ofPath path: String, synItems: [MDKDiagnostic]) {
-        guard let relPath: String = NXBootstrap.shared().relativeToBootstrap(withAbsolutePath: path) else {
+        let absPath = standardize(path)
+        
+        os_unfair_lock_lock(&lock)
+        defer { os_unfair_lock_unlock(&lock) }
+        
+        if synItems.isEmpty {
+            self.debugObjects[absPath] = nil
             return
         }
         
-        os_unfair_lock_lock(&self.lock)
-        let fileObject: DebugObject = DebugObject(title: relPath, flavour: .File)
-        
-        for item in synItems {
-            let debugItem: DebugItem = DebugItem(severity: item.level, message: item.message, sourceLocation: item.fileSourceLocation?.location ?? CCSourceLocationZero)
-            fileObject.debugItems.append(debugItem)
+        let fileObject = DebugObject(title: absPath, flavour: .File)
+        fileObject.debugItems = synItems.map {
+            DebugItem(severity: $0.level, message: $0.message, sourceLocation: $0.fileSourceLocation?.location ?? .zero)
         }
         
-        self.debugObjects[relPath] = (synItems.count > 0) ? fileObject : nil
-        os_unfair_lock_unlock(&self.lock)
+        self.debugObjects[absPath] = fileObject
     }
-    
+
+    func appendFileDebug(ofPath path: String, originatorPath: String = "self", synItems: [MDKDiagnostic]) {
+        guard !synItems.isEmpty else { return }
+        let absPath = standardize(path)
+        
+        os_unfair_lock_lock(&lock)
+        defer { os_unfair_lock_unlock(&lock) }
+        
+        let fileObject = self.debugObjects[absPath] ?? DebugObject(title: absPath, flavour: .File)
+        
+        let newItems = synItems.map {
+            DebugItem(originator: originatorPath, severity: $0.level, message: $0.message, sourceLocation: $0.fileSourceLocation?.location ?? .zero)
+        }
+        fileObject.debugItems.append(contentsOf: newItems)
+        
+        self.debugObjects[absPath] = fileObject
+    }
+
     func removeFileDebug(ofPath path: String) {
-        let lastPathComponent: String = URL(fileURLWithPath: path).lastPathComponent
-        self.debugObjects[lastPathComponent] = nil
+        let absPath = standardize(path)
+        
+        os_unfair_lock_lock(&lock)
+        defer { os_unfair_lock_unlock(&lock) }
+        self.debugObjects[absPath] = nil
+        
+        var keysToRemove: [String] = []
+        for debugObjectKey in debugObjects.keys {
+            debugObjects[debugObjectKey]!.debugItems.removeAll(where: { $0.originator == absPath })
+            if debugObjects[debugObjectKey]!.debugItems.isEmpty {
+                keysToRemove.append(debugObjectKey)
+            }
+        }
+        
+        for key in keysToRemove {
+            debugObjects.removeValue(forKey: key)
+        }
+    }
+
+    func appendDebug(originatorPath: String,
+                     synItems: [MDKDiagnostic]) {
+        let absOriginatorPath = standardize(originatorPath)
+        
+        let grouped = Dictionary(grouping: synItems) { item -> String in
+            let rawPath = item.fileSourceLocation?.fileURL.path ?? ""
+            return rawPath.isEmpty ? "" : standardize(rawPath)
+        }
+        
+        for (absPath, items) in grouped where !absPath.isEmpty {
+            appendFileDebug(ofPath: absPath, originatorPath: absOriginatorPath, synItems: items)
+        }
     }
     
     func clearDatabase() {
@@ -266,6 +327,8 @@ class UIDebugViewController: UITableViewController {
             switch item.severity {
             case .warning:
                 return UIColor.systemOrange
+            case .fatal:
+                fallthrough
             case .error:
                 return UIColor.systemRed
             default:
@@ -277,6 +340,8 @@ class UIDebugViewController: UITableViewController {
             switch item.severity {
             case .warning:
                 return "exclamationmark.triangle.fill"
+            case .fatal:
+                fallthrough
             case .error:
                 return "xmark.octagon.fill"
             default:
@@ -340,7 +405,7 @@ class UIDebugViewController: UITableViewController {
             return
         }
         
-        let fileURL: URL = NXBootstrap.shared().rootURL.appendingPathComponent(object.title)
+        let fileURL = URL(fileURLWithPath: object.title)
         
         if UIDevice.current.userInterfaceIdiom == .pad {
             NotificationCenter.default.post(name: Notification.Name("FileListAct"), object: ["open",fileURL.path,"\(item.sourceLocation.line)","\(item.sourceLocation.column)"])

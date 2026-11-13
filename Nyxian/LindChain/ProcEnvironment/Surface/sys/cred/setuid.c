@@ -1,23 +1,23 @@
 /*
- SPDX-License-Identifier: AGPL-3.0-or-later
+ SPDX-License-Identifier: LicenseRef-EPSL-1.1
 
  Copyright (C) 2025 - 2026 emexlab
- Copyright (C) 2026 semvis123
 
  This file is part of Nyxian.
 
- Nyxian is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+ Licensed under the emexLabs Public Source License, version 1.1
+ (EPSL 1.1).
 
- Nyxian is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
+ Private use and modification are permitted under the license.
+ Redistribution of source or binaries, modified or unmodified,
+ requires prior written permission from emexLabs.
 
- You should have received a copy of the GNU Affero General Public License
- along with Nyxian. If not, see <https://www.gnu.org/licenses/>.
+ External deployment is subject to the source-availability
+ requirements and other conditions of the license.
+
+ Provided "AS IS", without warranty, to the extent permitted by law.
+
+ See LICENSE for the full license terms.
 */
 
 #include <LindChain/ProcEnvironment/Surface/sys/cred/setuid.h>
@@ -58,13 +58,7 @@ void proc_set_sugid_if_applicable(ksurface_proc_t *proc,
 bool proc_is_privileged(ksurface_proc_t *proc)
 {
     /* Checking if process is entitled to elevate. */
-    if(entitlement_got_entitlement(proc_getentitlements(proc), kPEEntitlementProcessElevate))
-    {
-        return true;
-    }
-    
-    if(entitlement_got_entitlement(proc_getmaxentitlements(proc), kPEEntitlementPlatform) &&
-       entitlement_got_entitlement(proc_getmaxentitlements(proc), kPEEntitlementPlatformRoot))
+    if(entitlement_got_entitlement(proc_getentitlements(proc), kPEEntitlementFlagProcessElevate))
     {
         return true;
     }
@@ -80,15 +74,15 @@ DEFINE_SYSCALL_HANDLER(setuid)
     ksurface_proc_ucred_backup_t ucred_backup = proc_make_ucred_backup(sys_proc_);
     
     /* getting args, nu checks needed the syscall server does them */
-    uid_t uid = (uid_t)args[0];
+    uid_t u_uid = (uid_t)args[0];
     
     /* checking if process is priveleged enough */
     if(proc_is_privileged(sys_proc_))
     {
         /* process is privelegedm updating credentials */
-        proc_setruid(sys_proc_, uid);
-        proc_seteuid(sys_proc_, uid);
-        proc_setsvuid(sys_proc_, uid);
+        proc_setruid(sys_proc_, u_uid);
+        proc_seteuid(sys_proc_, u_uid);
+        proc_setsvuid(sys_proc_, u_uid);
         
         /* update and return */
         goto out_update;
@@ -96,11 +90,11 @@ DEFINE_SYSCALL_HANDLER(setuid)
     else
     {
         /* setting if ruid or svuid matches the wished uid */
-        if(uid == proc_getruid(sys_proc_) ||
-           uid == proc_getsvuid(sys_proc_))
+        if(u_uid == proc_getruid(sys_proc_) ||
+           u_uid == proc_getsvuid(sys_proc_))
         {
             /* updating credentials */
-            proc_seteuid(sys_proc_, uid);
+            proc_seteuid(sys_proc_, u_uid);
             
             /* update and return */
             goto out_update;
@@ -124,25 +118,25 @@ DEFINE_SYSCALL_HANDLER(seteuid)
     ksurface_proc_ucred_backup_t ucred_backup = proc_make_ucred_backup(sys_proc_);
     
     /* getting args, nu checks needed the syscall server does them */
-    uid_t euid = (uid_t)args[0];
+    uid_t u_euid = (uid_t)args[0];
     
     /* checking if process is priveleged enough */
     if(proc_is_privileged(sys_proc_))
     {
         /* updating credentials */
-        proc_seteuid(sys_proc_, euid);
+        proc_seteuid(sys_proc_, u_euid);
         
         /* update and return */
         goto out_update;
     }
     else
     {
-        if(euid == proc_getruid(sys_proc_) ||
-           euid == proc_geteuid(sys_proc_) ||
-           euid == proc_getsvuid(sys_proc_))
+        if(u_euid == proc_getruid(sys_proc_) ||
+           u_euid == proc_geteuid(sys_proc_) ||
+           u_euid == proc_getsvuid(sys_proc_))
         {
             /* updating credentials */
-            proc_seteuid(sys_proc_, euid);
+            proc_seteuid(sys_proc_, u_euid);
             
             /* update and return */
             goto out_update;
@@ -166,22 +160,17 @@ DEFINE_SYSCALL_HANDLER(setreuid)
     ksurface_proc_ucred_backup_t ucred_backup = proc_make_ucred_backup(sys_proc_);
     
     /* getting args, nu checks needed the syscall server does them */
-    uid_t ruid = (uid_t)args[0];
-    uid_t euid = (uid_t)args[1];
-    
-    /* getting current credentials from copy */
-    uid_t cur_ruid = proc_getruid(sys_proc_);
-    uid_t cur_euid = proc_geteuid(sys_proc_);
-    uid_t cur_svuid = proc_getsvuid(sys_proc_);
+    uid_t u_ruid = (uid_t)args[0];
+    uid_t u_euid = (uid_t)args[1];
     
     /* performing privelege test */
     bool privileged = proc_is_privileged(sys_proc_);
     
     /* performing ruid priv check */
-    if(ruid != (uid_t)-1 &&
+    if(u_ruid != (uid_t)-1 &&
        !privileged)
     {
-        if(ruid != cur_ruid && ruid != cur_euid)
+        if(u_ruid != ucred_backup.ruid && u_ruid != ucred_backup.euid)
         {
             kvo_unlock(sys_proc_);
             sys_return_failure_with_errno(EPERM);
@@ -189,12 +178,12 @@ DEFINE_SYSCALL_HANDLER(setreuid)
     }
     
     /* performing euid priv check */
-    if(euid != (uid_t)-1 &&
+    if(u_euid != (uid_t)-1 &&
        !privileged)
     {
-        if(euid != cur_ruid &&
-           euid != cur_euid &&
-           euid != cur_svuid)
+        if(u_euid != ucred_backup.ruid &&
+           u_euid != ucred_backup.euid &&
+           u_euid != ucred_backup.svuid)
         {
             kvo_unlock(sys_proc_);
             sys_return_failure_with_errno(EPERM);
@@ -202,18 +191,18 @@ DEFINE_SYSCALL_HANDLER(setreuid)
     }
     
     /* setting credential */
-    if(ruid != (uid_t)-1)
+    if(u_ruid != (uid_t)-1)
     {
-        proc_setruid(sys_proc_, ruid);
+        proc_setruid(sys_proc_, u_ruid);
     }
     
     /* setting credential */
-    if(euid != (uid_t)-1)
+    if(u_euid != (uid_t)-1)
     {
-        proc_seteuid(sys_proc_, euid);
+        proc_seteuid(sys_proc_, u_euid);
         if(privileged)
         {
-            proc_setsvuid(sys_proc_, euid);
+            proc_setsvuid(sys_proc_, u_euid);
         }
     }
     

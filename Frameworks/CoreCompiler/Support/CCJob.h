@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef CCJOB_H
-#define CCJOB_H
+#ifndef CORECOMPILER_CCJOB_H
+#define CORECOMPILER_CCJOB_H
 
 #include <CoreCompiler/CCBase.h>
 #include <CoreCompiler/CCDiagnostic.h>
@@ -41,13 +41,17 @@ typedef struct __CCJob *CCJobRef;
 
 CC_EXPORT CFTypeID CCJobGetTypeID(void);
 
-CC_EXPORT CCJobRef CCJobCreate(CFAllocatorRef allocator, CCJobType type, CFArrayRef CC1Arguments);
+CC_EXPORT CCJobRef CCJobCreate(CFAllocatorRef allocator, CCJobType type, CFArrayRef CC1Arguments, CFArrayRef inputFileURLs, CFURLRef outputFileURL);
 
 CC_EXPORT CCJobType CCJobGetType(CCJobRef job);
-CC_EXPORT CFArrayRef CCJobGetArguments(CCJobRef job);
+CC_EXPORT CFArrayRef CCJobGetBaseArguments(CCJobRef job);
+CC_EXPORT CFArrayRef CCJobGetInputFileURLs(CCJobRef job);
+CC_EXPORT CFURLRef CCJobGetOutputFileURL(CCJobRef job);
+
+CC_EXPORT CFArrayRef CCJobCreateArguments(CFAllocatorRef allocator, CCJobRef job);
 
 CC_EXPORT Boolean CCJobExecuteJob(CCJobRef job, CFArrayRef *outDiagnostic, CFStringRef *outMainSource);
 
 CC_EXPORT Boolean CCJobTypeSupportsMultithreading(CCJobType type);
 
-#endif /* CCJOB_H */
+#endif /* CORECOMPILER_CCJOB_H */

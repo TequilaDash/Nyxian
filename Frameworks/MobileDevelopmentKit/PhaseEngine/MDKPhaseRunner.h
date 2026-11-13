@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#ifndef MDKPHASERUNNER_H
-#define MDKPHASERUNNER_H
+#ifndef MOBILEDEVELOPMENTKIT_MDKPHASERUNNER_H
+#define MOBILEDEVELOPMENTKIT_MDKPHASERUNNER_H
 
 #import <Foundation/Foundation.h>
 #import <MobileDevelopmentKit/MDKPhaseEngine.h>
@@ -33,6 +33,7 @@
 @protocol MDKPhaseRunnerDelegate <NSObject>
 
 @optional
+- (BOOL)runner:(MDKPhaseRunner * _Nonnull)runner phase:(MDKPhase * _Nonnull)phase executeJob:(MDKJob * _Nonnull)job withOutDiagnostics:(NSArray<MDKDiagnostic*> * _Nonnull* _Nullable)diagnostics withOutMainSource:(NSString * _Nonnull* _Nullable)mainSource;
 - (void)runner:(MDKPhaseRunner * _Nonnull)runner phase:(MDKPhase * _Nonnull)phase finishedRunningJob:(MDKJob * _Nonnull)job withResultingDiagnostics:(NSArray<MDKDiagnostic*> * _Nullable)diagnostics withMainSource:(NSString * _Nullable)mainSource wasSuccessful:(BOOL)success;
 - (CFIndex)runner:(MDKPhaseRunner * _Nonnull)runner multithreadingThreadCountForPhase:(MDKPhase * _Nonnull)phase;
 
@@ -45,8 +46,6 @@
 
 + (instancetype _Nullable)runnerWithEngine:(MDKPhaseEngine * _Nonnull)engine;
 
-- (instancetype _Nullable)initWithEngine:(MDKPhaseEngine * _Nonnull)engine;
-
 - (BOOL)runJob:(MDKJob * _Nonnull)job withinPhase:(MDKPhase * _Nonnull)phase;
 - (BOOL)runPhase:(MDKPhase * _Nonnull)phase;
 - (BOOL)runPhasesWithPhases:(NSArray * _Nonnull)phases;
@@ -57,4 +56,4 @@
 
 @end
 
-#endif /* MDKPHASERUNNER_H */
+#endif /* MOBILEDEVELOPMENTKIT_MDKPHASERUNNER_H */
