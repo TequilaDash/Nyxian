@@ -182,3 +182,20 @@ clean-artifacts:
 clean-all: clean clean-artifacts
 	rm -rf Frameworks/CoreCompiler/CoreCompilerSupportLibs
 	cd LLVM-On-iOS; make clean; git reset --hard
+
+# ROM packaging target
+rom: SCHEME := Nyxian
+rom: all
+	@$(call log_info,packaging ROM manifest)
+	mkdir -p Payload/Nyxian.app/ROM
+	@echo '<?xml version="1.0" encoding="UTF-8"?>' > Payload/Nyxian.app/ROM/manifest.plist
+	@echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> Payload/Nyxian.app/ROM/manifest.plist
+	@echo '<plist version="1.0"><dict>' >> Payload/Nyxian.app/ROM/manifest.plist
+	@echo '<key>NXRomManifestVersion</key><integer>1</integer>' >> Payload/Nyxian.app/ROM/manifest.plist
+	@echo '<key>NXRomIdentifier</key><string>org.amorcool.nyxian-rom</string>' >> Payload/Nyxian.app/ROM/manifest.plist
+	@echo '<key>NXRomName</key><string>Nyxian-Integrated</string>' >> Payload/Nyxian.app/ROM/manifest.plist
+	@echo '<key>NXRomVersion</key><string>1.0.0</string>' >> Payload/Nyxian.app/ROM/manifest.plist
+	@echo '<key>NXRomSecurityVersion</key><integer>1</integer>' >> Payload/Nyxian.app/ROM/manifest.plist
+	@echo '<key>NXRomMinimumNyxianVersion</key><string>0.11.6</string>' >> Payload/Nyxian.app/ROM/manifest.plist
+	@echo '</dict></plist>' >> Payload/Nyxian.app/ROM/manifest.plist
+	@$(call log_info,ROM package complete)
